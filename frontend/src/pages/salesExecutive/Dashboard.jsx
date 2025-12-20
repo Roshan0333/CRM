@@ -4,7 +4,7 @@ import payout from "../../assets/salesExecutive/Dashboard/payout.png";
 import prospectNumber from "../../assets/salesExecutive/Dashboard/prospectNumber.png";
 import totalSales from "../../assets/salesExecutive/Dashboard/totalSales.png";
 import "../../style/salesExecutive/dashboard.css";
-
+import Sidebar from "../../components/salesExecutive/Sidebar";
 const Dashboard = () => {
   const [showPopup, setShowpopup] = useState(false);
 
@@ -12,7 +12,8 @@ const Dashboard = () => {
   const closePopup = () => setShowpopup(false);
 
   return (
-    <main>
+ <main>
+      <Sidebar />
       <div id="dashboard">
         <div id="dashboard-container">
           <section id="dashboard-data">

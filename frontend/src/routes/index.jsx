@@ -90,7 +90,7 @@ import A_PreviousClients from "../pages/accountant/PreviousClients";
 
 export const roleBasedRoutes = {
   salesExecutive: [
-    { path: "/dashboard", element: <SE_Dashboard /> },
+    { path: "/salesExecutive", element: <SE_Dashboard /> },
     { path: "/prospect", element: <SE_Prospect /> },
     { path: "/sales-report", element: <SE_SalesReport /> },
     { path: "/report", element: <SE_Report /> },

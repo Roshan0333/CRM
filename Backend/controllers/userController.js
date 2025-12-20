@@ -1,90 +1,117 @@
-import User from "../models/userSchema.js";
+// Backend/controllers/userController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-// User Registration
+const JWT_SECRET = process.env.JWT_SECRET || "secret123";
+
 export const registerUser = async (req, res) => {
   try {
-    const { firstname,lastname, email, password, phone } = req.body;
+    let {
+      firstName, lastName, bankName, ifsc, bankAccount,
+      email, password, department, role
+    } = req.body;
 
-    // Check if user already exists
+    // Normalize inputs
+    email = email.trim().toLowerCase();
+    department = department.trim().toLowerCase();
+    role = role.trim().toLowerCase();
+
+    if (!email || !password || !department || !role) {
+      return res.status(400).json({ message: "Please fill all fields." });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "Email already registered." });
     }
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-    // Create new user
-    const newUser = new User({
-      firstname,
-      lastname,
-      email,
-      password: hashedPassword,
-      phone
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = new User({
+      firstName, lastName, bankName, ifsc, bankAccount,
+      email, password: hashedPassword, department, role
     });
-    await newUser.save();
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    console.log('registration error ');
+
+    await user.save();
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
     
-    res.status(500).json({ message: "Server error", error });
+    res.status(201).json({
+      message: "User registered successfully",
+      token,
+      user: { id: user._id, email, department, role }
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// User Login
+// Backend/controllers/userController.js - loginUser only
 export const loginUser = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    let { email, password, department, role } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ email,role });
-    if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+    email = email.trim().toLowerCase();
+    const inputDept = department.trim().toLowerCase();
+    const inputRole = role.trim().toLowerCase();
+
+    if (!email || !password || !department || !role) {
+      return res.status(400).json({ message: "Please fill all fields." });
     }
-    // Compare passwords
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found. Please register first." });
+    }
+
+    // console.log("LOGIN BODY:", { email, department, role });
+    // console.log("USER DB:", { department: user.department, role: user.role });
+
+    // Handle legacy short department names
+    const normalizeDept = (dept) => {
+      const deptLower = dept.toLowerCase();
+      const mapping = {
+        'sales': 'sales department',
+        'finance': 'finance department',
+        'management': 'management department',
+        'feedback': 'feedback department'
+      };
+      return mapping[deptLower] || deptLower;
+    };
+
+    const normInputDept = normalizeDept(inputDept);
+    const normDbDept = normalizeDept(user.department);
+    const normDbRole = user.role.toLowerCase();
+
+    if (normDbDept !== normInputDept || normDbRole !== inputRole) {
+      return res.status(400).json({
+        message: `invalid crediantials.`
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) { 
-        return res.status(400).json({ message: "Invalid email or password" });
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect password." });
     }
-    // Create JWT token
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.EXPIRES_IN }
-    );
-    user.password = undefined; // Hide password
-    res.status(200).json({ token, message: "Login successful", user });
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: { 
+        id: user._id, 
+        email: user.email, 
+        department: user.department, 
+        role: user.role 
+      }
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
-
-// Get User Profile
-export const getUserProfile = async (req, res) => {
-  try {
-    const userId = req.user.userId;
-    const user = await User.findById(userId).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
-// Update User Profile
-export const updateUserProfile = async (req, res) => {
-  try {
-    const userId = req.user.userId;
-    const updates = req.body;
-    const user = await User.findByIdAndUpdate(userId, updates, { new: true }).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
-
