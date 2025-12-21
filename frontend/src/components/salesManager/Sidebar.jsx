@@ -47,61 +47,61 @@ const Sidebar = () => {
           <ul id="nav-menu" style={{backgroundColor:"#3d68e7"}}>
             <li className="nav-item">
               <img src={dashboard} alt="Dashboard Icon" id="nav-icon" />
-              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/salesManager/dashboard">Dashboard</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={totalSales} alt="User Data Icon" id="nav-icon" />
-              <NavLink to="/total-sales">Total Sales</NavLink>
+              <NavLink to="/salesManager/total-sales">Total Sales</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={totalprospect} alt="Prospect Icon" id="nav-icon" />
-              <NavLink to="/total-prospect">Total Prospect</NavLink>
+              <NavLink to="/salesManager/total-prospect">Total Prospect</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={report} alt="Report Icon" id="nav-icon" />
-              <NavLink to="/report">Report</NavLink>
+              <NavLink to="/salesManager/report">Report</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={managerReport} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/manager-report">Manager Report</NavLink>
+              <NavLink to="/salesManager/manager-report">Manager Report</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={teamMember} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/team-member">Team Member</NavLink>
+              <NavLink to="/salesManager/team-member">Team Member</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={transferData} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/transfer-data">Transfer Data</NavLink>
+              <NavLink to="/salesManager/transfer-data">Transfer Data</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={transferDataFin} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/transfer-data-fin">Transfer Data to Fin.</NavLink>
+              <NavLink to="/salesManager/transfer-data-fin">Transfer Data to Fin.</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={untouchedData} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/untouched-data">Untouched data</NavLink>
+              <NavLink to="/salesManager/untouched-data">Untouched data</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={prospectForm} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/prospect-form">Prospect Form</NavLink>
+              <NavLink to="/salesManager/prospect-form">Prospect Form</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={salary} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/salary">Salary</NavLink>
+              <NavLink to="/salesManager/salary">Salary</NavLink>
               <hr className="nav-separator" />
             </li>
           </ul>

@@ -50,43 +50,43 @@ const Sidebar = () => {
           <ul id="nav-menu" style={{ backgroundColor: "#3d68e7" }}>
             <li className="nav-item">
               <img src={dashboard} alt="Dashboard Icon" id="nav-icon" />
-              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/managermanagement/dashboard">Dashboard</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={totalProjects} alt="User Data Icon" id="nav-icon" />
-              <NavLink to="/total-projects">Total Projects</NavLink>
+              <NavLink to="/managermanagement/total-projects">Total Projects</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={workingProjects} alt="Prospect Icon" id="nav-icon" />
-              <NavLink to="/working-projects">Working Projects</NavLink>
+              <NavLink to="/managermanagement/working-projects">Working Projects</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={teamMamber} alt="Report Icon" id="nav-icon" />
-              <NavLink to="/team-members">Team Member</NavLink>
+              <NavLink to="/managermanagement/team-members">Team Member</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={managerReport} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/manager-report">Manager Report</NavLink>
+              <NavLink to="/managermanagement/manager-report">Manager Report</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={teamReport} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/team-report">Team Report</NavLink>
+              <NavLink to="/managermanagement/team-report">Team Report</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={recivedData} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/recived-data">Recived Data</NavLink>
+              <NavLink to="/managermanagement/recived-data">Recived Data</NavLink>
               <hr className="nav-separator" />
             </li>
 
@@ -96,7 +96,7 @@ const Sidebar = () => {
                 alt="Sales Report Icon"
                 id="nav-icon"
               />
-              <NavLink to="/transfer-data-to-feedback">
+              <NavLink to="/managermanagement/transfer-data-to-feedback">
                 Transfer Data to FDBK.
               </NavLink>
               <hr className="nav-separator" />
@@ -104,13 +104,13 @@ const Sidebar = () => {
 
             <li className="nav-item">
               <img src={review} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/review">Review</NavLink>
+              <NavLink to="/managermanagement/review">Review</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={salary} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/salary">Salary</NavLink>
+              <NavLink to="/managermanagement/salary">Salary</NavLink>
               <hr className="nav-separator" />
             </li>
           </ul>

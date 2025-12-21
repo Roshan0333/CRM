@@ -3,7 +3,8 @@ export const DEPARTMENTS = [
   "sales department",
   "finance department", 
   "management department",
-  "feedback department"
+  "feedback department",
+  "account"
 ];
 
 export const DEPARTMENT_ROLES = {
@@ -21,5 +22,6 @@ export const DEPARTMENT_ROLES = {
   "feedback department": [
     "feedback manager",
     "feedback employee"
-  ]
+  ],
+  "account":["accountant"]
 };

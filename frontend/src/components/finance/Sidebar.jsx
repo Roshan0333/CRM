@@ -43,37 +43,37 @@ const Sidebar = () => {
           <ul id="nav-menu" style={{backgroundColor:"#3d68e7"}}>
             <li className="nav-item">
               <img src={dashboard} alt="Dashboard Icon" id="nav-icon" />
-              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/finance/dashboard">Dashboard</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={invoice} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/invoice">Invoice</NavLink>
+              <NavLink to="/finance/invoice">Invoice</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={clientMgmt} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/client-management">Client Management</NavLink>
+              <NavLink to="/finance/client-management">Client Management</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={employeeMgmt} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/employee-management">Employee Management</NavLink>
+              <NavLink to="/finance/employee-management">Employee Management</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={addEmployeePayout} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/add-employee-payout">Add Employee Payout</NavLink>
+              <NavLink to="/finance/add-employee-payout">Add Employee Payout</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={payout} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/payout">Payout</NavLink>
+              <NavLink to="/finance/payout">Payout</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={report} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/reports">Reports</NavLink>
+              <NavLink to="/finance/reports">Reports</NavLink>
               <hr className="nav-separator" />
             </li>
           </ul>

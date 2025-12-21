@@ -42,37 +42,37 @@ const Sidebar = () => {
           <ul id="nav-menu" style={{backgroundColor:"#3d68e7"}}>
             <li className="nav-item">
               <img src={dashboard} alt="Dashboard Icon" id="nav-icon" />
-              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/feedbackmanager/dashboard">Dashboard</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={feedback} alt="User Data Icon" id="nav-icon" />
-              <NavLink to="/feedbacks">Feedbacks</NavLink>
+              <NavLink to="/feedbackmanager/feedbacks">Feedbacks</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={complaints} alt="Prospect Icon" id="nav-icon" />
-              <NavLink to="/complaints">Complaints</NavLink>
+              <NavLink to="/feedbackmanager/complaints">Complaints</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={teamMamber} alt="Report Icon" id="nav-icon" />
-              <NavLink to="/team-members">Team Members</NavLink>
+              <NavLink to="/feedbackmanager/team-members">Team Members</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={teamReport} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/team-report">Team Report</NavLink>
+              <NavLink to="/feedbackmanager/team-report">Team Report</NavLink>
               <hr className="nav-separator" />
             </li>
             
             <li className="nav-item">
               <img src={salary} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/salary">Salary</NavLink>
+              <NavLink to="/feedbackmanager/salary">Salary</NavLink>
               <hr className="nav-separator" />
             </li>
           </ul>

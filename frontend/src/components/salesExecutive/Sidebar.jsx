@@ -41,7 +41,7 @@ const Sidebar = () => {
           <ul id="nav-menu" style={{backgroundColor:"#3d68e7"}}>
             <li className="nav-item">
               <img src={dashboard} alt="Dashboard Icon" id="nav-icon" />
-              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/salesexecutive/dashboard">Dashboard</NavLink>
               <hr className="nav-separator" />
             </li>
 
@@ -53,19 +53,19 @@ const Sidebar = () => {
 
             <li className="nav-item">
               <img src={prospect} alt="Prospect Icon" id="nav-icon" />
-              <NavLink to="/prospect">Prospect</NavLink>
+              <NavLink to="/salesexecutive/prospect">Prospect</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={report} alt="Report Icon" id="nav-icon" />
-              <NavLink to="/report">Report</NavLink>
+              <NavLink to="/salesexecutive/report">Report</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={salesReport} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/sales-report">Sales Report</NavLink>
+              <NavLink to="/salesexecutive/sales-report">Sales Report</NavLink>
               <hr className="nav-separator" />
             </li>
           </ul>

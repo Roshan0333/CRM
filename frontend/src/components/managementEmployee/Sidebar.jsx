@@ -42,27 +42,27 @@ const Sidebar = () => {
           <ul id="nav-menu" style={{backgroundColor:"#3d68e7"}}>
             <li className="nav-item">
               <img src={dashboard} alt="Dashboard Icon" id="nav-icon" />
-              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/managementemployee/dashboard">Dashboard</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={myProjects} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/my-projects">My Projects</NavLink>
+              <NavLink to="/managementemployee/my-projects">My Projects</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={completedProjects} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/completed-projects">Completed Projects</NavLink>
+              <NavLink to="/managementemployee/complete-projects">Completed Projects</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={payout} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/payout">payout</NavLink>
+              <NavLink to="/managementemployee/payout">payout</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={help} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/Help">Help</NavLink>
+              <NavLink to="/managementemployee/help">Help</NavLink>
               <hr className="nav-separator" />
             </li>
           </ul>

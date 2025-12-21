@@ -47,41 +47,41 @@ const Sidebar = () => {
           <ul id="nav-menu" style={{ backgroundColor: "#3d68e7" }}>
             <li className="nav-item">
               <img src={dashboard} alt="Dashboard Icon" id="nav-icon" />
-              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/managementTL/dashboard">Dashboard</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={projects} alt="User Data Icon" id="nav-icon" />
-              <NavLink to="/projects">Projects</NavLink>
+              <NavLink to="/managementTL/projects">Projects</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={transferProjects} alt="Prospect Icon" id="nav-icon" />
-              <NavLink to="/transfer-projects">Transfer Projects</NavLink>
+              <NavLink to="/managementTL/transfer-projects">Transfer Projects</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={report} alt="Report Icon" id="nav-icon" />
-              <NavLink to="/report">Report</NavLink>
+              <NavLink to="/managementTL/report">Report</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={teamMember} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/team-member">Team Member</NavLink>
+              <NavLink to="/managementTL/team-member">Team Member</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={payout} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/payout">Payout</NavLink>
+              <NavLink to="/managementTL/payout">Payout</NavLink>
               <hr className="nav-separator" />
             </li>
             <li className="nav-item">
               <img src={review} alt="Sales Report Icon" id="nav-icon" />
-              <NavLink to="/review">Review</NavLink>
+              <NavLink to="/managementTL/review">Review</NavLink>
               <hr className="nav-separator" />
             </li>
           </ul>

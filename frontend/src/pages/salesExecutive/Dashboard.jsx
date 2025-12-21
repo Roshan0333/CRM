@@ -5,14 +5,20 @@ import prospectNumber from "../../assets/salesExecutive/Dashboard/prospectNumber
 import totalSales from "../../assets/salesExecutive/Dashboard/totalSales.png";
 import "../../style/salesExecutive/dashboard.css";
 import Sidebar from "../../components/salesExecutive/Sidebar";
+import LastUpdatePopUp from "./LastupdatePopUp";
+import UpdataDataPopUp from "./UpdateDataPopUp";
 const Dashboard = () => {
-  const [showPopup, setShowpopup] = useState(false);
+  const [showLastUpdatePopup, setshowLastUpdatePopup] = useState(false);
+  const [showUpdatePopup, setShowUpdatepopup] = useState(false);
 
-  const openPopup = () => setShowpopup(true);
-  const closePopup = () => setShowpopup(false);
+  const openPopup = () => setshowLastUpdatePopup(true);
+  const closePopup = () => setshowLastUpdatePopup(false);
+
+  const openUpdatePopup = () => setShowUpdatepopup(true);
+  const closeUpdatePopup = () => setShowUpdatepopup(false);
 
   return (
- <main>
+    <main>
       <Sidebar />
       <div id="dashboard">
         <div id="dashboard-container">
@@ -61,41 +67,49 @@ const Dashboard = () => {
                 >
                   <table id="se-table">
                     <thead id="sales-exe-thead">
-                      <th> </th>
-                      <th>Company Name</th>
-                      <th>Client Name</th>
-                      <th>Email_id</th>
-                      <th>Contact no.</th>
-                      <th>Reminder Date</th>
-                      <th>Activity</th>
-                      <th>Last Update</th>
+                      <tr>
+                        <th>#</th>
+                        <th>Company Name</th>
+                        <th>Client Name</th>
+                        <th>Email ID</th>
+                        <th>Contact No.</th>
+                        <th>Reminder Date</th>
+                        <th>Activity</th>
+                        <th>Last Update</th>
+                      </tr>
                     </thead>
 
-                    {/** SAMPLE STATIC ROWS */}
-                    {[1, 2, 3, 4, 5, 6].map((item) => (
-                      <tr key={item}>
-                        <td>{item}</td>
-                        <td>Graphura India</td>
-                        <td>Vivek Kumar</td>
-                        <td>vivek@gmail.com</td>
-                        <td>0123456789</td>
-                        <td>10/10/25</td>
-                        <td>
-                          <button onClick={openPopup}>Update</button>
-                        </td>
-                        <td>
-                          <button>View</button>
-                        </td>
-                      </tr>
-                    ))}
+                    <tbody>
+                      {[1, 2, 3, 4, 5, 6].map((item) => (
+                        <tr key={item}>
+                          <td>{item}</td>
+                          <td>Graphura India</td>
+                          <td>Vivek Kumar</td>
+                          <td>vivek@gmail.com</td>
+                          <td>0123456789</td>
+                          <td>10/10/25</td>
+                          <td>
+                            {/* <button onClick={openPopup}>Update</button> */}
+                            <button onClick={openUpdatePopup}>Update</button>
+                          </td>
+                          <td>
+                            <button onClick={openPopup}>View</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
                   </table>
+
                 </div>
               </div>
             </div>
           </section>
         </div>
       </div>
-      {showPopup && (
+      {showLastUpdatePopup && <LastUpdatePopUp closePopup={closePopup} />}
+      {showUpdatePopup && <UpdataDataPopUp closeUpdatePopup = {closeUpdatePopup}/> }
+      
+      {/* {showLastUpdatePopup && (
         <div id="popup-overlay" onClick={closePopup}>
           <div id="popup-box" onClick={(e) => e.stopPropagation()}>
             <div id="popup-header">
@@ -135,7 +149,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </main>
   );
 };

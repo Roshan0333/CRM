@@ -44,25 +44,25 @@ const Sidebar = () => {
           <ul id="nav-menu" style={{ backgroundColor: "#3d68e7" }}>
             <li className="nav-item">
               <img src={dashboard} alt="Dashboard Icon" id="nav-icon" />
-              <NavLink to="/dashboard">Dashboard</NavLink>
+              <NavLink to="/accountant/dashboard">Dashboard</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={clientManagement} alt="User Data Icon" id="nav-icon" />
-              <NavLink to="/client-management">Client Management</NavLink>
+              <NavLink to="/accountant/client-management">Client Management</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={invoice} alt="Prospect Icon" id="nav-icon" />
-              <NavLink to="/invoice">Invoice</NavLink>
+              <NavLink to="/accountant/invoice">Invoice</NavLink>
               <hr className="nav-separator" />
             </li>
 
             <li className="nav-item">
               <img src={previousClients} alt="Report Icon" id="nav-icon" />
-              <NavLink to="/previous-clients">Previous Clients</NavLink>
+              <NavLink to="/accountant/previous-clients">Previous Clients</NavLink>
               <hr className="nav-separator" />
             </li>
           </ul>
