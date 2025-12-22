@@ -458,7 +458,7 @@
 
 // export default App;
 // src / App.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 
 import "./App.css"
@@ -582,7 +582,17 @@ import A_PreviousClients from "./pages/accountant/PreviousClients";
 
 function App() {
 
-  const role = localStorage.getItem("role");
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role");
+    setRole(storedRole);
+    console.log(storedRole)
+  }, []);
+
+  useEffect(()=>{
+    console.log(role)
+  },[role])
 
   return (
     <>
@@ -590,24 +600,24 @@ function App() {
         {!role && (
           <Routes>
             {/* 🔓 PUBLIC ROUTES */}
-            <Route path="/" element={<LoginForm />} />
-            <Route path="/login" element={<LoginForm />} />
+            <Route path="/" element={<LoginForm onLoginSuccess={setRole}/>} />
+            <Route path="/login" element={<LoginForm onLoginSuccess={setRole}/>} />
             <Route path="/register" element={<RegisterForm />} />
-            <Route path="/profile"element={<Profile/>}/>
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         )}
 
         {/* 🧑‍💼 ROLE BASED Routes */}
         {role === "sales executive" && <SalesExecutive />}
-        {role === "sales team" && <SalesTeamLead />}
+        {role === "sales team lead" && <SalesTeamLead />}
         {role === "sales manager" && <SalesManager />}
         {role === "management tl" && <ManagementTL />}
-        {role =="management employee" && <ManagementEmployee/>}
-        {role === "management manager" && <ManagerManagement/>}
-        {role === "feedback manager" && <FeedbackManager/>}
-        {role === "feedback employee" && <FeedbackEmployee/>}
-        {role === "finance employee" && <Finance/>}
-        {role === "accountant" && <Accountant/>}
+        {role == "management employee" && <ManagementEmployee />}
+        {role === "management manager" && <ManagerManagement />}
+        {role === "feedback manager" && <FeedbackManager />}
+        {role === "feedback employee" && <FeedbackEmployee />}
+        {role === "finance employee" && <Finance />}
+        {role === "accountant" && <Accountant />}
       </Router>
 
     </>

@@ -56,7 +56,7 @@
 //       regenerate();
 //       return;
 //     }
-   
+
 
 //     localStorage.setItem("token", data.token);
 //     localStorage.setItem("user", JSON.stringify(data.user));
@@ -193,7 +193,7 @@ import { roleRedirectMap } from "../../utils/roleRedirect";
 import normalizeRole from "../../utils/normalizeRole";
 import Dashboard from "../../pages/salesExecutive/Dashboard";
 
-const LoginForm = () => {
+const LoginForm = ({onLoginSuccess}) => {
   const navigate = useNavigate();
   const { captcha, regenerate } = useCaptcha();
 
@@ -250,7 +250,7 @@ const LoginForm = () => {
       if (!ok) {
         setError(
           data?.message ||
-            "Login failed. Please register first for this department and role."
+          "Login failed. Please register first for this department and role."
         );
         regenerate();
         return;
@@ -269,17 +269,23 @@ const LoginForm = () => {
       // =========================
       // const roleKey = data.user.role.toLowerCase();
       // const redirectPath = roleRedirectMap[roleKey];
-      
-      
+
+
       const redirectPath = roleRedirectMap[data.user.role.toLowerCase()];
       if (!redirectPath) {
         setError("No route configured for this role.");
         return;
       }
 
-      navigate(redirectPath , { replace: true });
-        console.log(redirectPath)
+      if (onLoginSuccess) {
+          onLoginSuccess(data.user.role); 
+          navigate(redirectPath, { replace: true });
+        }
       
+
+      // navigate("redirectPath" , { replace: true });
+      //   console.log(redirectPath)
+
     } catch (err) {
       console.error("Login error:", err);
       setError("Something went wrong. Please try again.");
