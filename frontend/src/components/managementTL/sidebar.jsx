@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../../assets/managementTL/sidebar/logo.png";
 import profile from "../../assets/managementTL/sidebar/profile.png";
 import dashboard from "../../assets/managementTL/sidebar/dashboard.png";
@@ -13,6 +13,13 @@ import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const name = localStorage.getItem("userName");
+    setUserName(name);
+  }, []);
+
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
@@ -39,7 +46,8 @@ const Sidebar = () => {
           <div id="profile-section" style={{ backgroundColor: "#3d68e7" }}>
             <img src={profile} alt="Profile Icon" id="profile-img" />
             <div id="profile-details">
-              <h1 id="profile-name">Name</h1>
+              <h1 id="profile-name">{userName || "User"}</h1>
+
               <p id="profile-title">TL / Management</p>
             </div>
           </div>

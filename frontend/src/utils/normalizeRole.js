@@ -1,5 +1,3 @@
-// src/utils/normalizeRole.js
-
 const normalizeRole = (role) => {
   const map = {
     "sales executive": "salesexecutive",

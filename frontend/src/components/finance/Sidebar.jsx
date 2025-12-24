@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../../assets/managementEmployee/sidebar/logo.png";
 import profile from "../../assets/managementEmployee/sidebar/profile.png";
 import dashboard from "../../assets/finance/sidebar/dashboard.png";
@@ -10,9 +10,19 @@ import employeeMgmt from "../../assets/finance/sidebar/employeeMgmt.png";
 import report from "../../assets/finance/sidebar/report.png";
 import "../salesManager/sidebar.css";
 import { NavLink } from "react-router-dom";
-
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    const name = localStorage.getItem("userName");
+    const userRole = localStorage.getItem("role");
+
+    console.log("SIDEBAR NAME:", name); // debug
+    setUserName(name);
+    setRole(userRole);
+  }, []);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
@@ -35,8 +45,9 @@ const Sidebar = () => {
           <div id="profile-section" style={{backgroundColor:"#3d68e7"}}>
             <img src={profile} alt="Profile Icon" id="profile-img" />
             <div id="profile-details">
-              <h1 id="profile-name">Name</h1>
-              <p id="profile-title">Finance</p>
+              <h1 id="profile-name">{userName || "User"}</h1>
+              <p id="profile-title">{role}</p>
+
             </div>
           </div>
 

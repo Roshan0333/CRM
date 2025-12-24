@@ -105,7 +105,7 @@ const Complaints = () => {
 
         /* Sidebar + Responsive Layout */
         .complaints-wrapper {
-          // background: #ffffff;
+          background: #f7f8fa;
           min-height: 100vh;
           padding: 40px 30px;
           margin-left: 250px;
@@ -126,7 +126,7 @@ const Complaints = () => {
           display: flex;
           gap: 0;
           border-bottom: 1px solid #ddd;
-          background: #ffffffff;
+          background: #f7f8fa;
           width: 100%;
           padding: 0 40px;
         }
@@ -373,7 +373,7 @@ const Complaints = () => {
         }
       `}</style>
 
-      <div style={{backgroundColor:"#ffffff"}} className="complaints-wrapper">
+      <div className="complaints-wrapper">
         {/* Tabs */}
         <div className="tabs-container">
           <button className={`tab-button ${activeTab === "solved" ? "active" : ""}`} onClick={() => setActiveTab("solved")}>  
