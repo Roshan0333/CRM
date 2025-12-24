@@ -32,13 +32,14 @@
 // app.listen(PORT,()=>{
 //     console.log(`server is running on port http://localhost:${PORT}`);
 // })
+process.env.MONGODB_URL = "mongodb://127.0.0.1:27017/CRM-Project";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./config/db.js";
 
-dotenv.config();
+dotenv.config({ path: "./.env", debug: true });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
