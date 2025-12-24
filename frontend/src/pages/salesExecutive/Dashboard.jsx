@@ -8,11 +8,11 @@ import Sidebar from "../../components/salesExecutive/Sidebar";
 import LastUpdatePopUp from "./LastupdatePopUp";
 import UpdataDataPopUp from "./UpdateDataPopUp";
 const Dashboard = () => {
-  const [showLastUpdatePopup, setshowLastUpdatePopup] = useState(false);
+  const [showLastUpdatePopup, setShowLastUpdatePopup] = useState(false);
   const [showUpdatePopup, setShowUpdatepopup] = useState(false);
 
-  const openPopup = () => setshowLastUpdatePopup(true);
-  const closePopup = () => setshowLastUpdatePopup(false);
+  const openPopup = () => setShowLastUpdatePopup(true);
+  const closePopup = () => setShowLastUpdatePopup(false);
 
   const openUpdatePopup = () => setShowUpdatepopup(true);
   const closeUpdatePopup = () => setShowUpdatepopup(false);

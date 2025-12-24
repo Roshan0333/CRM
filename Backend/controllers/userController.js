@@ -41,7 +41,7 @@ export const registerUser = async (req, res) => {
     res.status(201).json({
       message: "User registered successfully",
       token,
-      user: { id: user._id, email, department, role }
+      user: { id: user._id, name: `${firstName} ${lastName}`,email, department, role }
     });
   } catch (error) {
     console.error("Register error:", error);
@@ -105,6 +105,7 @@ export const loginUser = async (req, res) => {
       token,
       user: { 
         id: user._id, 
+        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
         email: user.email, 
         department: user.department, 
         role: user.role 

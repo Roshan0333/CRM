@@ -1,16 +1,16 @@
 
 // src/utils/roleRedirect.js
 export const roleRedirectMap = {
-  "sales executive": "/salesExecutive",
-  "sales team lead": "/sales-lead/dashboard",
-  "sales manager": "/sales-manager/dashboard",
+  "sales executive": "/salesexecutive/dashboard",
+  "sales team lead": "/salesTeamLead/dashboard",
+  "sales manager": "/salesManager/dashboard",
 
-  "management tl": "/management-tl/dashboard",
-  "management employee": "/management-employee/dashboard",
-  "manager management": "/manager-management/dashboard",
+  "management tl": "/managementTL/dashboard",
+  "management employee": "/managementemployee/dashboard",
+  "manager management": "/managermanagement/dashboard",
 
-  "feedback manager": "/feedback-manager/dashboard",
-  "feedback employee": "/feedback-employee/dashboard",
+  "feedback manager": "/feedbackmanager/dashboard",
+  "feedback employee": "/feedbackemployee/dashboard",
 
   "finance": "/finance/dashboard",
   "accountant": "/accountant/dashboard",
