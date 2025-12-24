@@ -1,234 +1,118 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { DEPARTMENTS, DEPARTMENT_ROLES } from "../../utils/constants";
-import { loginUser } from "../../services/authApi";
-import { useCaptcha } from "../../hooks/useCaptcha";
-import { roleRedirectMap } from "../../utils/roleRedirect";
-import normalizeRole from "../../utils/normalizeRole";
-import Dashboard from "../../pages/salesExecutive/Dashboard";
+// Backend/controllers/userController.js
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-const LoginForm = ({onLoginSuccess}) => {
-  const navigate = useNavigate();
-  const { captcha, regenerate } = useCaptcha();
+const JWT_SECRET = process.env.JWT_SECRET || "secret123";
 
-  const [form, setForm] = useState({
-    department: "",
-    role: "",
-    email: "",
-    password: "",
-    captchaInput: "",
-  });
+export const registerUser = async (req, res) => {
+  try {
+    let {
+      firstName, lastName, bankName, ifsc, bankAccount,
+      email, password, department, role
+    } = req.body;
 
-  const [error, setError] = useState("");
+    // Normalize inputs
+    email = email.trim().toLowerCase();
+    department = department.trim().toLowerCase();
+    role = role.trim().toLowerCase();
 
-  // =========================
-  // HANDLE INPUT CHANGE
-  // =========================
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+    if (!email || !password || !department || !role) {
+      return res.status(400).json({ message: "Please fill all fields." });
+    }
 
-    setForm((prev) => {
-      // Reset role when department changes
-      if (name === "department") {
-        return { ...prev, department: value, role: "" };
-      }
-      return { ...prev, [name]: value };
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already registered." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = new User({
+      firstName, lastName, bankName, ifsc, bankAccount,
+      email, password: hashedPassword, department, role
     });
-  };
 
-  // =========================
-  // HANDLE LOGIN SUBMIT
-  // =========================
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+    await user.save();
 
-    // CAPTCHA CHECK
-    if (form.captchaInput.trim() !== captcha) {
-      setError("Captcha is incorrect.");
-      regenerate();
-      setForm((prev) => ({ ...prev, captchaInput: "" }));
-      return;
-    }
-
-    const payload = {
-      email: form.email,
-      password: form.password,
-      department: form.department,
-      role: form.role,
-    };
-
-    try {
-      const { ok, data } = await loginUser(payload);
-
-      if (!ok) {
-        setError(
-          data?.message ||
-          "Login failed. Please register first for this department and role."
-        );
-        regenerate();
-        return;
-      }
-
-      // =========================
-      // SAVE AUTH DATA
-      // =========================
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.user.role);
-      localStorage.setItem("department", data.user.department);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // =========================
-      // ROLE BASED REDIRECT
-      // =========================
-      // const roleKey = data.user.role.toLowerCase();
-      // const redirectPath = roleRedirectMap[roleKey];
-
-
-      const redirectPath = roleRedirectMap[data.user.role.toLowerCase()];
-      if (!redirectPath) {
-        setError("No route configured for this role.");
-        return;
-      }
-
-      if (onLoginSuccess) {
-          onLoginSuccess(data.user.role); 
-          navigate(redirectPath, { replace: true });
-        }
-      
-
-      // navigate("redirectPath" , { replace: true });
-      //   console.log(redirectPath)
-
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Something went wrong. Please try again.");
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* HEADER */}
-        <div className="bg-blue-600 text-white py-4 text-center">
-          <h1 className="text-xl font-semibold tracking-wide">GRAPURA</h1>
-          <p className="text-xs mt-1">Graphura India Private Limited</p>
-        </div>
-
-        {/* FORM */}
-        <div className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Login</h2>
-
-          <form className="space-y-3" onSubmit={handleSubmit}>
-            {/* DEPARTMENT */}
-            <select
-              name="department"
-              className="w-full border px-3 py-2 rounded text-sm"
-              value={form.department}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select Department</option>
-              {DEPARTMENTS.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-
-            {/* ROLE */}
-            <select
-              name="role"
-              className="w-full border px-3 py-2 rounded text-sm"
-              value={form.role}
-              onChange={handleChange}
-              required
-              disabled={!form.department}
-            >
-              <option value="">Select Role</option>
-              {form.department &&
-                DEPARTMENT_ROLES[form.department]?.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-            </select>
-
-            {/* EMAIL */}
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Id"
-              className="w-full border px-3 py-2 rounded text-sm"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-
-            {/* PASSWORD */}
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              className="w-full border px-3 py-2 rounded text-sm"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-
-            {/* CAPTCHA */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="px-3 py-2 bg-gray-100 border rounded font-mono tracking-widest text-sm select-none">
-                  {captcha}
-                </div>
-                <button
-                  type="button"
-                  onClick={regenerate}
-                  className="text-xs text-blue-600"
-                >
-                  Refresh
-                </button>
-              </div>
-
-              <input
-                type="text"
-                name="captchaInput"
-                placeholder="Enter Captcha"
-                className="border px-3 py-2 rounded text-xs w-32"
-                value={form.captchaInput}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            {/* ERROR */}
-            {error && <p className="text-xs text-red-600">{error}</p>}
-
-            {/* SUBMIT */}
-            <button
-              type="submit"
-              className="w-full mt-2 bg-blue-600 text-white py-2 rounded text-sm font-medium hover:bg-blue-700 transition"
-            >
-              Login
-            </button>
-
-            {/* REGISTER */}
-            <p className="mt-2 text-xs text-center">
-              New user?{" "}
-              <button
-                type="button"
-                onClick={() => navigate("/register")}
-                className="text-blue-600"
-              >
-                Register
-              </button>
-            </p>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
+    
+    res.status(201).json({
+      message: "User registered successfully",
+      token,
+      user: { id: user._id, name: `${firstName} ${lastName}`,email, department, role }
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-export default LoginForm;
+// Backend/controllers/userController.js - loginUser only
+export const loginUser = async (req, res) => {
+  try {
+    let { email, password, department, role } = req.body;
+
+    email = email.trim().toLowerCase();
+    const inputDept = department.trim().toLowerCase();
+    const inputRole = role.trim().toLowerCase();
+
+    if (!email || !password || !department || !role) {
+      return res.status(400).json({ message: "Please fill all fields." });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found. Please register first." });
+    }
+
+    // console.log("LOGIN BODY:", { email, department, role });
+    // console.log("USER DB:", { department: user.department, role: user.role });
+
+    // Handle legacy short department names
+    const normalizeDept = (dept) => {
+      const deptLower = dept.toLowerCase();
+      const mapping = {
+        'sales': 'sales department',
+        'finance': 'finance department',
+        'management': 'management department',
+        'feedback': 'feedback department'
+      };
+      return mapping[deptLower] || deptLower;
+    };
+
+    const normInputDept = normalizeDept(inputDept);
+    const normDbDept = normalizeDept(user.department);
+    const normDbRole = user.role.toLowerCase();
+
+    if (normDbDept !== normInputDept || normDbRole !== inputRole) {
+      return res.status(400).json({
+        message: `invalid crediantials.`
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect password." });
+    }
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: { 
+        id: user._id, 
+        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        email: user.email, 
+        department: user.department, 
+        role: user.role 
+      }
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
