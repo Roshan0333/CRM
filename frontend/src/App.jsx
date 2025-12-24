@@ -632,6 +632,7 @@ function SalesExecutive() {
       <div>
         <SalesExecutiveHeader />
         <Routes>
+          <Route path="/" element={<SE_Dashboard />}/>
           <Route path="/salesexecutive/dashboard" element={<SE_Dashboard />} />
           <Route path="/salesexecutive/prospect" element={<SE_Prospect />} />
           <Route path="/salesexecutive/sales-report" element={<SE_SalesReport />} />
@@ -651,6 +652,7 @@ function SalesTeamLead() {
       <div>
         <SalesTeamLeadHeader />
         <Routes>
+          <Route path="/" element={<TL_Dashboard />} />
           <Route path="/salesTeamLead/dashboard" element={<TL_Dashboard />} />
           <Route path="/salesTeamLead/transfer-data" element={<TL_TransferData />} />
           <Route path="/salesTeamLead/total-sales" element={<TL_TotalSales />} />
@@ -673,6 +675,7 @@ function SalesManager() {
       <div>
         <SalesManagerHeader />
         <Routes>
+          <Route path="/" element={<SM_Dashboard />} />
           <Route path="/salesManager/dashboard" element={<SM_Dashboard />} />
           <Route path="/salesManager/manager-report" element={<SM_ManagerReport />} />
           <Route path="/salesManager/total-sales" element={<SM_TotalSales />} />
@@ -698,6 +701,7 @@ function ManagementTL() {
       <div>
         <ManagementTLHeader />
         <Routes>
+          <Route path="/" element={<M_Dashboard />} />
           <Route path="/managementTL/dashboard" element={<M_Dashboard />} />
           <Route path="/managementTL/projects" element={<M_MyProjects />} />
           <Route path="/managementTL/transfer-projects" element={<M_TransferProjects />} />
@@ -719,6 +723,7 @@ function ManagementEmployee() {
       <div>
         <ManagementEmployeeHeader />
         <Routes>
+          <Route path="/" element={<ME_Dashboard />} />
           <Route path="/managementemployee/dashboard" element={<ME_Dashboard />} />
           <Route path="/managementemployee/my-projects" element={<ME_MyProjects />} />
           <Route path="/managementemployee/complete-projects" element={<ME_CompleteProjects />} />
@@ -738,6 +743,7 @@ function ManagerManagement() {
       <div>
         <ManagerManagementHeader />
         <Routes>
+          <Route path="/" element={<MM_Dashboard />} />
           <Route path="/managermanagement/dashboard" element={<MM_Dashboard />} />
           <Route path="/managermanagement/total-projects" element={<MM_TotalProjects />} />
           <Route path="/managermanagement/working-projects" element={<MM_WorkingProject />} />
@@ -762,6 +768,7 @@ function FeedbackManager() {
       <div>
         <FeedbackManagerHeader />
         <Routes>
+          <Route path="/" element={<FM_Dashboard />} />
           <Route path="/feedbackmanager/dashboard" element={<FM_Dashboard />} />
           <Route path="/feedbackmanager/salary" element={<FM_Salary />} />
           <Route path="/feedbackmanager/feedbacks" element={<FM_Feedbacks />} />
@@ -782,6 +789,7 @@ function FeedbackEmployee() {
       <div>
         <FeedbackEmployeeHeader />
         <Routes>
+          <Route path="/" element={<FE_Dashboard />} />
           <Route path="/feedbackemployee/dashboard" element={<FE_Dashboard />} />
           <Route path="/feedbackemployee/feedbacks" element={<FE_Feedbacks />} />
           <Route path="/feedbackemployee/complaints" element={<FE_Complaints />} />
@@ -800,6 +808,7 @@ function Finance() {
       <div>
         <FinanceHeader />
         <Routes>
+          <Route path="/" element={<F_Dashboard />} />
           <Route path="/finance/dashboard" element={<F_Dashboard />} />
           <Route path="/finance/employee-management" element={<F_Employeemanagement />} />
           <Route path="/finance/add-employee-payout" element={<F_AddEmployeePayout />} />
@@ -822,6 +831,7 @@ function Accountant() {
       <div>
         <AccountantHeader />
         <Routes>
+          <Route path="/" element={<A_Dashboard />} />
           <Route path="/accountant/dashboard" element={<A_Dashboard />} />
           <Route path="/accountant/client-management" element={<A_ClientManagement />} />
           <Route path="/accountant/invoice" element={<A_Invoice />} />
