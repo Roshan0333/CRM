@@ -1,4 +1,37 @@
+// import express from 'express';
+// const app = express();
+// import dotenv from 'dotenv';
+// dotenv.config();
+// import cors from 'cors';
+// import authRoutes from "./routes/authRoutes.js"
 
+// app.use(cors({
+//   origin: "http://localhost:5173",
+//   credentials: true,
+// }));
+
+// const PORT = process.env.PORT || 5000;
+
+// import connectDB from './config/db.js';
+// // import userRoutes from './routes/userRoute.js';
+
+// app.use(express.json());
+// //database connection
+// connectDB();
+
+// app.get('/',(req,res)=>{
+//     res.send('server is running');  
+// })
+
+// // define routes
+
+// app.use("/api/auth", authRoutes);
+
+
+
+// app.listen(PORT,()=>{
+//     console.log(`server is running on port http://localhost:${PORT}`);
+// })
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -8,9 +41,10 @@ import userRoutes from "./routes/userRoutes.js";
 import clientRoutes from "./routes/salesDepartment/client.route.js";
 import salesRoutes from './routes/salesDepartment/sales.route.js';
 import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
+import auth from "./middlewares/AuthMiddleware.js"
 
 
-dotenv.config();
+dotenv.config({ path: "./.env", debug: true });
 
 const app = express();
 
@@ -35,9 +69,9 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/client", clientRoutes);
-app.use("/api/sales", salesRoutes);
-app.use("/api/alllog", callLogRoutes)
+app.use("/api/client",auth, clientRoutes);
+app.use("/api/sales",auth, salesRoutes);
+app.use("/api/calllog",auth, callLogRoutes)
 
 
 app.listen(PORT, () => {
