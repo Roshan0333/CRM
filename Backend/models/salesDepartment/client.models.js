@@ -5,7 +5,8 @@ const { ObjectId } = mongoose.Schema.Types;
 const client_Schema = new Schema({
     EmployeeIds: [{
         EmployeeId:{type: ObjectId, ref: 'User'},
-        ClientStatus:{type: String}
+        ClientStatus:{type: String},
+        Date:{type:String}
     }],
     CompanyName: {
         type: String,
@@ -41,12 +42,18 @@ const client_Schema = new Schema({
     }],
     LastUpdate_Date: {
         type: String,
-        required: true
     },
     Reminder_Date: {
         type: String,
         required: true
     },
+    ClientType:{
+        type: String,
+    },
+    AddDate:{
+        type: Date,
+        required: true
+    }
 });
 
 const client_Model = mongoose.model("Client", client_Schema);

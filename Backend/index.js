@@ -5,6 +5,9 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
+import clientRoutes from "./routes/salesDepartment/client.route.js";
+import salesRoutes from './routes/salesDepartment/sales.route.js';
+import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
 
 
 dotenv.config();
@@ -32,6 +35,11 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/client", clientRoutes);
+app.use("/api/sales", salesRoutes);
+app.use("/api/alllog", callLogRoutes)
+
+
 app.listen(PORT, () => {
   console.log(`server is running on port http://localhost:${PORT}`);
 });
