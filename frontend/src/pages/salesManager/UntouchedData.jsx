@@ -119,22 +119,35 @@ const UntouchedData = () => {
               Untouched Data
             </h1>
           </div>
-          <div className="importBtn tracking-wider">
-            <button
-              style={{
-                backgroundColor: "#4972E8",
-                color: "#FFFFFF",
-                fontSize: "16px",
-                padding: "8px 16px",
-                border: "none",
-                cursor: "pointer",
-                borderRadius: "4px",
-                letterSpacing: "0.01em",
-              }}
-            >
-              Import Data <img src={dropbox} alt="" />
-            </button>
-          </div>
+         <div className="importBtn tracking-wider">
+  <button
+    style={{
+      backgroundColor: "#4972E8",
+      color: "#FFFFFF",
+      fontSize: "16px",
+      padding: "8px 16px",
+      border: "none",
+      cursor: "pointer",
+      borderRadius: "4px",
+      letterSpacing: "0.01em",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",      
+    }}
+  >
+    Import Data
+    <img
+      src={dropbox}
+      alt="import"
+      style={{
+        width: "18px",
+        height: "18px",
+        display: "block",
+      }}
+    />
+  </button>
+</div>
+
         </div>
 
         {/* Filter Section */}
@@ -251,7 +264,7 @@ const UntouchedData = () => {
         {/* Data Table */}
         <div className="col-12 px-3 pb-4">
           <div
-            className="card shadow-sm rounded-3 overflow-hidden mt-3"
+            className="card shadow-lg rounded-3 overflow-hidden mt-3"
             style={{ maxWidth: "100%" }}
           >
             <div

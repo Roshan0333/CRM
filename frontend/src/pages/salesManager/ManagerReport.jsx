@@ -188,9 +188,13 @@ const ManagerReport = () => {
                           </div>
 
                           <div className="comment-section">
-                            <label htmlFor="comment">Comment</label>
-                            <textarea id="comment" placeholder=""></textarea>
+                            <span className="comment-label">Comment</span>
+                            <textarea
+                              id="comment"
+                              className="comment-box"
+                            ></textarea>
                           </div>
+
 
                           <button id="update-btn">Update</button>
                         </div>

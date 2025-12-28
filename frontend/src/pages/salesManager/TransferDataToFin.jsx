@@ -16,7 +16,7 @@ const TransferDataToFin = () => {
             <div id="transfer-container">
               <div id="heading">
                 <h1>Transfer Data to Fin.</h1>
-                <button id="heading-btn">Add New +</button>
+                <button id="heading-btn" onClick={openPopup}>Add New +</button>
               </div>
               <div id="client-list">
                 <div style={{ overflowX: "auto", whiteSpace: "nowrap" }}>
@@ -29,7 +29,7 @@ const TransferDataToFin = () => {
                       <th>Contact no.</th>
                       <th>Date</th>
                       <th>Ammount</th>
-                      <th>Tl Name</th>
+                      <th>TL Name</th>
                       <th>Sales Executive</th>
                       <th>Services</th>
                       <th>Action</th>

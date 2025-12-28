@@ -9,7 +9,7 @@ function ProspectForm() {
       <main>
         <div id="prospect-container">
           <div id="card">
-            <h1>Prospect</h1>
+            <h1>Prospect Form</h1>
             <form id="prospect-form">
               {/* <div id="form-box"></div> */}
               <div id="form-row">

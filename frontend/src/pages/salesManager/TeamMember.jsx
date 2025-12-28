@@ -53,7 +53,8 @@ function TeamMember() {
     <>
       <div className="SalesManagerTeamMemberContainer">
         <h1 className="TeamMemberContainerHeading">Team Member</h1>
-
+    {/* LEFT: TABLE CARD */}
+    <section className="team-card">
         <section className="tableContainer">
           <table style={{ width: "100%" }}>
             <thead>
@@ -83,6 +84,11 @@ function TeamMember() {
             ))}
           </table>
         </section>
+        </section>
+
+         {/* RIGHT: FORM CARD */}
+    <section className="team-card form-card">
+      
 
         <section className="teamMemberForm">
           <form className="user-data-form">
@@ -171,6 +177,10 @@ function TeamMember() {
             </div>
           </form>
         </section>
+          
+    </section>
+    
+    
 
         {/* ------------------ VIEW MODAL ------------------ */}
         {viewModal && (

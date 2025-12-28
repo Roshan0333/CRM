@@ -111,7 +111,7 @@ const Dashboard = () => {
             </div>
           </section>
           <section id="dashboard-data">
-            <h1>FINANACE DEBT.</h1>
+            <h1>FINANCE DEPT.</h1>
             <div id="data-wrap">
               <div id="data">
                 <h3>TOTAL DATA</h3>
