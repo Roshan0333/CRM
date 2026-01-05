@@ -5,7 +5,7 @@ const post_Sale = async (req, res) => {
     try {
         const { ClientId, Service, Amount, ActivityData } = req.body;
 
-        const { _id } = req.user;
+        const { _id, role } = req.user;
 
         const date = new Date().toLocaleDateString("en-IN");
 
@@ -42,7 +42,7 @@ const salesExecutive_TotalSales = async (req, res) => {
         const totalSales = await Sales_Model.find({ SalesExecutiveId: _id });
 
         if (totalSales.length === 0) {
-            return res.status(200).json({ msg: "No Sale" });
+            return res.status(404).json({ msg: "No Sale" });
         }
 
         return res.status(200).json({ TotalSales: totalSales, msg: "Successfully" })
@@ -59,7 +59,7 @@ const teamLeader_TotalSales = async (req, res) => {
         const totalSales = await Sales_Model.find({ TeamLeaderId: _id });
 
         if (totalSales.length === 0) {
-            return res.status(200).json({ msg: "No found" });
+            return res.status(404).json({ msg: "No found" });
         }
 
         return res.status(200).json({ TotalSales: totalSales, msg: "Successfully" })

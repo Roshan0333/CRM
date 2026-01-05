@@ -41,6 +41,7 @@ import userRoutes from "./routes/userRoutes.js";
 import clientRoutes from "./routes/salesDepartment/client.route.js";
 import salesRoutes from './routes/salesDepartment/sales.route.js';
 import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
+import reminderCallRoutes from "./routes/salesDepartment/todayReminderCall.route.js"
 import auth from "./middlewares/AuthMiddleware.js"
 
 
@@ -69,9 +70,10 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/client",auth, clientRoutes);
-app.use("/api/sales",auth, salesRoutes);
-app.use("/api/calllog",auth, callLogRoutes)
+app.use("/api/client", clientRoutes);
+app.use("/api/sales", salesRoutes);
+app.use("/api/calllog", callLogRoutes)
+app.use("/api/remindercall", reminderCallRoutes);
 
 
 app.listen(PORT, () => {

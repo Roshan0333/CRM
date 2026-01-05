@@ -12,15 +12,17 @@ const Sales_Schema = new Schema({
         type: Date,
         required: true
     },
+    SalerId:{
+        type: ObjectId,
+        ref: "User"
+    },
     TeamLeaderId: {
-        type: Object,
-        ref: "User",
-        required: true
+        type: ObjectId,
+        ref: "User"
     },
     SalesExecutiveId: {
-        type: Object,
-        ref: "User",
-        required: true
+        type: ObjectId,
+        ref: "User"
     },
     Service: {
         type: String,

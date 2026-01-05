@@ -5,12 +5,12 @@ const getToday_CallList = async (req, res) => {
     try {
         const { _id } = req.user;
 
-        let todaydate = new Date().toLocaleDateString("en-IN");
+        let todaydate = new Date().toLocaleDateString("en-CA");
 
-        let callList = await EmployeeHandleClientHistory.find({ employeeId: _id, handledDate: todaydate });
+        let callList = await EmployeeHandleClientHistory.find({ employeeId: _id, handledDate: todaydate.toString() });
 
         if (callList.length === 0) {
-            return res.status(200).json({ msg: "No call today" });
+            return res.status(404).json({ msg: "No call today" });
         }
 
         return res.status(200).json({ TodayCallList: callList, msg: "Successfully" });
@@ -35,7 +35,7 @@ const getCustomDate_CallList = async (req, res) => {
         });
 
         if(callList.length === 0){
-            return res.status(200).json({msg:"No CallList Availabel"});
+            return res.status(404).json({msg:"No CallList Availabel"});
         }
 
         return res.status(200).json({CallList: callList, msg: "Successfully"});
