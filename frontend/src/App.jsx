@@ -6,7 +6,8 @@ import "./App.css"
 /* AUTH PAGES */
 import LoginForm from "./components/auth/LoginForm";
 import RegisterForm from "./components/auth/RegisterForm";
-import Profile from "./pages/Profile";
+
+// import Profile from "./pages/profile/ProfilePopup";
 
 /* ROLE BASED COMPONENTS */
 
@@ -143,16 +144,17 @@ function App() {
             <Route path="/" element={<LoginForm onLoginSuccess={setRole}/>} />
             <Route path="/login" element={<LoginForm onLoginSuccess={setRole}/>} />
             <Route path="/register" element={<RegisterForm />} />
-            <Route path="/profile" element={<Profile />} />
+          
+
           </Routes>
         )}
 
         {/* 🧑‍💼 ROLE BASED Routes */}
         {role === "sales executive" && <SalesExecutive />}
-        {role === "sales team lead" && <SalesTeamLead />}
+        {role === "sales team" && <SalesTeamLead />}
         {role === "sales manager" && <SalesManager />}
         {role === "management tl" && <ManagementTL />}
-        {role == "management employee" && <ManagementEmployee />}
+        {role === "management employee" && <ManagementEmployee />}
         {role === "management manager" && <ManagerManagement />}
         {role === "feedback manager" && <FeedbackManager />}
         {role === "feedback employee" && <FeedbackEmployee />}
@@ -178,6 +180,7 @@ function SalesExecutive() {
           <Route path="/salesexecutive/sales-report" element={<SE_SalesReport />} />
           <Route path="/salesexecutive/report" element={<SE_Report />} />
           <Route path="/salesexecutive/userdata" element={<SE_UserData />} />
+          {/* <Route path="/salesexecutive/profile" element={<Profile />} /> */}
           <Route path="*" element={<h2>Page Not Found</h2>} />
         </Routes>
       </div>

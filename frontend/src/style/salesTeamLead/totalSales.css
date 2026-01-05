@@ -1,31 +1,371 @@
-#totalSales-main-content {
-  margin-left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
+/* ================= ROOT ================= */
+
+:root {
+  --sidebar-width: 260px;
+  --primary: #4e73df;
+  --bg: #f8f9fc;
 }
+
+/* ================= MAIN LAYOUT ================= */
 
 #totalSales-main {
-  padding: 40px;
+  margin-left: var(--sidebar-width);
+  padding: 32px 40px;
+  background: var(--bg);
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
-#stl-table thead th {
-  color: #000000;
-  font-weight: 700;
+#totalSales-main-content {
+  max-width: 1200px;
+  margin: 0 auto;
 }
+
+/* ================= HEADER ================= */
 
 #totalSales-heading-btn {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+#totalSales-heading-btn h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #4a4a4a;
 }
 
 #totalSales-heading-btn button {
+  background: var(--primary);
+  color: #fff;
   border: none;
-  outline: none;
-  background-color: #4972e8;
-  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
   font-size: 13px;
-  width: 108px;
-  height: 33px;
-  border-radius: 4px;
-  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+#totalSales-heading-btn button:hover {
+  background: #3b5ccc;
+}
+
+/* ================= TABLE CARD ================= */
+
+.table-wrapper {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  padding: 18px 0;
+  overflow-x: auto;
+}
+
+/* ================= TABLE ================= */
+
+#stl-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+
+#stl-table thead th {
+  background: #ffffff;
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+  border-bottom: 1px solid #ececec;
+}
+
+#stl-table tbody td {
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+#stl-table tbody tr:hover {
+  background: #fafbff;
+}
+
+/* ================= COLUMN STYLES ================= */
+
+.company {
+  font-weight: 600;
+}
+
+.amount {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.tag {
+  background: #eef2ff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #3730a3;
+  display: inline-block;
+}
+
+/* ================= MODAL ================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 28px 30px;
+  border-radius: 16px;
+  width: 520px;
+  max-width: 95%;
+}
+
+.modal-box h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+/* ================= FORM ================= */
+
+.sale-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.sale-form label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #444;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.sale-form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dcdfe8;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.sale-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ================= FORM ACTIONS ================= */
+
+.form-actions {
+  grid-column: span 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.form-actions .cancel {
+  background: #e5e7eb;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.form-actions .save {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-actions .save:hover {
+  background: #3b5ccc;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+  #totalSales-main {
+    margin-left: 0;
+    padding: 24px 20px;
+  }
+}
+ 
+/* ================= SEARCH BAR (PROFESSIONAL CRM STYLE) ================= */
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+/* Main search container */
+.search-box {
+  display: grid;
+  grid-template-columns: 1fr 220px auto; /* 🔥 text | date | button */
+  align-items: center;
+  gap: 18px;
+  background: #ffffff;
+  padding: 20px 24px;
+  border-radius: 14px;
+  max-width: 1050px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ================= SEARCH CLIENT ================= */
+.search-box input[type="text"] {
+  height: 54px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: 1.5px solid #d1d5db;
+  font-size: 16px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.search-box input[type="text"]::placeholder {
+  font-size: 15px;
+  color: #9ca3af;
+}
+
+/* ================= DATE PICKER ================= */
+.search-box input[type="date"] {
+  height: 54px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1.5px solid #d1d5db;
+  font-size: 15px;
+  color: #374151;
+  background: #f9fafb; /* 🔥 slight separation */
+}
+
+/* ================= FOCUS EFFECT ================= */
+.search-box input:focus {
+  outline: none;
+  border-color: #4361ee;
+  background: #ffffff;
+}
+
+/* ================= SEARCH BUTTON (KEEP AS IS BUT ALIGN) ================= */
+.search-box button {
+  height: 54px;
+  padding: 0 36px;
+  background: #4361ee;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .search-box {
+    grid-template-columns: 1fr;
+  }
+
+  .search-box button {
+    width: 100%;
+  }
+}
+
+/* ================= UPDATE MODAL ================= */
+
+#popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#popup-box {
+  background: #ffffff;
+  width: 520px;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+#popup-box h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+  color: #111827;
+}
+
+/* Radio buttons */
+.radio-group {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-bottom: 22px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Textarea */
+#popup-box textarea {
+  width: 100%;
+  min-height: 120px;          /* 🔥 HEIGHT FIX */
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 15px;
+  resize: none;
+  margin-bottom: 24px;
+  font-family: inherit;
+}
+
+#popup-box textarea::placeholder {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+#popup-box textarea:focus {
+  outline: none;
+  border-color: #4361ee;
+}
+
+/* Update button */
+#popup-box button[type="submit"] {
+  display: block;
+  margin: 0 auto;
+  background: #4361ee;
+  color: #ffffff;
+  border: none;
+  padding: 10px 40px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#popup-box button[type="submit"]:hover {
+  background: #3451d1;
 }

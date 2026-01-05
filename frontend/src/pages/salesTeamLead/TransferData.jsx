@@ -1,138 +1,143 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "../../style/salesTeamLead/TransferData.css";
 
+const API = "http://localhost:5000/api/salesTeamLead";
+
 const SalesReport = () => {
-  const data = [
-    {
-      employeeName: "Bold text column",
-      TransferData: "Bold text column",
-      date: "Bold text column",
-      Transferby: "Bold text column",
-      TotalData: "Bold text column",
-    },
-    {
-      employeeName: "Bold text column",
-      TransferData: "Bold text column",
-      date: "Bold text column",
-      Transferby: "Bold text column",
-      TotalData: "Bold text column",
-    },
-    {
-      employeeName: "Bold text column",
-      TransferData: "Bold text column",
-      date: "Bold text column",
-      Transferby: "Bold text column",
-      TotalData: "Bold text column",
-    },
-    {
-      employeeName: "Bold text column",
-      TransferData: "Bold text column",
-      date: "Bold text column",
-      Transferby: "Bold text column",
-      TotalData: "Bold text column",
-    },
-    {
-      employeeName: "Bold text column",
-      TransferData: "Bold text column",
-      date: "Bold text column",
-      Transferby: "Bold text column",
-      TotalData: "Bold text column",
-    },
-    {
-      employeeName: "Bold text column",
-      TransferData: "Bold text column",
-      date: "Bold text column",
-      Transferby: "Bold text column",
-      TotalData: "Bold text column",
-    },
-  ];
+  const [history, setHistory] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState("");
+  const [selectedCount, setSelectedCount] = useState("");
+
+  useEffect(() => {
+    fetchMembers();
+    fetchHistory();
+  }, []);
+
+  const fetchMembers = async () => {
+    try {
+      const res = await axios.get(`${API}/team-members`);
+      setMembers(res.data);
+    } catch (err) {
+      console.error("Member fetch error:", err);
+    }
+  };
+
+  const fetchHistory = async () => {
+    try {
+      const res = await axios.get(`${API}/transfer-history`);
+      setHistory(res.data);
+    } catch (err) {
+      console.error("History fetch error:", err);
+    }
+  };
+
+  const handleTransfer = async () => {
+    if (!selectedMember || !selectedCount) {
+      alert("Member aur Transfer Count select karna zaroori hai!");
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/transfer`, {
+        employeeId: selectedMember,
+        transferCount: Number(selectedCount),
+      });
+
+      alert("Leads successfully transfer ho gayi ✅");
+      setSelectedMember("");
+      setSelectedCount("");
+      fetchHistory();
+    } catch (error) {
+      console.error("Transfer error:", error);
+      alert("Transfer failed ❌");
+    }
+  };
 
   return (
     <div
       id="transferData-container"
-      className="p-4"
-      style={{ backgroundColor: "#fff" }}
+      style={{ backgroundColor: "#f8f9fc", minHeight: "100vh" }}
     >
-      <h3 style={{fontWeight:"700"}} className="mb-4 text-secondary">Transfer Data</h3>
+      <h3 className="page-title">Transfer Data</h3>
 
-      <div className="d-flex flex-column mb-5 mx-4">
-        <div
-          className="d-flex flex-column mb-5 mx-4"
-          style={{ maxWidth: "950px" }}
+      {/* ================= TRANSFER ================= */}
+      <div className="transfer-box">
+        <select
+          className="form-select pro-select"
+          value={selectedMember}
+          onChange={(e) => setSelectedMember(e.target.value)}
         >
-          <div
-            className="d-flex justify-content-between mb-3"
-            style={{ gap: "20px" }}
-          >
-            <select
-              className="form-select shadow-sm fw-bold"
-              style={{ width: "100%", maxWidth: "450px", height: "50px" }}
-            >
-              <option>Member Name</option>
-              <option>Harry</option>
-              <option>Alex</option>
-              <option>Smith</option>
-            </select>
+          <option value="">Member Name</option>
+          {members.map((m) => (
+            <option key={m._id} value={m._id}>
+              {m.firstName} {m.lastName}
+            </option>
+          ))}
+        </select>
 
-            <select
-              className="form-select shadow-sm fw-bold"
-              style={{ width: "100%", maxWidth: "450px", height: "50px" }}
-            >
-              <option>Transfer Data in No.</option>
-              <option>21</option>
-              <option>45</option>
-              <option>32</option>
-            </select>
-          </div>
+        <select
+          className="form-select pro-select"
+          value={selectedCount}
+          onChange={(e) => setSelectedCount(e.target.value)}
+        >
+          <option value="">Transfer Data in No.</option>
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+        </select>
 
-          <div className="d-flex justify-content-end">
-            <button
-              className="btn btn-primary px-5 py-2"
-              style={{
-                backgroundColor: "#4972e8",
-                fontWeight: "600",
-                width: "fit-content",
-              }}
-            >
-              Transfer
-            </button>
-          </div>
+        <div className="text-end">
+          <button className="transfer-btn" onClick={handleTransfer}>
+            Transfer Leads
+          </button>
         </div>
       </div>
 
-      <h3 style={{fontWeight:"700"}} className="mb-4 text-secondary">Transfer Data History</h3>
+      {/* ================= HISTORY ================= */}
+      <h3 className="history-title">Transfer Data History</h3>
 
-      <div className="d-flex justify-content-center">
-        <div
-          className="table-responsive shadow-lg p-2 bg-white rounded"
-          style={{
-            width: "100%",
-            padding: "0px 20px 0px 80px",
-          }}
-        >
-          <table className="custom-table">
-            <thead>
+      <div className="table-wrapper">
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>Employee Name</th>
+              <th>Transfer Data</th>
+              <th>Date</th>
+              <th>Transfer By</th>
+              <th>Total Data</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {history.length === 0 ? (
               <tr>
-                <th>Employee Name</th>
-                <th>Transfer Data in No.</th>
-                <th>Date</th>
-                <th>Transfer By</th>
-                <th>Total Data in account</th>
+                <td colSpan="5" className="empty">
+                  No transfer history
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {data.map((row, index) => (
-                <tr key={index}>
-                  <td>{row.employeeName}</td>
-                  <td>{row.TransferData}</td>
-                  <td>{row.date}</td>
-                  <td>{row.Transferby}</td>
-                  <td>{row.TotalData}</td>
+            ) : (
+              history.map((row) => (
+                <tr key={row._id}>
+                  <td>
+                    <b>
+                      {row.employee
+                        ? `${row.employee.firstName} ${row.employee.lastName}`
+                        : "N/A"}
+                    </b>
+                  </td>
+                  <td>{row.transferCount}</td>
+                  <td>{new Date(row.createdAt).toLocaleDateString("en-GB")}</td>
+                  <td>
+                    <span className="transfer-by">{row.transferBy}</span>
+                  </td>
+                  <td>{row.totalData}</td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
