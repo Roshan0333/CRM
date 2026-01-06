@@ -11,7 +11,18 @@ const userSchema = new mongoose.Schema(
     email:     { type: String, required: true, unique: true },
     password:  { type: String, required: true },
     department:{ type: String, required: true },
-    role:      { type: String, required: true }
+    role:      { type: String, required: true },
+      // 🔥 ADD / CONFIRM THESE
+    contact: {type: String,   },
+    location: {
+      type: String,   // address
+    },
+    upiId: {
+      type: String,
+    },
+    joiningDate: {
+     type: Date,
+    },
   },
   { timestamps: true }
 );

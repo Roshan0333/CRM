@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import clientData from "../../assets/salesExecutive/Dashboard/clientData.png";
 import payout from "../../assets/salesExecutive/Dashboard/payout.png";
 import prospectNumber from "../../assets/salesExecutive/Dashboard/prospectNumber.png";
 import totalSales from "../../assets/salesExecutive/Dashboard/totalSales.png";
 import "../../style/salesExecutive/dashboard.css";
-import Sidebar from "../../components/salesExecutive/Sidebar";
+// import Sidebar from "../../components/salesExecutive/Sidebar";
 import LastUpdatePopUp from "./LastupdatePopUp";
 import UpdataDataPopUp from "./UpdateDataPopUp";
-
+import {TotalSale, prospectList} from "../../services/salesDepartmentApi";
 
 
 const Dashboard = () => {
@@ -20,9 +20,24 @@ const Dashboard = () => {
   const openUpdatePopup = () => setShowUpdatepopup(true);
   const closeUpdatePopup = () => setShowUpdatepopup(false);
 
+  const [totalSalesNumber, setTotalSalesNumber] = useState(0);
+  const [prospectNumber, setProspectNumber] = useState(0);
+
+  useEffect(() => {
+    ;(
+      async () => {
+        let totalSaleResponse = await TotalSale();
+        let totalProspectNumber = await prospectList();
+
+        setTotalSalesNumber(totalSaleResponse.TotalSales.length);
+        setProspectNumber(totalProspectNumber.ProspectList.length)
+      }
+    )()
+  },[])
+
   return (
     <main>
-      <Sidebar />
+      
       <div id="dashboard">
         <div id="dashboard-container">
           <section id="dashboard-data">
@@ -38,7 +53,7 @@ const Dashboard = () => {
               <div id="data">
                 <h3>TOTAL SALES</h3>
                 <div id="num-vector">
-                  <p>7</p>
+                  <p>{totalSalesNumber}</p>
                   <img src={totalSales} alt="" />
                 </div>
               </div>
@@ -52,7 +67,7 @@ const Dashboard = () => {
               <div id="data">
                 <h3>PROSPECT NUMBER</h3>
                 <div id="num-vector">
-                  <p>16</p>
+                  <p>{prospectNumber}</p>
                   <img src={prospectNumber} alt="" />
                 </div>
               </div>

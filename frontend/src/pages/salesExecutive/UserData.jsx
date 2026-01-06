@@ -114,8 +114,8 @@ function UserData() {
           </table>
         </div>
 
-        {showLastUpdatePopup && <LastUpdatePopUp closePopup ={closeLastUpdatePopup}/>};
-        {showUpdatePopup && <UpdateDataPopUp closeUpdatePopup={closeUpdatePopup}/>};
+        {showLastUpdatePopup && <LastUpdatePopUp closePopup ={closeLastUpdatePopup}/>}
+        {showUpdatePopup && <UpdateDataPopUp closeUpdatePopup={closeUpdatePopup}/>}
       </div>
     </>
   );

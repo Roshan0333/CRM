@@ -22,6 +22,10 @@ const client_Schema = new Schema({
         type: Number,
         unique: true
     },
+    AdderId:{
+        type: ObjectId,
+        ref: "User"
+    },
     AddedBy:{
         type: String
     },

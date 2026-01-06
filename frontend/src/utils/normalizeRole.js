@@ -3,17 +3,17 @@
 const normalizeRole = (role) => {
   const map = {
     "sales executive": "sales executive",
-    "sales team lead": "salesTeamLead",
+    "sales team": "sales team",
     "sales manager": "salesManager",
 
     "management tl": "managementTL",
-    "management employee": "managementemployee",
-    "manager management": "managermanagement",
+    "management employee": "management employee",
+    "management manager ": "management manager",
 
     "feedback manager": "feedbackmanager",
     "feedback employee": "feedbackemployee",
 
-    "finance": "finance",
+    "finance employee": "finance employee",
     "accountant": "accountant",
   };
 

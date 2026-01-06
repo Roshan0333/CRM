@@ -18,6 +18,9 @@ const SalesTeam_Schema = new Schema({
         Status:{
             type: String,
             default: "Active",
+        },
+        TeamJoiningDate:{
+            type: Date,
         }
     }]
 });

@@ -1,140 +1,243 @@
-import React from "react";
-import "../../style/SalesTeamLead/TeamMember.css";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "../../style/salesTeamLead/TeamMember.css";
+
+const API = "http://localhost:5000/api/salesTeamLead/team-members";
 
 function TeamMember() {
-  const teamMemberData = [
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Active",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Inactive",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Active",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Active",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Inactive",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Inactive",
-    },
-  ];
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  const [formData, setFormData] = useState({
+    firstName: "",
+    contact: "",
+    email: "",
+    location: "",
+    joiningDate: "",
+  });
+
+  useEffect(() => {
+    fetchMembers();
+  }, []);
+
+  /* ================= FETCH MEMBERS (FINAL FIX) ================= */
+  const fetchMembers = async () => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      // 🔥 TOKEN NOT FOUND → STOP REQUEST
+      if (!token) {
+        console.warn("Token missing – please login again");
+        setTeamMembers([]);
+        return;
+      }
+
+      const res = await axios.get(API, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // 🔥 SAFETY CHECK
+      if (!Array.isArray(res.data)) {
+        console.error("Expected array but got:", res.data);
+        setTeamMembers([]);
+        return;
+      }
+
+      const mapped = res.data.map((u) => ({
+        id: u._id,
+        name: u.firstName || "-",
+        location: u.location || "-",
+        email: u.email || "-",
+        contact: u.contact || "-",
+        joiningDate: u.joiningDate
+          ? new Date(u.joiningDate).toLocaleDateString()
+          : "-",
+        status: u.status || "Active",
+      }));
+
+      setTeamMembers(mapped);
+    } catch (err) {
+      console.error(
+        "Error fetching team members:",
+        err.response?.data || err.message
+      );
+      setTeamMembers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ================= FORM HANDLERS ================= */
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleAddMember = async () => {
+    if (!formData.firstName || !formData.email) {
+      alert("Name and Email required");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("Please login again");
+        return;
+      }
+
+      await axios.post(API, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      setFormData({
+        firstName: "",
+        contact: "",
+        email: "",
+        location: "",
+        joiningDate: "",
+      });
+
+      fetchMembers();
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      alert("Failed to add member");
+    }
+  };
+
+  const toggleStatus = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("Please login again");
+        return;
+      }
+
+      const res = await axios.patch(
+        `${API}/${id}/status`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setTeamMembers((prev) =>
+        prev.map((m) =>
+          m.id === id ? { ...m, status: res.data.status } : m
+        )
+      );
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      alert("Status update failed");
+    }
+  };
+
+  /* ================= UI ================= */
   return (
-    <>
-      <div className="containerMember">
-        <h1 style={{ fontSize: "36px" }}>Team Member</h1>
-        <div className="card">
-          <table id="tram-member-table">
+    <div className="containerMember">
+      <h1 className="main-title">Team Member</h1>
+
+      <div className="text-area-view">
+        {loading ? (
+          <p>Loading team members...</p>
+        ) : teamMembers.length === 0 ? (
+          <p>No team members found</p>
+        ) : (
+          <table className="team-table">
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Location</th>
-                <th>Email_id</th>
-                <th>Contact no.</th>
-                <th>Joining date</th>
+                <th>Email</th>
+                <th>Contact</th>
+                <th>Joining Date</th>
                 <th>Status</th>
               </tr>
             </thead>
-            {teamMemberData.map((member, index) => (
-              <tbody key={index}>
-                <tr>
+            <tbody>
+              {teamMembers.map((m) => (
+                <tr key={m.id}>
+                  <td>{m.name}</td>
+                  <td>{m.location}</td>
+                  <td>{m.email}</td>
+                  <td>{m.contact}</td>
+                  <td>{m.joiningDate}</td>
                   <td>
-                    <b>{member.Name}</b>
-                  </td>
-                  <td>
-                    <b>{member.Location}</b>
-                  </td>
-                  <td>
-                    <b>{member.Email_id}</b>
-                  </td>
-                  <td>
-                    <b>{member.Contact_no}</b>
-                  </td>
-                  <td>
-                    <b>{member.Joining}</b>
-                  </td>
-                  <td
-                    className={
-                      member.Status.toLowerCase() === "active"
-                        ? "badge badge-success"
-                        : "badge badge-danger"
-                    }
-                  >
-                    {member.Status}
+                    <button
+                      className={`status-pill ${m.status.toLowerCase()}`}
+                      onClick={() => toggleStatus(m.id)}
+                    >
+                      {m.status}
+                    </button>
                   </td>
                 </tr>
-              </tbody>
-            ))}
+              ))}
+            </tbody>
           </table>
-        </div>
+        )}
       </div>
 
-      <div className="formContainer">
-        <div className="card">
-          <form className="team-form">
-            <div className="team-form-row">
-              <label htmlFor="name">Name</label>
-              <input type="text" id="name" name="name" />
-            </div>
-            <div className="team-form-row">
-              <label htmlFor="contact">Contact no.</label>
-              <input type="text" id="contact" name="contact" />
-            </div>
-            <div className="team-form-row">
-              <label htmlFor="email">Email_id</label>
-              <input type="email" id="email" name="email" />
-            </div>
-            <div className="team-form-row">
-              <label htmlFor="location">Location</label>
-              <input type="text" id="location" name="location" />
-            </div>
-            <div className="team-form-row">
-              <label htmlFor="joining">Joining date</label>
-              <input type="text" id="joining" name="joining" />
-            </div>
-            <div className="team-form-row">
-              <button type="submit" className="add-btn">
-                ADD
-              </button>
-            </div>
-          </form>
+      <div className="text-area-add">
+        <div className="compact-form">
+          <div className="input-row">
+            <label>Name</label>
+            <input
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="input-row">
+            <label>Contact</label>
+            <input
+              name="contact"
+              value={formData.contact}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="input-row">
+            <label>Email</label>
+            <input
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="input-row">
+            <label>Location</label>
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="input-row">
+            <label>Joining Date</label>
+            <input
+              type="date"
+              name="joiningDate"
+              value={formData.joiningDate}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="button-row">
+            <button className="add-submit-btn" onClick={handleAddMember}>
+              ADD
+            </button>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

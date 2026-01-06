@@ -140,36 +140,36 @@ export const hotClient = async () => {
 }
 
 export const todayReminderList = async () => {
-  try{
+  try {
     let response = await axios.get(
       `${API_URL}/remindercall/todayReminderCall`,
       {
-        headers:{
+        headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${token}`
         }
       }
     );
 
-    return {ok: true, fetchMessage: true, data: response.data};
+    return { ok: true, fetchMessage: true, data: response.data };
   }
-  catch(err){
-    if(err.response){
-      if(err.response.status < 500){
-        return {ok: false, fetchMessage: true, data: err.response.data.msg};
+  catch (err) {
+    if (err.response) {
+      if (err.response.status < 500) {
+        return { ok: false, fetchMessage: true, data: err.response.data.msg };
       }
-      else{
-        return {ok: false, fetchMessage: true, data: err.response.data.error};
+      else {
+        return { ok: false, fetchMessage: true, data: err.response.data.error };
       }
     }
-    else{
-      return {ok: false, fetchMessage: false, data: err.message};
+    else {
+      return { ok: false, fetchMessage: false, data: err.message };
     }
   }
 }
 
 export const todayCallingList = async () => {
-  try{
+  try {
     let response = await axios.get(
       `${API_URL}/calllog/todayCallList`,
       {
@@ -180,48 +180,48 @@ export const todayCallingList = async () => {
       }
     );
 
-    return {ok: true, fetchMessage: true, data: response.data};
+    return { ok: true, fetchMessage: true, data: response.data };
   }
-  catch(err){
-    if(err.response){
-      if(err.response.status < 500){
-        return {ok: false, fetchMessage: true, data: err.response.data.msg};
+  catch (err) {
+    if (err.response) {
+      if (err.response.status < 500) {
+        return { ok: false, fetchMessage: true, data: err.response.data.msg };
       }
-      else{
-        return {ok: false, fetchMessage: true, data: err.response.data.error};
+      else {
+        return { ok: false, fetchMessage: true, data: err.response.data.error };
       }
     }
-    else{
-      return {ok: false, fetchMessage: false, data: err.message};
+    else {
+      return { ok: false, fetchMessage: false, data: err.message };
     }
   }
 }
 
 export const cutomerCallingList = async (startDate, lastDate) => {
-  try{
+  try {
     let response = await axios.get(
       `${API_URL}/calllog/customDateCallList?StartDate=${startDate}&LastDate=${lastDate}`,
       {
-        headers:{
+        headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${token}`
         }
       }
     );
 
-    return {ok: true, fetchMessage: true, data: response.data};
+    return { ok: true, fetchMessage: true, data: response.data };
   }
-  catch(err){
-    if(err.response){
-      if(err.response.status < 500){
-        return {ok: false, fetchMessage: true, data: response.data.msg};
+  catch (err) {
+    if (err.response) {
+      if (err.response.status < 500) {
+        return { ok: false, fetchMessage: true, data: response.data.msg };
       }
-      else{
-        return {ok: false, fetchMessage: true, data: response.data.error};
+      else {
+        return { ok: false, fetchMessage: true, data: response.data.error };
       }
     }
-    else{
-      return {ok: false, fetchMessage: false, data: err.message};
+    else {
+      return { ok: false, fetchMessage: false, data: err.message };
     }
   }
 }
@@ -257,19 +257,19 @@ export const postSale = async (salesData) => {
   }
 }
 
-export const SE_TotalSale = async () => {
+export const TotalSale = async () => {
   try {
     let response = await axios.get(
-      `${API_URL}/sales/SE_totalSales`,
+      `${API_URL}/sales/totalSales`,
       {
         headers: {
-          "Content-Type" : "application/json",
-          authorization : `Bearer ${token}`
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`
         }
       }
     );
 
-    return {ok: true, fetchMessage: true, data: response.data};
+    return { ok: true, fetchMessage: true, data: response.data };
   }
   catch (err) {
     if (err.response) {
@@ -278,6 +278,36 @@ export const SE_TotalSale = async () => {
       }
       else {
         return { ok: false, fetchMessage: true, data: err.response.data.error };
+      }
+    }
+    else {
+      return { ok: false, fetchMessage: false, data: err.message };
+    }
+  }
+}
+
+export const prospectList = async () => {
+  try {
+    let response = await axios.get(`
+      ${API_URL}/client/prospectList`,
+      {
+        headers:{
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    return {ok: true, fetchMessage: true, data: response.data};
+
+  }
+  catch (err) {
+    if (err.response) {
+      if (err.response.status < 500) {
+        return { ok: false, fetchMessage: true, data: err.response.data };
+      }
+      else {
+        return { ok: false, fetchMessage: true, data: err.message.error };
       }
     }
     else{

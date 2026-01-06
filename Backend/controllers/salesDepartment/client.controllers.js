@@ -191,7 +191,35 @@ const get_HotClient = async (req, res) => {
     }
 }
 
-export { add_Client, update_ClientData, delete_Client, get_HotClient };
+const get_CurrentMonthProspect = async (req, res) => {
+    try{
+        let {_id} = req.user;
+
+        const startofMonth = new Date();
+        startofMonth.setDate(1);
+        startofMonth.setHours(0,0,0,0);
+
+        const endofMonth = new Date();
+        endofMonth.setMonth(endofMonth.getMonth()+1);
+        endofMonth.setDate(0);
+        endofMonth.setHours(23, 59, 59, 999);
+
+        let prospectList = await Client_Model.find({
+            AdderId: _id,
+            AddDate:{
+                $gte: startofMonth,
+                $lte: endofMonth
+            }
+        })
+
+        return res.status(200).json({ProspectList: prospectList, msg: "Successfully"});
+    }
+    catch(err){
+        return res.status(500).json({error: err.message})
+    }
+}
+
+export { add_Client, update_ClientData, delete_Client, get_HotClient, get_CurrentMonthProspect};
 
 
 

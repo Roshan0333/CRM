@@ -1,275 +1,187 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+/* ========= ASSETS ========= */
 import clientData from "../../assets/salesTeamLead/untouchedData/clientData.png";
 import totalProspectus from "../../assets/salesTeamLead/untouchedData/totalProspect.png";
 import totalUntouchedData from "../../assets/salesTeamLead/untouchedData/totalUntouchedData.png";
 import call from "../../assets/salesTeamLead/untouchedData/call.png";
+
 import "../../style/salesTeamLead/untouchedData.css";
 
+const API_URL = "http://localhost:5000/api/untouched";
+
 const UntouchedData = () => {
-  const untouchedData = [
-    {
-      id: 1,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Select",
-    },
-    {
-      id: 2,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-    {
-      id: 3,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-    {
-      id: 4,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-    {
-      id: 5,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-    {
-      id: 6,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-  ];
+  const [tableData, setTableData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [activeCard, setActiveCard] = useState("");
+
+  const [searchText, setSearchText] = useState("");
+  const [searchDate, setSearchDate] = useState("");
+
+  const [stats, setStats] = useState({
+    totalData: 0,
+    todayCalls: 0,
+    totalProspect: 0,
+    totalUntouched: 0,
+  });
+
+  useEffect(() => {
+    fetchStats();
+    fetchTableData();
+  }, []);
+
+  const fetchStats = async () => {
+    const res = await axios.get(`${API_URL}/stats`);
+    setStats(res.data);
+  };
+
+  const fetchTableData = async () => {
+    const res = await axios.get(API_URL);
+    setTableData(res.data);
+    setFilteredData(res.data);
+  };
+
+  /* ===== SEARCH ===== */
+  const handleSearch = () => {
+    let filtered = [...tableData];
+
+    if (searchText.trim()) {
+      filtered = filtered.filter(
+        (item) =>
+          item.clientName?.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.memberName?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    if (searchDate) {
+      filtered = filtered.filter(
+        (item) =>
+          item.createdAt &&
+          new Date(item.createdAt).toISOString().split("T")[0] === searchDate
+      );
+    }
+
+    setFilteredData(filtered);
+  };
+
+  /* ===== CARD FILTER ===== */
+  const handleCardClick = (title) => {
+    setActiveCard(title);
+
+    if (title === "TOTAL DATA") {
+      setFilteredData(tableData);
+    }
+
+    if (title === "TODAY CALLS") {
+      setFilteredData(tableData.filter((d) => d.lastCall));
+    }
+
+    if (title === "TOTAL PROSPECT") {
+      setFilteredData(tableData.filter((d) => d.isProspect));
+    }
+
+    if (title === "TOTAL UNTOUCHED DATA") {
+      setFilteredData(tableData.filter((d) => !d.lastCall));
+    }
+  };
 
   const statsCards = [
-    {
-      title: "TOTAL DATA",
-      value: "10",
-      icon: clientData,
-      color: "#2d4fd7",
-    },
-    {
-      title: "TODAY CALLS",
-      value: "1600",
-      icon: call,
-      color: "#19a974",
-    },
-    {
-      title: "TOTAL PROSPECT",
-      value: "8000",
-      icon: totalProspectus,
-      color: "#00a8e8",
-    },
-    {
-      title: "TOTAL UNTOUCHED DATA",
-      value: "16",
-      icon: totalUntouchedData,
-      color: "#f2b705",
-    },
+    { title: "TOTAL DATA", value: stats.totalData, icon: clientData, color: "#2d4fd7" },
+    { title: "TODAY CALLS", value: stats.todayCalls, icon: call, color: "#19a974" },
+    { title: "TOTAL PROSPECT", value: stats.totalProspect, icon: totalProspectus, color: "#00a8e8" },
+    { title: "TOTAL UNTOUCHED DATA", value: stats.totalUntouched, icon: totalUntouchedData, color: "#f2b705" },
   ];
 
   return (
-    <div
-      id="untouchedData-container"
-      className="container-fluid min-vh-100"
-      style={{
-        overflowX: "hidden",
-        maxWidth: "100vw",
-      }}
-    >
-      <div className="row g-0">
-        {/* Header */}
-        <div className="col-12">
-          <div className="d-flex justify-content-between align-items-center mb-3 pt-4 px-3">
-            <h1 style={{ color: "#5A5C69" }} className="h3 fw-semibold m-0">
-              Untouched Data
-            </h1>
-          </div>
-        </div>
+    <div id="untouchedData-container">
+      <h2 className="page-title">Untouched Data</h2>
 
-        {/* Filter Section */}
-        <div className="col-12 px-3">
+      {/* ===== FILTER BAR ===== */}
+      <div className="filter-bar">
+        <input
+          type="text"
+          placeholder="Member Name"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+
+        <input
+          type="date"
+          value={searchDate}
+          onChange={(e) => setSearchDate(e.target.value)}
+        />
+
+        <button onClick={handleSearch}>Search</button>
+      </div>
+
+      {/* ===== STATS ===== */}
+      <div className="stats-row">
+        {statsCards.map((card, i) => (
           <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "16px",
-              marginBottom: "20px",
-            }}
+            key={i}
+            className={`stats-card ${activeCard === card.title ? "active" : ""}`}
+            style={{ borderColor: card.color }}
+            onClick={() => handleCardClick(card.title)}
           >
-            <div style={{ minWidth: "250px", flex: "1" }}>
-              <select className="form-select">
-                <option>Member Name</option>
-              </select>
+            <div>
+              <p style={{ color: card.color }}>{card.title}</p>
+              <h3>{card.value}</h3>
             </div>
-            <div style={{ minWidth: "250px", flex: "1" }}>
-              <select className="form-select">
-                <option>Select Date</option>
-              </select>
-            </div>
-            <div style={{ minWidth: "120px" }}>
-              <button
-                style={{
-                  width: "100%",
-                  height: "38px",
-                  background: "#4972e8",
-                  border: "none",
-                  borderRadius: "6px",
-                  color: "white",
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                }}
-              >
-                Search
-              </button>
-            </div>
+            <img src={card.icon} alt="" />
           </div>
-        </div>
+        ))}
+      </div>
 
-        {/* Stats Cards */}
-        <div className="col-12 px-3">
-          <div
-            style={{
-              margin: "16px 0",
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: "16px",
-            }}
-          >
-            {statsCards.map((card, index) => (
-              <div
-                key={index}
-                style={{
-                  background: "#fff",
-                  borderRadius: "10px",
-                  boxShadow: "0 2px 8px rgba(44, 62, 80, 0.07)",
-                  padding: "16px 18px",
-                  borderLeft: `4px solid ${card.color}`,
-                }}
-              >
-                <h3
-                  style={{
-                    margin: 0,
-                    color: card.color,
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    letterSpacing: "0.3px",
-                  }}
-                >
-                  {card.title}
-                </h3>
+      {/* ===== TABLE ===== */}
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Company Name</th>
+              <th>Client Name</th>
+              <th>Email ID</th>
+              <th>Contact No.</th>
+              <th>Last Call</th>
+              <th>Sales Executive Name</th>
+              <th className="blue">Transfer Date</th>
+            </tr>
+          </thead>
 
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginTop: "8px",
-                  }}
-                >
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: "28px",
-                      color: "#7c7979",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {card.value}
-                  </p>
-                  <div
-                    style={{
-                      background: "#ffffffff",
-                      borderRadius: "8px",
-                      padding: "8px",
-                    }}
-                  >
-                    <img
-                      src={card.icon}
-                      alt={card.title}
-                      style={{ width: "28px", height: "28px" }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <tbody>
+            {filteredData.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="empty">
+                  No data found
+                </td>
+              </tr>
+            ) : (
+              filteredData.map((d) => (
+                <tr key={d._id}>
+                  <td>{d.companyName}</td>
+                  <td>{d.clientName}</td>
+                  <td>{d.email}</td>
+                  <td>{d.contact}</td>
+                  <td>{d.lastCall ? new Date(d.lastCall).toLocaleDateString() : "—"}</td>
+                  <td>
+                   <span className="badge">
+                    {d.assignedTo
+                     ? `${d.assignedTo.firstName} ${d.assignedTo.lastName}`
+                      : "-"}
+                    </span>
 
-        {/* Data Table */}
-        <div className="col-12 px-3 pb-4">
-          <div
-            className="card shadow-sm rounded-3 overflow-hidden mt-3"
-            style={{ maxWidth: "100%" }}
-          >
-            <div
-              className="table-responsive"
-              style={{ overflowX: "auto", width: "100%" }}
-            >
-              <table className="table m-0 align-middle text-nowrap">
-                <thead className="border-bottom">
-                  <tr>
-                    <th className="small fw-bold p-3">Company Name</th>
-                    <th className="small fw-bold p-3">Client Name</th>
-                    <th className="small fw-bold p-3">Email ID</th>
-                    <th className="small fw-bold p-3">Contact No.</th>
-                    <th className="small fw-bold p-3">Last Call</th>
-                    <th className="small fw-bold p-3">Sales Executive Name</th>
-                    <th className="small fw-bold p-3">Transfer Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {untouchedData.map((data) => (
-                    <tr key={data.id} className="border-top">
-                      <td className="small p-3">{data.company}</td>
-                      <td className="small p-3">{data.client}</td>
-                      <td className="small p-3">{data.email}</td>
-                      <td className="small p-3">{data.contact}</td>
-                      <td className="small p-3">{data.lastCall}</td>
-                      <td className="small p-3">{data.salesExecutive}</td>
-                      <td
-                        className={`small p-3 ${
-                          data.transferDate === "Select" ? "text-primary" : ""
-                        }`}
-                      >
-                        {data.transferDate}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+                   </td>
+
+                  <td>
+                    {d.transferredAt
+                      ? new Date(d.transferredAt).toLocaleDateString()
+                      : "Select"}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
