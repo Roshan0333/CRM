@@ -11,7 +11,7 @@ const isAuth = async (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(token,"secret123");
+    const decoded = jwt.verify(token,"graphura_jwt_secret");
 
     const user = await User.findById(decoded.userId).select("-password");
 
@@ -20,6 +20,7 @@ const isAuth = async (req, res, next) => {
     }
 
     req.user = user; // 🔥 VERY IMPORTANT
+
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token" });

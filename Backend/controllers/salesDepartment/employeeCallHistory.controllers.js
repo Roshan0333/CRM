@@ -5,7 +5,7 @@ const getToday_CallList = async (req, res) => {
     try {
         const { _id } = req.user;
 
-        let todaydate = new Date().toLocaleDateString("en-CA");
+        let todaydate = new Date().toLocaleDateString("en-GB");
 
         let callList = await EmployeeHandleClientHistory.find({ employeeId: _id, handledDate: todaydate.toString() });
 

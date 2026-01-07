@@ -1,5 +1,6 @@
 import Sales_Model from "../../models/salesDepartment/sales.models.js";
 import SalesTeam_Model from "../../models/salesDepartment/salesTeams.models.js";
+import Client_Model from "../../models/salesDepartment/client.models.js";
 
 const post_Sale = async (req, res) => {
     try {
@@ -7,11 +8,12 @@ const post_Sale = async (req, res) => {
 
         const { _id, role } = req.user;
 
-        const date = new Date().toLocaleDateString("en-IN");
+        const date = new Date().toLocaleDateString("en-GB");
 
         const salesDone = null;
 
         if (role === "sales manager") {
+
             salesDone = await Sales_Model({
                 ClientId: ClientId,
                 Date: date,
@@ -48,7 +50,7 @@ const post_Sale = async (req, res) => {
                 }
             });
 
-            const salesDone = await Sales_Model({
+            salesDone = await Sales_Model({
                 ClientId: ClientId,
                 Date: date,
                 SalerId: _id,

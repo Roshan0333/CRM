@@ -38,7 +38,6 @@ let token = localStorage.getItem("token");
 
 export const addNewClientApi = async (clientData) => {
   try {
-
     let response = await axios.post(
       `${API_URL}/client/addClient`,
       clientData,
@@ -69,9 +68,8 @@ export const addNewClientApi = async (clientData) => {
   }
 }
 
-export const updateClientStatus = async (clientData) => {
+export const updateClientStatusApi = async (clientData) => {
   try {
-
     let response = await axios.put(`${API_URL}/client/updateClientData`,
       clientData,
       {
@@ -112,7 +110,7 @@ export const hotClient = async () => {
     );
 
     if (role === "sales executive") {
-      let hotClientList = response.data.HotClient(client => client === "sales executive");
+      let hotClientList = response.data.HotClient.filter(client => client.AddedBy === "sales executive");
 
       if (hotClientList.lenght === 0) {
         return { ok: true, fetchMessage: false, data: "No Hot Client Availabel" }
@@ -139,7 +137,7 @@ export const hotClient = async () => {
   }
 }
 
-export const todayReminderList = async () => {
+export const todayReminderListApi = async () => {
   try {
     let response = await axios.get(
       `${API_URL}/remindercall/todayReminderCall`,
@@ -168,7 +166,7 @@ export const todayReminderList = async () => {
   }
 }
 
-export const todayCallingList = async () => {
+export const todayCallingListApi = async () => {
   try {
     let response = await axios.get(
       `${API_URL}/calllog/todayCallList`,
@@ -304,10 +302,10 @@ export const prospectList = async () => {
   catch (err) {
     if (err.response) {
       if (err.response.status < 500) {
-        return { ok: false, fetchMessage: true, data: err.response.data };
+        return { ok: false, fetchMessage: true, data: err.response.data.msg };
       }
       else {
-        return { ok: false, fetchMessage: true, data: err.message.error };
+        return { ok: false, fetchMessage: true, data: err.response.data.error };
       }
     }
     else{

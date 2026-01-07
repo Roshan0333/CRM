@@ -1,27 +1,65 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const {ObjectId} = mongoose.Schema.Types;
+const { ObjectId } = mongoose.Schema.Types;
 
 const SalesTeam_Schema = new Schema({
-    TLId:{
+    TLId: {
         type: ObjectId,
         ref: "User",
-        required: true,
         unique: true
     },
-    Members:[{
-        MemberId:{
+    TLStatus:{
+        type: String,
+        default: "Active"
+    },
+    TLName: {
+        type: String,
+    },
+    TLContact_No: {
+        type: Number,
+        required: true,
+        unique: true,
+    },
+    TLEmail_Id: {
+        type: String,
+        required: true,
+    },
+    TLLocation: {
+        type: String,
+        required: true
+    },
+    TLJoiningDate: {
+        type: Date,
+    },
+    Members: [{
+        MemberId: {
             type: ObjectId,
             ref: "User",
             unique: true
         },
-        Status:{
+        Status: {
             type: String,
             default: "Active",
         },
-        TeamJoiningDate:{
+        Name: {
+            type: String,
+        },
+        Contact_No: {
+            type: Number,
+            required: true,
+            unique: true
+        },
+        Email_Id: {
+            type: String,
+            required: true
+        },
+        Location: {
+            type: String,
+            required: true
+        },
+        TeamJoiningDate: {
             type: Date,
-        }
+        },
     }]
 });
 

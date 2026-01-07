@@ -5,13 +5,30 @@ import SalesTeam_Model from "../../models/salesDepartment/salesTeams.models.js";
 
 const add_Client = async (req, res) => {
     try {
-        const { CompanyName, ClientName, Email_Id, Contact_No, Comments, Reminder_Date, ClientType } = req.body;
+        let { CompanyName, ClientName, Email_Id, Contact_No, Comments, Reminder_Date, ClientType } = req.body;
 
         const { _id, role } = req.user;
 
-        const todayDate = new Date().toLocaleDateString("en-CA");
+        const today = new Date();
 
-        let teamId = null;
+        const updateDate = today.toLocaleDateString("en-GB");
+
+        const d = new Date(Reminder_Date.toString());
+        Reminder_Date = d.toLocaleDateString("en-GB");
+
+        let teamId = "";
+
+        const clientValidation = await Client_Model.findOne(
+            {
+                $or: [
+                    { Email_Id: Email_Id },
+                    { Contact_No: Contact_No },
+                ]
+            })
+
+        if (clientValidation) {
+            return res.status(401).json({ msg: "Client Already Added." })
+        }
 
         if (role !== "sales manager") {
             if (role === "sales executive") {
@@ -23,20 +40,18 @@ const add_Client = async (req, res) => {
                 teamId = teamDetail._id;
             }
         }
-        else {
-            teamId = null;
-        }
 
         const clientData = Client_Model({
             EmployeeIds: {
                 EmployeeId: _id,
                 ClientStatus: "Add New Client",
-                Date: todayDate.toString()
+                Date: updateDate
             },
             CompanyName: CompanyName,
             ClientName: ClientName,
             Email_Id: Email_Id,
             Contact_No: Contact_No,
+            AdderId: _id,
             AddedBy: role,
             TeamId: teamId,
             CurrentStatus: "Add New Client",
@@ -47,10 +62,10 @@ const add_Client = async (req, res) => {
                 Time: Comments.Time,
                 Comment: Comments.Comment
             }],
-            LastUpdate_Date: todayDate.toString(),
+            LastUpdate_Date: updateDate,
             Reminder_Date: Reminder_Date,
             ClientType: ClientType,
-            AddDate: todayDate.toString()
+            AddDate: today
         });
 
         await clientData.save();
@@ -58,7 +73,12 @@ const add_Client = async (req, res) => {
         const updateEmployeeHistory = await EmployeeHandleClientHistory({
             employeeId: _id,
             clientId: clientData._id,
-            handledDate: todayDate.toString()
+            companyName: CompanyName,
+            clientName: ClientName,
+            email_Id: Email_Id,
+            contact_No: Contact_No,
+            reminder_Date: Reminder_Date,
+            handledDate: updateDate
         })
 
         await updateEmployeeHistory.save();
@@ -72,17 +92,20 @@ const add_Client = async (req, res) => {
 
 const update_ClientData = async (req, res) => {
     try {
-        const { ClientId, Status, Comments, Reminder_Date, SalesStatus } = req.body;
+        let { ClientId, Status, Comments, Reminder_Date, SalesStatus } = req.body;
 
         const { _id } = req.user;
 
-        const todayDate = new Date().toLocaleDateString("en-CA");
+        const todayDate = new Date().toLocaleDateString("en-GB");
+        const d = new Date(Reminder_Date.toString());
+        Reminder_Date = d.toLocaleDateString("en-GB");
+
+        let clientDetail = null;
 
         let employeeAdded = await Client_Model.findOne({
             _id: ClientId,
             "EmployeeIds.EmployeeId": _id
         });
-
 
         if (!employeeAdded) {
             await Client_Model.findByIdAndUpdate(
@@ -90,7 +113,7 @@ const update_ClientData = async (req, res) => {
                 {
                     $set: {
                         CurrentStatus: Status,
-                        LastUpdate_Date: todayDate.toString(),
+                        LastUpdate_Date: todayDate,
                         Reminder_Date: Reminder_Date,
                         SalesStatus: SalesStatus,
                     },
@@ -98,7 +121,7 @@ const update_ClientData = async (req, res) => {
                         EmployeeIds: {
                             EmployeeId: _id,
                             ClientStatus: Status,
-                            Date: todayDate.toString()
+                            Date: todayDate
                         },
                         Comments: {
                             Date: Comments.Date,
@@ -110,12 +133,12 @@ const update_ClientData = async (req, res) => {
             )
         }
         else {
-            await Client_Model.findByIdAndUpdate(
+            clientDetail = await Client_Model.findByIdAndUpdate(
                 { _id: ClientId },
                 {
                     $set: {
                         CurrentStatus: Status,
-                        LastUpdate_Date: todayDate.toString(),
+                        LastUpdate_Date: todayDate,
                         Reminder_Date: Reminder_Date,
                         SalesStatus: SalesStatus,
                     },
@@ -133,7 +156,12 @@ const update_ClientData = async (req, res) => {
         const updateEmployeeHistory = await EmployeeHandleClientHistory({
             employeeId: _id,
             clientId: ClientId,
-            handledDate: todayDate.toString()
+            companyName: clientDetail.CompanyName,
+            clientName: clientDetail.ClientName,
+            email_Id: clientDetail.Email_Id,
+            contact_No: clientDetail.Contact_No,
+            reminder_Date: Reminder_Date,
+            handledDate: todayDate
         })
 
         await updateEmployeeHistory.save();
@@ -174,12 +202,14 @@ const get_HotClient = async (req, res) => {
             }
         })
 
+
         let hotClient = await Client_Model.find({
             TeamId: teamDetail._id,
             ClientType: "High Priority",
             SalesStatus: "No Sale"
         });
 
+        console.lo
         if (hotClient.length === 0) {
             return res.status(404).json({ msg: "No Hot Client Availabel" });
         }
@@ -192,34 +222,34 @@ const get_HotClient = async (req, res) => {
 }
 
 const get_CurrentMonthProspect = async (req, res) => {
-    try{
-        let {_id} = req.user;
+    try {
+        let { _id } = req.user;
 
         const startofMonth = new Date();
         startofMonth.setDate(1);
-        startofMonth.setHours(0,0,0,0);
+        startofMonth.setHours(0, 0, 0, 0);
 
         const endofMonth = new Date();
-        endofMonth.setMonth(endofMonth.getMonth()+1);
-        endofMonth.setDate(0);
-        endofMonth.setHours(23, 59, 59, 999);
+        endofMonth.setMonth(endofMonth.getMonth() + 1);
+        endofMonth.setDate(0); endofMonth.setHours(23, 59, 59, 999);
 
-        let prospectList = await Client_Model.find({
+        const prospectList = await Client_Model.find({
             AdderId: _id,
-            AddDate:{
+            AddDate: {
                 $gte: startofMonth,
                 $lte: endofMonth
             }
-        })
+        });
 
-        return res.status(200).json({ProspectList: prospectList, msg: "Successfully"});
+
+        return res.status(200).json({ ProspectList: prospectList, msg: "Successfully" });
     }
-    catch(err){
-        return res.status(500).json({error: err.message})
+    catch (err) {
+        return res.status(500).json({ error: err.message })
     }
 }
 
-export { add_Client, update_ClientData, delete_Client, get_HotClient, get_CurrentMonthProspect};
+export { add_Client, update_ClientData, delete_Client, get_HotClient, get_CurrentMonthProspect };
 
 
 

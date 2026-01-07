@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { updateClientStatus } from "../../services/salesDepartmentApi";
 
-function UpdateDataPopUp({ closeUpdatePopup }) {
+    function UpdateDataPopUp({ closeUpdatePopup, updateFunction = null }) {
+
+    let todayDate = new Date().toLocaleDateString("en-GB");
+    let currentTime = new Date().toLocaleTimeString("en-IN");
 
     const [saleFlag, setSaleFlag] = useState(false);
 
@@ -95,7 +97,22 @@ function UpdateDataPopUp({ closeUpdatePopup }) {
                         <textarea id="comment" placeholder="" onChange={(e) => setComment(e.target.value)}></textarea>
                     </div>
 
-                    <button id="update-btn">Update</button>
+                    <button id="update-btn" onClick={() => {
+
+                        let comments={
+                            Date: todayDate,
+                            Time: currentTime,
+                            Comment: comment,
+                        }
+
+                        if(saleFlag){
+                            let salesStatus = "Sold"
+                        }
+                        else{
+                            let salesStatus = "No Sale"
+                            updateFunction(clientStatus, comments, reminderDate, salesStatus);
+                        }
+                        }}>Update</button>
                 </div>
             </div>
         </div>

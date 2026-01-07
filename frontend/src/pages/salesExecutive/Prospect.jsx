@@ -10,14 +10,16 @@ function Prospect() {
   const [email, setEmail] = useState("");
   const [contactNumber, setContactNumber] = useState(null);
   const [reminderDate, setReminderDate] = useState(null);
-  const [comment, setComment] = useState("");
-  const [clientType, setClientType] = useState("");
+  const [comment, setComment] = useState(null);
+  const [clientType, setClientType] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let todayDate = new Date().toLocaleDateString("en-CA");
-    let currentTime = new Date().toLocaleTimeString("en-CA");
+    let todayDate = new Date().toLocaleDateString("en-GB");
+    let currentTime = new Date().toLocaleTimeString("en-GB");
+
+    console.log(companyName, clientName, email, contactNumber, reminderDate, comment, clientType)
 
     if (!companyName || !clientName || !email || !contactNumber || !reminderDate || !comment) {
 
@@ -111,17 +113,17 @@ function Prospect() {
                 <label>Client Type</label>
                 <div id="client-type">
                   <div >
-                    <input type="radio" name="clientPriority" value="High Priority" onChange={(e) => setClientType(e.target.value)} />
+                    <input type="radio" name="clientPriority" value="High Priority" checked={clientType === "High Priority"} onChange={(e) => setClientType(e.target.value)} />
                     <label>High Priority</label>
                   </div>
 
                   <div>
-                    <input type="radio" name="clientPriority" value="Medium Priority" onChange={(e) => setClientType(e.target.value)} />
+                    <input type="radio" name="clientPriority" value="Medium Priority" checked={clientType === "Medium Priority"} onChange={(e) => setClientType(e.target.value)} />
                     <label>Medium Priority</label>
                   </div>
 
                   <div>
-                    <input type="radio" name="clientPriority" value="Low Priority" onChange={(e) => setClientType(e.target.value)} />
+                    <input type="radio" name="clientPriority" value="Low Priority" checked={clientType === "Low Priority"} onChange={(e) => setClientType(e.target.value)} />
                     <label>Low Priority</label>
                   </div>
                 </div>
@@ -129,7 +131,7 @@ function Prospect() {
               </div>
 
               <div id="form-row">
-                <label for="comment">Comment</label>
+                <label htmlFor="comment">Comment</label>
                 <textarea id="comment" name="comment" rows="4" onChange={(e) => setComment(e.target.value)}></textarea>
               </div>
 

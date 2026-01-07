@@ -6,7 +6,7 @@ const todayReminderCall = async (req, res) => {
 
         let {_id} = req.user;
 
-        let todayDate = new Date().toLocaleDateString("en-CA");
+        let todayDate = new Date().toLocaleDateString("en-GB");
 
         let teamDetails = await SalesTeam_Model.findOne({"Members.MemberId": _id})
 

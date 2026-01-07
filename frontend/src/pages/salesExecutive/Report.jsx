@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import calender from "../../assets/salesExecutive/report/calander.png";
 import "../../style/salesExecutive/report.css";
+import { useEffect } from "react";
+import {todayCallingListApi} from "../../services/salesDepartmentApi";
 
 const Report = () => {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({ callStatus: "", comment: "" });
 
-  const todaysCalls = Array(6)
-    .fill(null)
-    .map((_, i) => ({
-      id: i + 1,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      reminder: "Bold text column",
-    }));
+  const [todayCalls, setTodayCalls] = useState([])
+
+  // const todaysCalls = Array(6)
+  //   .fill(null)
+  //   .map((_, i) => ({
+  //     id: i + 1,
+  //     company: "Bold text column",
+  //     client: "Bold text column",
+  //     email: "Bold text column",
+  //     contact: "Bold text column",
+  //     reminder: "Bold text column",
+  //   }));
 
   const pastCalls = Array(5)
     .fill(null)
@@ -34,6 +38,22 @@ const Report = () => {
     setShowModal(false);
     setFormData({ callStatus: "", comment: "" });
   };
+
+  useEffect(() => {
+    ;(
+      async() => {
+        let today_CallListResponse = await todayCallingListApi();
+
+        if(!today_CallListResponse.ok || !today_CallListResponse.fetchMessage){
+          console.log(todayCallingListApi.data);
+        }
+        else{
+          console.log(today_CallListResponse.data.TodayCallList)
+          setTodayCalls(today_CallListResponse.data.TodayCallList)
+        }
+      }
+    )()
+  },[])
 
   return (
     <div
@@ -108,7 +128,7 @@ const Report = () => {
                     borderBottom: "1px solid #e5e7eb",
                   }}
                 >
-                  <th style={{ padding: "16px 20px", color: "#000000" }}></th>
+                  <th style={{ padding: "16px 20px", color: "#000000" }}>#</th>
                   <th style={{ padding: "16px 20px" }}>Company Name</th>
                   <th style={{ padding: "16px 20px" }}>Client Name</th>
                   <th style={{ padding: "16px 20px" }}>Email_id</th>
@@ -119,22 +139,22 @@ const Report = () => {
               </thead>
 
               <tbody>
-                {todaysCalls.map((row) => (
+                {todayCalls.map((item, index) => (
                   <tr
-                    key={row.id}
+                    key={item.clientId}
                     style={{
                       backgroundColor: "white",
                       borderBottom: "1px solid #e5e7eb",
                     }}
                   >
                     <td style={{ padding: "16px 20px" }}>
-                      <span style={{ color: "#000000" }}>⋮</span>
+                      <span style={{ color: "#000000" }}>{index+1}</span>
                     </td>
-                    <td style={{ padding: "16px 20px" }}>{row.company}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.client}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.email}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.contact}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.reminder}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.companyName}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.clientName}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.email_Id}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.contact_No}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.reminder_Date}</td>
                     <td style={{ padding: "16px 20px" }}>
                       <button
                         onClick={() => setShowModal(true)}

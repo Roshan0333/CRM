@@ -6,10 +6,11 @@ const Sales_Schema = new Schema({
     ClientId: {
         type: ObjectId,
         ref: "Client",
-        required: true
+        required: true,
+        unique : true
     },
     Date: {
-        type: Date,
+        type: String,
         required: true
     },
     SalerId:{

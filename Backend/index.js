@@ -9,7 +9,7 @@ import clientRoutes from "./routes/salesDepartment/client.route.js";
 import salesRoutes from './routes/salesDepartment/sales.route.js';
 import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
 import reminderCallRoutes from "./routes/salesDepartment/todayReminderCall.route.js"
-import auth from "./middlewares/AuthMiddleware.js"
+import salesTeamRoutes from "./routes/salesDepartment/salesTeam.route.js";
 
 import totalSalesRoutes from "./routes/SalesTeam/totalSalesRoutes.js";
 import untouchedRoutes from "./routes/SalesTeam/untouchedRoutes.js";
@@ -26,7 +26,7 @@ const PORT = process.env.PORT || 5000;
 // 🔐 CORS
 app.use(
   cors({
-    origin: "http://localhost:5174",        // Vite default URL
+    origin: "http://localhost:5173",        // Vite default URL
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: false,                     // cookie वापरत नाहीस
@@ -47,6 +47,7 @@ app.use("/api/client", clientRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/calllog", callLogRoutes)
 app.use("/api/remindercall", reminderCallRoutes);
+app.use("/api/salesTeam", salesTeamRoutes);
 
 app.use("/api/salesTeamLead", salesTeamLeadRoutes);
 app.use("/api/prospects", prospectRoutes);
