@@ -10,7 +10,7 @@ const Sales_Schema = new Schema({
         unique : true
     },
     Date: {
-        type: String,
+        type: Date,
         required: true
     },
     SalerId:{
@@ -32,15 +32,7 @@ const Sales_Schema = new Schema({
     Amount: {
         type: Number,
         required: true
-    },
-    Activities: [{
-        Date: {
-            type: String,
-        },
-        Activity: {
-            type: String,
-        }
-    }]
+    }
 })
 
 const Sales_Model = mongoose.model("Sales", Sales_Schema);

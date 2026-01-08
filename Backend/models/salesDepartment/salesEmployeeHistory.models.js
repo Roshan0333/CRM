@@ -29,8 +29,11 @@ const employeeHistorySchema = new mongoose.Schema(
     reminder_Date: {
         type: String,
     },
+    comment:{
+      type: String
+    },
     handledDate: {
-      type: String,
+      type: Date,
       required: true,
       index: true
     }

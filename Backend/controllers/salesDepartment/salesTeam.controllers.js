@@ -3,9 +3,11 @@ import SalesTeam_Model from "../../models/salesDepartment/salesTeams.models.js";
 
 const addTeam_SalesTeamLead = async (req, res) => {
     try {
-        const { firstName, lastName, email, contact, location, joiningDate } = req.body
+        let { firstName, lastName, email, contact, location, joiningDate } = req.body
 
         let employeeDetail = await User.findOne({ email: email });
+
+        joiningDate = new Date(joiningDate.toString()).toLocaleDateString("en-GB");
 
 
         let contactValidation = await SalesTeam_Model.findOne({
@@ -55,9 +57,11 @@ const addTeam_SalesTeamLead = async (req, res) => {
 const addTeam_SalesExcutive = async (req, res) => {
     try {
         const { _id } = req.user;
-        const { name, email, contact, location, joiningDate } = req.body;
+        let { name, email, contact, location, joiningDate } = req.body;
 
         const employeeDetail = await User.findOne({ email: email });
+
+        joiningDate = new Date(joiningDate.toString()).toLocaleDateString("en-GB");
 
         const contactValidation = await SalesTeam_Model.findOne({
             $or: [

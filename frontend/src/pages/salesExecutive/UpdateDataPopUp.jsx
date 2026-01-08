@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-    function UpdateDataPopUp({ closeUpdatePopup, updateFunction = null }) {
+    function UpdateDataPopUp({ closeUpdatePopup, updateFunction = null, salesFunction=null }) {
 
     let todayDate = new Date().toLocaleDateString("en-GB");
     let currentTime = new Date().toLocaleTimeString("en-IN");
@@ -106,11 +106,15 @@ import { useState } from "react";
                         }
 
                         if(saleFlag){
-                            let salesStatus = "Sold"
+                            let salesStatus = "Sold";
+                            updateFunction(clientStatus, comments, reminderDate, salesStatus);
+                            salesFunction(service, amount);
+                            closeUpdatePopup()
                         }
                         else{
                             let salesStatus = "No Sale"
                             updateFunction(clientStatus, comments, reminderDate, salesStatus);
+                            closeUpdatePopup()
                         }
                         }}>Update</button>
                 </div>

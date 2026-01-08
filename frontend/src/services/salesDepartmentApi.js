@@ -109,17 +109,6 @@ export const hotClient = async () => {
       }
     );
 
-    if (role === "sales executive") {
-      let hotClientList = response.data.HotClient.filter(client => client.AddedBy === "sales executive");
-
-      if (hotClientList.lenght === 0) {
-        return { ok: true, fetchMessage: false, data: "No Hot Client Availabel" }
-      }
-      else {
-        return { ok: true, fetchMessage: true, data: hotClientList };
-      }
-    }
-
     return { ok: true, fetchMessage: true, data: response.data.HotClient };
   }
   catch (err) {
@@ -148,8 +137,8 @@ export const todayReminderListApi = async () => {
         }
       }
     );
-
-    return { ok: true, fetchMessage: true, data: response.data };
+    
+      return { ok: true, fetchMessage: true, data: response.data.ReminderList };
   }
   catch (err) {
     if (err.response) {
@@ -195,10 +184,11 @@ export const todayCallingListApi = async () => {
   }
 }
 
-export const cutomerCallingList = async (startDate, lastDate) => {
+export const cutomerCallingListApi = async (startDate, endDate) => {
   try {
+    
     let response = await axios.get(
-      `${API_URL}/calllog/customDateCallList?StartDate=${startDate}&LastDate=${lastDate}`,
+      `${API_URL}/calllog/customDateCallList?StartDate=${startDate}&LastDate=${endDate}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -207,15 +197,15 @@ export const cutomerCallingList = async (startDate, lastDate) => {
       }
     );
 
-    return { ok: true, fetchMessage: true, data: response.data };
+    return { ok: true, fetchMessage: true, data: response.data.CallList };
   }
   catch (err) {
     if (err.response) {
       if (err.response.status < 500) {
-        return { ok: false, fetchMessage: true, data: response.data.msg };
+        return { ok: false, fetchMessage: true, data: err.response.data.msg };
       }
       else {
-        return { ok: false, fetchMessage: true, data: response.data.error };
+        return { ok: false, fetchMessage: true, data: err.response.data.error };
       }
     }
     else {
@@ -224,7 +214,7 @@ export const cutomerCallingList = async (startDate, lastDate) => {
   }
 }
 
-export const postSale = async (salesData) => {
+export const postSaleApi = async (salesData) => {
   try {
     let response = await axios.post(
       `${API_URL}/sales/saleDone`,

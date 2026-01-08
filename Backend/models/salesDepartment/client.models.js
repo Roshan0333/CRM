@@ -55,10 +55,10 @@ const client_Schema = new Schema({
         }
     }],
     LastUpdate_Date: {
-        type: String,
+        type: Date,
     },
     Reminder_Date: {
-        type: String,
+        type: Date,
         required: true
     },
     ClientType:{

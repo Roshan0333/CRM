@@ -23,6 +23,7 @@ const SalesTeam_Schema = new Schema({
     TLEmail_Id: {
         type: String,
         required: true,
+        unique: true
     },
     TLLocation: {
         type: String,

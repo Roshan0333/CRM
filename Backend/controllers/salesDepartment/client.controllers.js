@@ -10,11 +10,7 @@ const add_Client = async (req, res) => {
         const { _id, role } = req.user;
 
         const today = new Date();
-
         const updateDate = today.toLocaleDateString("en-GB");
-
-        const d = new Date(Reminder_Date.toString());
-        Reminder_Date = d.toLocaleDateString("en-GB");
 
         let teamId = "";
 
@@ -62,7 +58,7 @@ const add_Client = async (req, res) => {
                 Time: Comments.Time,
                 Comment: Comments.Comment
             }],
-            LastUpdate_Date: updateDate,
+            LastUpdate_Date: today,
             Reminder_Date: Reminder_Date,
             ClientType: ClientType,
             AddDate: today
@@ -78,7 +74,8 @@ const add_Client = async (req, res) => {
             email_Id: Email_Id,
             contact_No: Contact_No,
             reminder_Date: Reminder_Date,
-            handledDate: updateDate
+            comment: Comments.Comment,
+            handledDate: today
         })
 
         await updateEmployeeHistory.save();
@@ -96,9 +93,11 @@ const update_ClientData = async (req, res) => {
 
         const { _id } = req.user;
 
-        const todayDate = new Date().toLocaleDateString("en-GB");
-        const d = new Date(Reminder_Date.toString());
-        Reminder_Date = d.toLocaleDateString("en-GB");
+        if(Comments.Comment === "Sold"){
+            Reminder_Date = new Date().toISOString().split("T")[0];
+        }
+
+        const today = new Date();
 
         let clientDetail = null;
 
@@ -138,7 +137,7 @@ const update_ClientData = async (req, res) => {
                 {
                     $set: {
                         CurrentStatus: Status,
-                        LastUpdate_Date: todayDate,
+                        LastUpdate_Date: today,
                         Reminder_Date: Reminder_Date,
                         SalesStatus: SalesStatus,
                     },
@@ -161,7 +160,8 @@ const update_ClientData = async (req, res) => {
             email_Id: clientDetail.Email_Id,
             contact_No: clientDetail.Contact_No,
             reminder_Date: Reminder_Date,
-            handledDate: todayDate
+            comment: Comments.Comment,
+            handledDate: today
         })
 
         await updateEmployeeHistory.save();
@@ -209,7 +209,7 @@ const get_HotClient = async (req, res) => {
             SalesStatus: "No Sale"
         });
 
-        console.lo
+
         if (hotClient.length === 0) {
             return res.status(404).json({ msg: "No Hot Client Availabel" });
         }
@@ -231,7 +231,8 @@ const get_CurrentMonthProspect = async (req, res) => {
 
         const endofMonth = new Date();
         endofMonth.setMonth(endofMonth.getMonth() + 1);
-        endofMonth.setDate(0); endofMonth.setHours(23, 59, 59, 999);
+        endofMonth.setDate(0); 
+        endofMonth.setHours(23, 59, 59, 999);
 
         const prospectList = await Client_Model.find({
             AdderId: _id,

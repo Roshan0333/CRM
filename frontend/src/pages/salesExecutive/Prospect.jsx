@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../style/salesExecutive/prospect.css";
 import { addNewClientApi } from "../../services/salesDepartmentApi";
 
@@ -8,10 +8,11 @@ function Prospect() {
   const [companyName, setCompanyName] = useState("");
   const [clientName, setClientName] = useState("");
   const [email, setEmail] = useState("");
-  const [contactNumber, setContactNumber] = useState(null);
-  const [reminderDate, setReminderDate] = useState(null);
-  const [comment, setComment] = useState(null);
-  const [clientType, setClientType] = useState(null);
+  const [contactNumber, setContactNumber] = useState();
+  const [reminderDate, setReminderDate] = useState();
+  const [comment, setComment] = useState();
+  const [clientType, setClientType] = useState();
+  // const [resetFlag, setResetFlag] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,11 +20,9 @@ function Prospect() {
     let todayDate = new Date().toLocaleDateString("en-GB");
     let currentTime = new Date().toLocaleTimeString("en-GB");
 
-    console.log(companyName, clientName, email, contactNumber, reminderDate, comment, clientType)
 
     if (!companyName || !clientName || !email || !contactNumber || !reminderDate || !comment) {
 
-      console.log(companyName, clientName, email, contactNumber, reminderDate, comment)
       alert("All fields are required");
       return
     }
@@ -44,7 +43,7 @@ function Prospect() {
             Time: currentTime.toString(),
             Comment: comment
           },
-          Reminder_Date: reminderDate.toString(),          
+          Reminder_Date: reminderDate.toString(),
           ClientType: clientType,
         }
 
@@ -61,12 +60,13 @@ function Prospect() {
           setContactNumber("");
           setReminderDate("");
           setComment("");
+          setClientType("");
         }
-        else{
-          if(responseStatus){
+        else {
+          if (responseStatus) {
             alert(response.data)
           }
-          else{
+          else {
             alert("NetWork Error");
             console.log(response.data)
           }
@@ -86,27 +86,27 @@ function Prospect() {
               {/* <div id="form-box"></div> */}
               <div id="form-row">
                 <label for="form-row">Company Name</label>
-                <input type="text" id="company" name="company" onChange={(e) => setCompanyName(e.target.value)} />
+                <input type="text" id="company" name="company" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
               </div>
 
               <div id="form-row">
                 <label for="client">Client Name</label>
-                <input type="text" id="client" name="client" onChange={(e) => setClientName(e.target.value)} />
+                <input type="text" id="client" name="client" value={clientName} onChange={(e) => setClientName(e.target.value)} />
               </div>
 
               <div id="form-row">
                 <label for="email">Email_id</label>
-                <input type="email" id="email" name="email" onChange={(e) => setEmail(e.target.value)} />
+                <input type="email" id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
 
               <div id="form-row">
                 <label for="contact">Contact no.</label>
-                <input type="tel" id="contact" name="contact" onChange={(e) => setContactNumber(e.target.value)} />
+                <input type="tel" id="contact" name="contact" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} />
               </div>
 
               <div id="form-row">
                 <label for="reminder">Reminder Date</label>
-                <input type="date" id="reminder" name="reminder" onChange={(e) => setReminderDate(e.target.value)} />
+                <input type="date" id="reminder" name="reminder" value={reminderDate} onChange={(e) => setReminderDate(e.target.value)} />
               </div>
 
               <div id="clientTypeMain-Div">
@@ -132,7 +132,7 @@ function Prospect() {
 
               <div id="form-row">
                 <label htmlFor="comment">Comment</label>
-                <textarea id="comment" name="comment" rows="4" onChange={(e) => setComment(e.target.value)}></textarea>
+                <textarea id="comment" name="comment" rows="4" value={comment} onChange={(e) => setComment(e.target.value)}></textarea>
               </div>
 
               <div

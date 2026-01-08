@@ -1,6 +1,5 @@
 import { useState } from "react";
 function LastUpdatePopUp({ closePopup, statusData }) {
-  console.log('Popup')
 
   return (
     <div id="popup-overlay" onClick={closePopup}>

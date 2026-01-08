@@ -7,7 +7,7 @@ import "../../style/salesExecutive/dashboard.css";
 // import Sidebar from "../../components/salesExecutive/Sidebar";
 import LastUpdatePopUp from "./LastupdatePopUp";
 import UpdataDataPopUp from "./UpdateDataPopUp";
-import { TotalSale, prospectList, hotClient, updateClientStatusApi } from "../../services/salesDepartmentApi";
+import { TotalSale, prospectList, hotClient, updateClientStatusApi, postSaleApi } from "../../services/salesDepartmentApi";
 
 
 const Dashboard = () => {
@@ -28,14 +28,14 @@ const Dashboard = () => {
 
   let clientStatus = (index) => {
     setSelectClient(index);
-    setClientStatusList(hotClientList[index].Comments);
+    setClientStatusList(hotClientList[index].Comments.reverse());
   }
 
 
   const updateClientStatus = async (Status, Comments, Reminder_Date, SalesStatus) => {
 
 
-    let clientData ={
+    let clientData = {
       ClientId: hotClientList[selectClient]._id,
       Status: Status,
       Comments: Comments,
@@ -49,10 +49,25 @@ const Dashboard = () => {
       console.log(updateClientStatus_Response.data);
     }
     else {
-        alert(updateClientStatus_Response.data);
+      alert(updateClientStatus_Response.data);
+      setResetFlag(prev => !prev)
     }
   }
 
+  const salesApi = async (Service, Amount) => {
+
+    const salesData = {
+      ClientId: hotClientList[selectClient]._id,
+      Service: Service,
+      Amount: Amount
+    }
+
+    let salesResponse = await postSaleApi(salesData);
+    
+    alert(salesResponse.data)
+
+    setResetFlag(prev => !prev)
+  }
 
   useEffect(() => {
     ; (
@@ -75,7 +90,7 @@ const Dashboard = () => {
           console.log(totalSaleResponse.data);
         }
         else {
-          let totalSales = totalSaleResponse.data.TotalSales.length
+          let totalSales = totalSaleResponse.data.TotalSales[0].count;
           setTotalSalesNumber(totalSales);
         }
 
@@ -83,13 +98,14 @@ const Dashboard = () => {
           console.log(todayReminderList.data)
         }
         else {
-          let list = todayReminderList.data
+          let list = todayReminderList.data.filter(client => client.AddedBy === "sales executive");
           setHotClientList(list);
         }
 
       }
     )()
   }, [])
+
 
   return (
     <main>
@@ -161,7 +177,7 @@ const Dashboard = () => {
                           <td>{item.ClientName}</td>
                           <td>{item.Email_Id}</td>
                           <td>{item.Contact_No}</td>
-                          <td>{item.Reminder_Date}</td>
+                          <td>{new Date(item.Reminder_Date.toString()).toLocaleDateString("en-GB")}</td>
                           <td>
                             {/* <button onClick={openPopup}>Update</button> */}
                             <button onClick={() => {
@@ -187,7 +203,7 @@ const Dashboard = () => {
         </div>
       </div>
       {showLastUpdatePopup && <LastUpdatePopUp closePopup={closePopup} statusData={clientStatusList} />}
-      {showUpdatePopup && <UpdataDataPopUp closeUpdatePopup={closeUpdatePopup} updateFunction={updateClientStatus}/>}
+      {showUpdatePopup && <UpdataDataPopUp closeUpdatePopup={closeUpdatePopup} updateFunction={updateClientStatus} salesFunction = {salesApi}/>}
     </main>
   );
 };
