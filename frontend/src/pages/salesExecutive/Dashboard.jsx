@@ -7,7 +7,7 @@ import "../../style/salesExecutive/dashboard.css";
 // import Sidebar from "../../components/salesExecutive/Sidebar";
 import LastUpdatePopUp from "./LastupdatePopUp";
 import UpdataDataPopUp from "./UpdateDataPopUp";
-import { TotalSale, prospectList, hotClient, updateClientStatusApi, postSaleApi } from "../../services/salesDepartmentApi";
+import { TotalSale, prospectList, hotClient, updateClientStatusApi, postSaleApi, cutomerCallingListApi } from "../../services/salesDepartmentApi";
 
 
 const Dashboard = () => {
@@ -23,8 +23,16 @@ const Dashboard = () => {
   const [totalSalesNumber, setTotalSalesNumber] = useState(0);
   const [prospectNumber, setProspectNumber] = useState(0);
   const [hotClientList, setHotClientList] = useState([]);
+  const [totalClientNumber, setTotalClientNumber] = useState(0)
   const [clientStatusList, setClientStatusList] = useState([]);
   const [selectClient, setSelectClient] = useState();
+
+  let now = new Date();
+
+let startMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+
+let endMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
 
   let clientStatus = (index) => {
     setSelectClient(index);
@@ -50,7 +58,6 @@ const Dashboard = () => {
     }
     else {
       alert(updateClientStatus_Response.data);
-      setResetFlag(prev => !prev)
     }
   }
 
@@ -75,7 +82,7 @@ const Dashboard = () => {
         let totalSaleResponse = await TotalSale();
         let totalProspectResponse = await prospectList();
         let todayReminderList = await hotClient();
-        // let totalClientResponse = await cutomerCallingList();
+        let totalClientResponse = await cutomerCallingListApi(startMonth, endMonth);
 
 
         if (!totalProspectResponse.ok || !totalProspectResponse.fetchMessage) {
@@ -102,6 +109,15 @@ const Dashboard = () => {
           setHotClientList(list);
         }
 
+        if(!totalClientResponse.ok || !totalClientResponse.fetchMessage){
+          console.log(totalClientResponse.data);
+        }
+        else{
+          let list = totalClientResponse.data.map(item => item.clientId);
+          let totalClientList = new Set(list);
+          setTotalClientNumber(totalClientList.size);
+        }
+
       }
     )()
   }, [])
@@ -118,7 +134,7 @@ const Dashboard = () => {
               <div id="data">
                 <h3>TOTAL CLIENT'S DATA</h3>
                 <div id="num-vector">
-                  <p>300</p>
+                  <p>{totalClientNumber}</p>
                   <img src={clientData} alt="" />
                 </div>
               </div>
