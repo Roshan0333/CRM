@@ -1,81 +1,87 @@
 import React from "react";
 import "../../style/salesManager/totalSales.css";
+import { useEffect, useState } from "react";
+import { currentYearSales } from "../../services/salesDepartmentApi";
+import LastUpdatePopUp from "../salesExecutive/LastupdatePopUp";
 
 const TotalSales = () => {
-  const data = [
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      email_id: "Bold text column",
-      contactNo: "Bold text column",
-      Date: "Bold text column",
-      Amount: "Bold text column",
-      TLname: "Bold text column",
-      SalesExecutive: "Select",
-      Services: "Select",
-      Activity: "Button",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      email_id: "Bold text column",
-      contactNo: "Bold text column",
-      Date: "Bold text column",
-      Amount: "Bold text column",
-      TLname: "Bold text column",
-      SalesExecutive: "Bold text column",
-      Services: "Bold text column",
-      Activity: "Button",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      email_id: "Bold text column",
-      contactNo: "Bold text column",
-      Date: "Bold text column",
-      Amount: "Bold text column",
-      TLname: "Bold text column",
-      SalesExecutive: "Bold text column",
-      Services: "Bold text column",
-      Activity: "Button",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      email_id: "Bold text column",
-      contactNo: "Bold text column",
-      Date: "Bold text column",
-      Amount: "Bold text column",
-      TLname: "Bold text column",
-      SalesExecutive: "Bold text column",
-      Services: "Bold text column",
-      Activity: "Button",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      email_id: "Bold text column",
-      contactNo: "Bold text column",
-      Date: "Bold text column",
-      Amount: "Bold text column",
-      TLname: "Bold text column",
-      SalesExecutive: "Bold text column",
-      Services: "Bold text column",
-      Activity: "Button",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      email_id: "Bold text column",
-      contactNo: "Bold text column",
-      Date: "Bold text column",
-      Amount: "Bold text column",
-      TLname: "Bold text column",
-      SalesExecutive: "Bold text column",
-      Services: "Bold text column",
-      Activity: "Button",
-    },
-  ];
+
+  const [salesList, setSalesList] = useState([]);
+  const [filterList, setFilterList] = useState([]);
+
+  const [monthList, setMonthList] = useState([]);
+  const [TlList, setTlList] = useState([]);
+
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedTL, setSelectedTL] = useState("");
+
+  const [popupFlag, setPopupFlag] = useState(false);
+  const [commentList, setCommentList] = useState([])
+
+  let offPopupFlag = () => {
+    setPopupFlag(prev => !prev);
+  }
+
+
+  useEffect(() => {
+    ; (
+      async () => {
+        const apiResponse = await currentYearSales();
+
+        if (!apiResponse.fetchMessage) {
+          console.log(apiResponse.data)
+          return
+        }
+        else if (!apiResponse.ok) {
+          alert(apiResponse.data || "No Sales")
+          return
+        }
+        else {
+
+          const apiSalesList = apiResponse.data.TotalSales || [];
+
+          setSalesList(apiSalesList);
+          setFilterList(apiSalesList);
+
+          console.log(apiSalesList)
+
+          let months = [...new Set(
+            apiSalesList.map((item) => {
+              return new Date(item.Date).toLocaleDateString("default", { month: "long" });
+            })
+          )]
+
+          let teamLeads = [...new Set(
+            apiSalesList.map((item) => {
+              return `${item.TeamLeaderDetail.email}`
+            })
+          )]
+
+          setMonthList(months);
+          setTlList(teamLeads);
+        }
+      }
+
+    )()
+  }, [])
+
+  const applyFilter = () => {
+    let filtered = [...salesList];
+
+    if (selectedMonth) {
+      filtered = filtered.filter((item) => {
+        return new Date(item.Date).toLocaleDateString("default", { month: "long" }) === selectedMonth
+      })
+    }
+
+    if (selectedTL) {
+      filterList = filterList.filter((item) => {
+        return `${item.TeamLeaderDetail.email}` === selectedTL
+      })
+    }
+
+    setFilterList(filterList)
+  }
 
   return (
     <div
@@ -98,14 +104,20 @@ const TotalSales = () => {
           <div className="d-flex" style={{ gap: "20px", flex: "1" }}>
             <select className="form-select shadow-sm fw-bold tsm-select">
               <option>Month</option>
+              {monthList.map((item, index) => {
+                return <option value={item} key={index}>{item}</option>
+              })}
             </select>
 
             <select className="form-select shadow-sm fw-bold tsm-select">
-              <option>Team Leader Name</option>
+              <option>Team Leader Email</option>
+              {TlList.map((item, index) => {
+                return <option value={item} key={index}>{item}</option>
+              })}
             </select>
           </div>
 
-          <button className="btn btn-primary px-4 tsm-search-btn">
+          <button className="btn btn-primary px-4 tsm-search-btn" onClick={applyFilter}>
             Search
           </button>
         </div>
@@ -134,28 +146,40 @@ const TotalSales = () => {
               </thead>
 
               <tbody>
-                {data.map((row, index) => (
+                {filterList.map((item, index) => (
                   <tr key={index}>
-                    <td>{row.companyName}</td>
-                    <td>{row.clientName}</td>
-                    <td>{row.email_id}</td>
-                    <td>{row.contactNo}</td>
-                    <td>{row.Date}</td>
-                    <td>{row.Amount}</td>
-                    <td>{row.TLname}</td>
-                    <td>{row.SalesExecutive}</td>
-                    <td>{row.Services}</td>
+                    <td>{item.ClientDetails.CompanyName}</td>
+                    <td>{item.ClientDetails.ClientName}</td>
+                    <td>{item.ClientDetails.Email_Id}</td>
+                    <td>{item.ClientDetails.Contact_No}</td>
+                    <td>{new Date(item.Date).toLocaleDateString()}</td>
+                    <td>{item.Amount}</td>
+                    <td>{item.TeamLeaderDetail.firstName} {item.TeamLeaderDetail.lastName}</td>
+                    <td>{item.SalerDetail.firstName} {item.SalerDetail.lastName}</td>
+                    <td>{item.Service}</td>
 
                     <td>
-                      <button className="tsm-view-btn">View</button>
+                      <button className="tsm-view-btn" onClick={() => {
+                        setPopupFlag(prev => !prev);
+                        setCommentList(filterList[index].ClientDetails.Comments)
+                        }}>View</button>
                     </td>
                   </tr>
                 ))}
+
+                {filterList.length === 0 && (
+                  <tr>
+                    <td colSpan="10" className="text-center text-danger fw-bold">
+                      No Results Found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      {popupFlag && <LastUpdatePopUp closePopup={offPopupFlag} statusData={commentList} />}
     </div>
   );
 };

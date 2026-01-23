@@ -303,3 +303,62 @@ export const prospectList = async () => {
     }
   }
 }
+
+export const allProspectList = async () =>{
+  try{
+    const response = await axios.get(
+      `${API_URL}/client/allProspectList`,
+      {
+        headers:{
+          "Content-Type":"application/json",
+          Authorization:`Bearer ${token}`
+        }
+      }
+    );
+
+    return {ok: true, fetchMessage: true, data: response.data};
+  }
+  catch(err){
+        console.log(err.response)
+    if(err.response){
+      if (err.response.status < 500) {
+        return { ok: false, fetchMessage: true, data: err.response.data.msg };
+      }
+      else {
+        return { ok: false, fetchMessage: true, data: err.response.data.error };
+      }
+    }
+    else{
+      return {ok:false, fetchMessage: false, data: err.message}
+    }
+  }
+}
+
+export const currentYearSales = async () => {
+  try{
+    const response = await axios.get(
+      `${API_URL}/sales/yearSales`,
+      {
+        headers:{
+          "Content-Type":"application/json",
+          Authorization:`Bearer ${token}`
+        }
+      }
+    );
+
+    return {ok: true, fetchMessage: true, data: response.data};
+  }
+  catch(err){
+    if(err.response){
+      if(err.response.status < 500){
+        return {ok: false, fetchMessage: true, data: err.response.data.msg};
+      }
+      else{
+        return {ok: false, fetchMessage: true, data: err.response.data.error}
+      }
+    }
+    else{
+      return {ok: false, fetchMessage: false, data: err.message}
+    }
+  }
+}

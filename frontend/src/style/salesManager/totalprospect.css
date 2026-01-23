@@ -1,0 +1,263 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+/* =================== PAGE WRAPPER =================== */
+.leadprospectContainer {
+    font-family: "Inter", sans-serif;
+    padding: 24px 28px;
+    width: 80%;
+    background: #f8f9fc;
+    min-height: calc(100vh - 60px);
+    /* header height */
+    overflow-y: auto;
+    margin-left: 19%;
+}
+
+.leadprospectContainer h1 {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: #1f2937;
+}
+
+/* =================== FILTER SECTION =================== */
+.filter {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.selectControl {
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    background: white;
+    outline: none;
+    cursor: pointer;
+    min-width: 160px;
+}
+
+.searchBtn {
+    height: 42px;
+    padding: 0 24px;
+    background: #4361ee;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.searchBtn:hover {
+    background: #3048d3;
+}
+
+/* =================== TABLE CARD =================== */
+.tableContainer {
+    width: 100%;
+    background: #ffffff;
+    padding: 10px 12px;
+    border-radius: 12px;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+/* =================== TABLE =================== */
+#stl-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    min-width: 950px;
+    /* prevents compression */
+}
+
+#stl-table thead th {
+    padding: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
+    color: #374151;
+    white-space: nowrap;
+}
+
+#stl-table tbody td {
+    padding: 13px;
+    font-size: 13px;
+    color: #4b5563;
+    border-bottom: 1px solid #f3f4f6;
+    white-space: nowrap;
+}
+
+#stl-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* =================== TABLE BUTTONS =================== */
+#stl-table button {
+    display: flex;
+  align-items: center;
+  justify-content: center;
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: 0.16s ease-in-out;
+}
+
+#stl-table td:nth-child(7) button {
+    background: #4361ee;
+    color: white;
+}
+
+#stl-table td:nth-child(8) button {
+    background: #4f46e5;
+    color: white;
+}
+
+#stl-table button:hover {
+    opacity: 0.92;
+}
+
+/* =================== EMPTY STATE =================== */
+.empty-row {
+    padding: 24px;
+    text-align: center;
+    font-size: 15px;
+    color: #6b7280;
+}
+
+/* =================== POPUP OVERLAY =================== */
+#popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+/* =================== POPUP BOX =================== */
+#popup-box {
+    background: white;
+    width: 460px;
+    border-radius: 12px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
+    padding: 20px 22px;
+}
+
+/* =================== POPUP HEADER =================== */
+#popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+#popup-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* =================== POPUP FORM =================== */
+.radio-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.comment-section label {
+    font-size: 14px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.comment-section textarea {
+    width: 100%;
+    height: 90px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    outline: none;
+    font-size: 14px;
+    resize: none;
+}
+
+#update-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px;
+    background: #4361ee;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* =================== VIEW MODAL =================== */
+.update-row {
+    background: #f3f4f6;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.update-row .date {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.update-row .desc {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+/* =================== RESPONSIVE =================== */
+@media (max-width: 1025px) {
+
+    .leadprospectContainer {
+        font-family: "Inter", sans-serif;
+        padding: 24px 28px;
+        width: 100vw;
+        background: #f8f9fc;
+        min-height: calc(100vh - 60px);
+        /* header height */
+        overflow-y: auto;
+        margin-left: 0px;
+    }
+
+    .filter {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    .selectControl,
+    .searchBtn {
+        width: 100%;
+    }
+
+    #popup-box {
+        width: 90%;
+    }
+}

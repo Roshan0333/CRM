@@ -1,6 +1,6 @@
 import Sales_Model from "../../models/salesDepartment/sales.models.js";
 import SalesTeam_Model from "../../models/salesDepartment/salesTeams.models.js";
-import Client_Model from "../../models/salesDepartment/client.models.js";
+import client_Model from "../../models/salesDepartment/client.models.js";
 
 const post_Sale = async (req, res) => {
     try {
@@ -38,9 +38,7 @@ const post_Sale = async (req, res) => {
         else {
             const teamData = await SalesTeam_Model.findOne({
                 "Members.MemberId": _id
-              });
-
-            
+            });
 
             salesDone = await Sales_Model({
                 ClientId: ClientId,
@@ -51,6 +49,10 @@ const post_Sale = async (req, res) => {
                 Service: Service,
                 Amount: Amount
             });
+
+            client_Model.findByIdAndUpdate(
+                ClientId,
+                { SalesStatus: "Sold" })
         }
 
         await salesDone.save();
@@ -149,5 +151,58 @@ const TotalSalesBy_Id = async (req, res) => {
 //     }
 // }
 
-export { post_Sale, TotalSalesBy_Id };
+const currentYearSales = async (req, res) => {
+    try {
+        let date = new Date(Date.UTC(2026, 0, 1, 0, 0, 0));
+
+        let salesList = await Sales_Model.aggregate([
+            {
+                $match: {
+                    Date: {
+                        $gte: date
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "clients",
+                    localField: "ClientId",
+                    foreignField: "_id",
+                    as: "ClientDetails"
+                }
+            },
+            { $unwind: "$ClientDetails" },
+            {
+                $lookup:{
+                    from:"users",
+                    localField:"SalerId",
+                    foreignField:"_id",
+                    as:"SalerDetail"
+                }
+            },
+            {$unwind: "$SalerDetail"},
+            {
+                $lookup:{
+                    from:"users",
+                    localField:"TeamLeaderId",
+                    foreignField:"_id",
+                    as:"TeamLeaderDetail"
+                }
+            },
+            {$unwind: "$TeamLeaderDetail"},
+            { $sort: { Date: -1 } },
+        ])
+
+        if (!salesList.length) {
+            return res.status(404).json({ msg: "No Sales Found This Year" });
+        }
+
+        return res.status(200).json({ TotalSales: salesList, msg: "Successfully" })
+    }
+    catch (err) {
+        return res.status(500).json({ error: err.message })
+    }
+}
+
+export { post_Sale, TotalSalesBy_Id, currentYearSales };
 

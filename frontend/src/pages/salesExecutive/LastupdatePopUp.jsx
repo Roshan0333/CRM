@@ -12,7 +12,7 @@ function LastUpdatePopUp({ closePopup, statusData }) {
         </div>
 
         <div id="popup-content">
-          {statusData.map(item => {
+          {statusData.slice().reverse().map(item => {
             return <div className="update-row" key={item.EmployeeId}>
               <p className="date">{`${item.Date} ${item.Time}`}</p>
               <p className="desc">{item.Comment}</p>

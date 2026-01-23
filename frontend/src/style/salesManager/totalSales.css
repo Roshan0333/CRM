@@ -92,3 +92,15 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+@media (max-width: 1025px) {
+  :root {
+  --sidebar-width: 0pxx;
+}
+
+/* PAGE WRAPPER */
+#tsm-totalSales-wrapper {
+  margin-left: 0px;
+  width: 100%;
+}
+}

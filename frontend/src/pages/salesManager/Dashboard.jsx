@@ -6,9 +6,34 @@ import data from "../../assets/salesManager/Dashboard/data.png";
 import income from "../../assets/salesManager/Dashboard/income.png";
 import prospect from "../../assets/salesManager/Dashboard/prospect.png";
 import "../../style/salesExecutive/dashboard.css";
+import { useEffect, useState } from "react";
+import { currentYearSales } from "../../services/salesDepartmentApi";
 // import { Button } from "bootstrap";
 
 const Dashboard = () => {
+
+
+  const [totalSales, setTotalSales] = useState() 
+  useEffect(() => {
+    ; (
+      async () => {
+        const apiResponse = await currentYearSales();
+
+        if (!apiResponse.fetchMessage) {
+          console.log(apiResponse.data)
+          return
+        }
+        else if (!apiResponse.ok) {
+          alert(apiResponse.data || "No Sales")
+          return
+        }
+        else {
+          setTotalSales(apiResponse.data.TotalSales.length)
+        }
+      }
+    )()
+  })
+
   return (
     <main>
       <div id="dashboard">
@@ -19,7 +44,7 @@ const Dashboard = () => {
               <div id="data">
                 <h3>TOTAL SALES</h3>
                 <div id="num-vector">
-                  <p>10</p>
+                  <p>{totalSales}</p>
                   <img src={growth} alt="" />
                 </div>
               </div>

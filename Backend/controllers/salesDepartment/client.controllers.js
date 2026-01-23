@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Client_Model from "../../models/salesDepartment/client.models.js";
 import EmployeeHandleClientHistory from "../../models/salesDepartment/salesEmployeeHistory.models.js";
 import SalesTeam_Model from "../../models/salesDepartment/salesTeams.models.js";
@@ -12,7 +13,7 @@ const add_Client = async (req, res) => {
         const today = new Date();
         const updateDate = today.toLocaleDateString("en-GB");
 
-        let teamId = "";
+        let teamId = null;
 
         const clientValidation = await Client_Model.findOne(
             {
@@ -250,7 +251,70 @@ const get_CurrentMonthProspect = async (req, res) => {
     }
 }
 
-export { add_Client, update_ClientData, delete_Client, get_HotClient, get_CurrentMonthProspect };
+const get_CurrentMonthProspectManager = async (req, res) => {
+    try{
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0,0,0,0);
+
+        const endofMonth = new Date();
+        endofMonth.setMonth(endofMonth.getMonth()+1);
+        endofMonth.setDate(0);
+        endofMonth.setHours(23,59,59,999);
+
+        const prospectList = await Client_Model.aggregate([
+            {$match:{
+                AddDate:{
+                    $gte: startOfMonth,
+                    $lte: endofMonth
+                },
+
+            }},
+            {
+                $lookup:{
+                    from:"users",
+                    localField: "AdderId",
+                    foreignField:"_id",
+                    as:"AdderDetails"
+                }
+            },
+            {
+                $unwind:{
+                    path:"$AdderDetails",
+                    preserveNullAndEmptyArrays:true
+                }
+            },
+             {
+                $project: {
+                    CompanyName: 1,
+                    ClientName: 1,
+                    Email_Id: 1,
+                    Contact_No: 1,
+                    CurrentStatus: 1,
+                    SalesStatus: 1,
+                    ClientType: 1,
+                    AddDate: 1,
+                    Reminder_Date: 1,
+                    "AdderDetails._id": 1,
+                    "AdderDetails.firstName": 1,
+                    "AdderDetails.lastName":1,
+                    "AdderDetails.email": 1,
+                    "AdderDetails.role": 1
+                }
+            },
+            {
+                $sort:{AddDate: -1}
+            }
+        ])
+
+        return res.status(200).json({ ProspectList: prospectList, msg: "Successfully" });
+    }
+    catch(err){
+        return res.status(500).json({error:err.message});
+    }
+}
+
+export { add_Client, update_ClientData, delete_Client, get_HotClient, get_CurrentMonthProspect, get_CurrentMonthProspectManager };
 
 
 
