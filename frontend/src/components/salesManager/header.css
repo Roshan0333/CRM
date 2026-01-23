@@ -11,6 +11,14 @@ body {
   gap: 10px;
 }
 
+.header-inner {
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 #btn {
   background-color: #4972e8;
 }

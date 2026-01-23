@@ -19,7 +19,11 @@ function TeamReport(){
           <option value="">Day</option>
           <option value="Monday">Monday</option>
           <option value="Tuesday">Tuesday</option>
-          {/* Add more days as needed */}
+          <option value="Tuesday">Wednesday</option>
+          <option value="Tuesday">Thursday</option>
+          <option value="Tuesday">Friday</option>
+          <option value="Tuesday">Saturday</option>
+          <option value="Tuesday">Sunday</option>
         </select>
         <select className="feedbackreport-dropdown">
           <option value="">Team Leader Name</option>

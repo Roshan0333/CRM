@@ -3,7 +3,7 @@
   /* width: 80%; */
   padding: 2rem;
   margin-left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
+  /* width: calc(100% - var(--sidebar-width)); */
   border-radius: 15px;
   text-align: left;
 }
@@ -31,7 +31,7 @@
   border: 1px solid #ddd;
   background: #fafafa;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.06);
-  min-width: 490px;
+  min-width: 422px;
   font-weight: 500px;
 }
 

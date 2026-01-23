@@ -16,11 +16,12 @@ const Header = () => {
 
   return (
     <div id='header-btns'>
+      <div id='header-inner'>
       <Button id='btn'>Proposals</Button>
       <Button id='btn'>Custom Plan</Button>
       <Button id='btn'>Work Order</Button>
 
-      {/* फक्त इथे wrapper + onClick */}
+      {/*  wrapper + onClick */}
       <div className="profile-container">
         <Button
           id='img-btn'
@@ -36,12 +37,13 @@ const Header = () => {
             <button className="dropdown-item">Profile Settings</button>
             <button className="dropdown-item">Account Details</button>
             <div className="dropdown-divider"></div>
-            <button className="dropdown-item danger" onClick={handleLogout}>
+            <Button className="dropdown-item danger" onClick={handleLogout}>
               Logout
-            </button>
+            </Button>
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };

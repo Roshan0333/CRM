@@ -34,6 +34,7 @@
 // })
 import express from "express";
 import dotenv from "dotenv";
+dotenv.config({ path: "./.env", debug: true });
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./config/db.js";
@@ -41,10 +42,10 @@ import userRoutes from "./routes/userRoutes.js";
 import clientRoutes from "./routes/salesDepartment/client.route.js";
 import salesRoutes from './routes/salesDepartment/sales.route.js';
 import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
+import FeedbackRoutes from './routes/feedbackRoutes/FeedbackRoutes.js';
 import auth from "./middlewares/AuthMiddleware.js"
 
 
-dotenv.config({ path: "./.env", debug: true });
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use("/api/client",auth, clientRoutes);
 app.use("/api/sales",auth, salesRoutes);
 app.use("/api/calllog",auth, callLogRoutes)
 
+app.use("/api/feedback",auth, FeedbackRoutes)
 
 app.listen(PORT, () => {
   console.log(`server is running on port http://localhost:${PORT}`);

@@ -137,7 +137,7 @@ const Complaints = () => {
           border-bottom: none;
           padding: 8px 36px;
           font-size: 28px;
-          font-weight: 500;
+          font-weight: 600;
           color: #5A5C69;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -232,7 +232,7 @@ const Complaints = () => {
         .client-activity-box {
           background: #f9fafb;
           border: 1px solid #e5e7eb;
-          border-radius: 8px;
+          border-radius: 4px;
           padding: 24px;
           min-height: 450px;
           display: flex;
@@ -241,8 +241,8 @@ const Complaints = () => {
         }
         
         .client-activity-title {
-          font-size: 22px;
-          font-weight: 500;
+          font-size: 52px;
+          font-weight: 600;
           color: #1f2937;
           margin: 0;
         }
@@ -293,7 +293,7 @@ const Complaints = () => {
           position: relative;
         }
         .popup-title { 
-          font-size: 20px; 
+          font-size: 24px; 
           font-weight: 600;
           color: #1f2937;
           margin: 0;
@@ -456,7 +456,7 @@ const Complaints = () => {
             </div>
             <div className="update-right">
               <div className="activity-box" style={{ height: '340px' }}>
-                <h6 className="form-label" style={{ textAlign: "center", marginBottom: '10px' }}>Client Activity</h6>
+                <h6 className="form-label" style={{ textAlign: "center", marginBottom: '10px', fontSize : '12px' }}>Client Activity</h6>
               </div>
             </div>
           </div>

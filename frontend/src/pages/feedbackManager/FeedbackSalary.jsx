@@ -18,17 +18,26 @@ function FeedbackSalary() {
       <div className="fsalary-container">
         <div className="fsalary-head">Salary</div>
 
-        <div className="fsalary-filter">
+        <div className="fsalary-filter-row">
           <select className="fsalary-dropdown">
             <option value="">Month</option>
             <option value="">Jan</option>
-            <option value="">Feb</option>
+            <option value="">Mar</option>
+            <option value="">Apr</option>
+            <option value="">May</option>
+            <option value="">Jun</option>
+            <option value="">Jul</option>
+            <option value="">Aug</option>
+            <option value="">Sep</option>
+            <option value="">Oct</option>
+            <option value="">Nov</option>
+            <option value="">Dec</option>
           </select>
-        </div>
 
-        <div className="fsalary-search">
           <button className="fsalary-search-btn">Search</button>
         </div>
+
+
 
         <div className="fsalary-table-container">
           <table className="fsalary-table">

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import axios from "axios";
 
 const Feedbacks = () => {
   const [key, setKey] = useState("pending");
   const [openPending, setOpenPending] = useState(null);
   const [openCompleted, setOpenCompleted] = useState(null);
-
+  const [openMsgBox, setOpenMsgBox] = useState(null);
+  const [openVideoBox, setOpenVideoBox] = useState(null);
   const toggleDropdownPending = (index) => {
     setOpenPending(openPending === index ? null : index);
   };
@@ -14,8 +16,9 @@ const Feedbacks = () => {
     setOpenCompleted(openCompleted === index ? null : index);
   };
 
-  const feedbacks = [
+  const [pendingFeedbacks, setPendingFeedbacks] = useState([
     {
+      _id: "65a1b2c3d4e5f6g7h8i9j0",
       id: "1.",
       company: "Company Name",
       invoice: "Invoice no.",
@@ -24,13 +27,14 @@ const Feedbacks = () => {
       designation: "Manager",
       email: "john@example.com",
       services: [
-        { name: "Logo", rating: 0 },
-        { name: "Banner", rating: 0 },
-        { name: "Bold text column", rating: 0 },
-        { name: "Bold text column", rating: 0 },
+        { name: "Logo", rating: 5 },
+        { name: "Banner", rating: 4 },
+        { name: "Bold text column", rating: 3 },
+        { name: "Bold text column", rating: 5 },
       ],
     },
     {
+      _id: "65a1b2c3djj5f6g7h8i9j0",
       id: "2.",
       company: "Company Name",
       invoice: "Invoice no.",
@@ -44,7 +48,25 @@ const Feedbacks = () => {
         { name: "Logo", rating: 5 },
       ],
     },
-  ];
+  ]);
+
+  const [completedFeedbacks, setCompletedFeedbacks] = useState([]);
+
+  const markAsCompleted = (index) => {
+    const completedItem = pendingFeedbacks[index];
+
+    setPendingFeedbacks(prev =>
+      prev.filter((_, i) => i !== index)
+    );
+
+    setCompletedFeedbacks(prev => [
+      completedItem,
+      ...prev,
+    ]);
+
+    setOpenPending(null);
+  };
+
 
   const renderStars = (rating) => (
     <div style={{ display: "flex", gap: "3px", justifyContent: "center" }}>
@@ -63,6 +85,73 @@ const Feedbacks = () => {
     </div>
   );
 
+  const updatePendingField = (index, field, value) => {
+    setPendingFeedbacks(prev =>
+      prev.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+ const handleFileUpload = async (feedbackId, serviceIndex, file) => {
+  if (!file) return;
+
+  const token = localStorage.getItem("token"); // Verify this key matches your login storage
+  
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("serviceIndex", serviceIndex);
+
+  try {
+    await axios.patch(
+      `http://localhost:5000/api/feedback/upload/${feedbackId}`,
+      formData,
+      {
+        headers: {
+          "Authorization": `Bearer ${token}`, // Must match backend expectation
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    alert("File uploaded successfully!");
+  } catch (err) {
+    console.error("Upload Error Details:", err.response?.data || err.message);
+    alert(err.response?.status === 401 ? "Session expired. Please login again." : "Upload failed.");
+  }
+};
+const handleSendMail = async (feedbackId) => {
+  const token = localStorage.getItem("token");
+  try {
+    await axios.post(
+      `http://localhost:5000/api/feedback/send-mail/${feedbackId}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    alert("Mail sent to client successfully!");
+  } catch (err) {
+    alert("Failed to send mail: " + (err.response?.data?.message || err.message));
+  }
+};
+  const handleSaveMessage = async (feedbackId, serviceIndex, messageText) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.patch(`http://localhost:5000/api/feedback/message/${feedbackId}`, {
+        serviceIndex,
+        message: messageText,
+        type : saveType
+      },
+        {
+          headers: {
+            Authorization: `Bearer ${token}` // This is what your backend expects
+          }
+        }
+      );
+        alert(`${saveType === 'video' ? 'Video link' : 'Message'} saved!`);
+    } catch (err) {
+      alert("Failed to save message.");
+    }
+  };
+
   return (
     <div
       className="main-content-wrapper"
@@ -78,20 +167,22 @@ const Feedbacks = () => {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
-        .main-content-wrapper {
-            /* The overall wrapper for your component's content */
-            padding-top: 60px; /* Assuming your top navbar is around 60px tall */
-        }
+     
+     
+          .container {
+        width: 100%;
+        padding: 40px 16px;
+        margin-left: var(--sidebar-width);
+  max-width: calc(100% - var(--sidebar-width));
+          }
 
-        .container {
-          width: 100%;
-          padding: 40px 10px;
-          margin: 0 auto;
-          margin-left: 250px; 
-          width: calc(100% - 250px);
-          margin-right: 0;
-          // margin-top: -60px;
-        }
+@media (max-width: 1020px) {
+  .container {
+    margin-left: 0;
+    max-width: 100%;
+  }
+}
+
 
 
         @media (max-width: 1020px) {
@@ -105,23 +196,21 @@ const Feedbacks = () => {
         }
 
 
-        .tabs-container {
+     .tabs-container {
           display: flex;
           gap: 0;
           border-bottom: 1px solid #ddd;
-          background: #ffffffff;
           width: 100%;
-          padding:0px 50px
+          padding: 0 40px;
         }
-        
-        
+
         .tab-button {
           background: transparent;
           border: 1px solid transparent;
           border-bottom: none;
-          padding: 1px 34px;
-          font-size: 32px;
-          font-weight: 400;
+          padding: 8px 36px;
+          font-size: 28px;
+          font-weight: 600;
           color: #5A5C69;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -131,21 +220,22 @@ const Feedbacks = () => {
 
         .tab-button.active {
           background: #fff;
-          border: 1px solid #ddd;
-          border-bottom:none;
+          border: 1px solid #aba7a7ff;
+          border-bottom: none;
           box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
           transform: translateY(1px);
         }
 
         .tab-content {
           background: #fff;
-          padding: 25px 80px 40px;
+          padding: 30px 40px;
           border: 1px solid #ddd;
           border-top: none;
           border-radius: 0 0 12px 12px;
           box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-          width: 100%;
         }
+
+
 
         .feedback-item {
           margin-bottom: 15px;
@@ -154,15 +244,17 @@ const Feedbacks = () => {
           overflow: hidden;
           background: white;
           box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-          width:1015px;
+          width: 100%;
+          max-width: 100%;
         }
 
         .feedback-header {
           display: flex;
-          justify-content: space-between;
-          gap:1000px
           align-items: center;
-          padding: 16px 80px 16px 40px;
+          justify-content: space-between;
+          padding: 16px 20px;
+          gap: 16px;
+          flex-wrap: wrap;
           background: #fff;
           cursor: pointer;
           transition: background 0.2s;
@@ -174,17 +266,15 @@ const Feedbacks = () => {
 
         .header-left {
           font-size: 25px;
-          font-weight: 500;
-          color: #000;
+          font-weight: 700;
+          color: #211f1fff;
         }
 
         .header-right {
-        font-size: 25px;
-          font-weight: 500;
-          color: #000;
-          display: flex;
-          align-items: center;
-          gap: 10px;
+         display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
         }
 
         .feedback-content {
@@ -215,16 +305,18 @@ const Feedbacks = () => {
 
         }
 
-        .form-input {
+        .form-group .form-input {
           flex: 1;
           height: 35px;
           width: 307px;
           padding: 8px 12px;
-          border: 1px solid #ccc;
           border-radius: 4px;
           font-size: 14px;
+          box-shadow : 0px 1px 4px #9188889d;
 
         }
+
+        
 
         .service-title {
           text-align: center;
@@ -237,8 +329,9 @@ const Feedbacks = () => {
 
         .service-table {
           width: 100%;
-          border-collapse: none;
-          border: 1px solid #ddd;
+          border-radius: 2px;
+          box-shadow : 0px 2px 15px #9188889d;
+
         }
 
         .service-table th,
@@ -286,6 +379,19 @@ const Feedbacks = () => {
         .btn-green { background: #027402; }
         .btn-red { background: #E86149; }
 
+         .btn-green:hover{
+            background : #043904ff;
+            color:white;
+         }
+         .btn-blue:hover{
+            background : #253d85ff;
+            color:white;
+         }
+         .btn-red:hover{
+            background : #8f3e30ff;
+            color:white;
+         }
+
         .bottom-actions {
           display: flex;
           justify-content: center;
@@ -299,6 +405,62 @@ const Feedbacks = () => {
           font-size: 13px;
           font-weight: 500;
         }
+
+        @media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .tab-button {
+    font-size: 18px;
+    padding: 8px 16px;
+  }
+
+  .header-left,
+  .header-right {
+    font-size: 16px;
+  }
+  
+ 
+
+  .form-label {
+    font-size: 12px;
+    min-width: 90px;
+  }
+
+  .form-input {
+    font-size: 12px;
+    height: 32px;
+  }
+
+  .service-title {
+    font-size: 18px;
+  }
+
+  .service-table th,
+  .service-table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .btn {
+    font-size: 11px;
+    min-width: 70px;
+    height: 20px;
+  }
+
+  .btn-bottom {
+    font-size: 11px;
+    height: 24px;
+  }
+}
+
       `}</style>
 
       <div className="container">
@@ -319,7 +481,7 @@ const Feedbacks = () => {
 
         {/* Tab Content */}
         <div className="tab-content">
-          {(key === "pending" ? feedbacks : feedbacks).map((item, index) => (
+          {(key === "pending" ? pendingFeedbacks : completedFeedbacks).map((item, index) => (
             <div key={index} className="feedback-item">
               <div
                 className="feedback-header"
@@ -333,47 +495,84 @@ const Feedbacks = () => {
                   {item.id} {item.company}
                 </div>
                 <div className="header-right">
-                  <span style={{ fontWeight: "500", fontSize: "25px" }}>
+                  <span style={{ fontWeight: "700", fontSize: "25px", color: "#211f1fff" }}>
                     {item.invoice}
                   </span>
                 </div>
                 <div className="header-right">
                   {key === "pending" ? (
                     openPending === index ? (
-                      <ChevronDown size={30} strokeWidth={2.5} />
-                    ) : (
                       <ChevronUp size={30} strokeWidth={2.5} />
+                    ) : (
+                      <ChevronDown size={30} strokeWidth={2.5} />
                     )
                   ) : openCompleted === index ? (
-                    <ChevronUp size={22} strokeWidth={2.5} />
+                    <ChevronUp size={30} strokeWidth={2.5} />
                   ) : (
-                    <ChevronDown size={22} strokeWidth={2.5} />
+                    <ChevronDown size={30} strokeWidth={2.5} />
                   )}
                 </div>
               </div>
 
               {(key === "pending" ? openPending : openCompleted) === index && (
                 <div className="feedback-content">
+                  {/* //PENDING FEEDBACK */}
                   <div className="form-row">
                     <div>
                       <div className="form-group">
                         <label className="form-label">Client Name</label>
-                        <input type="text" className="form-input" />
+                        <input
+                          type="text"
+                          className="form-input"
+                          value={item.client || ""}
+                          disabled={key === "completed"}
+                          onChange={(e) =>
+                            updatePendingField(index, "client", e.target.value)
+                          }
+                        />
+
                       </div>
                       <div className="form-group">
                         <label className="form-label">Contact no.</label>
-                        <input type="text" className="form-input" />
+                        <input
+                          type="text"
+                          className="form-input"
+                          value={item.contact || ""}
+                          disabled={key === "completed"}
+                          onChange={(e) =>
+                            updatePendingField(index, "contact", e.target.value)
+                          }
+                        />
+
                       </div>
                     </div>
 
                     <div>
                       <div className="form-group">
                         <label className="form-label">Designation</label>
-                        <input type="text" className="form-input" />
+                        <input
+                          type="text"
+                          className="form-input"
+                          value={item.designation || ""}
+                          disabled={key === "completed"}
+                          onChange={(e) =>
+                            updatePendingField(index, "designation", e.target.value)
+                          }
+                        />
+
                       </div>
                       <div className="form-group">
                         <label className="form-label">Email_id</label>
-                        <input type="email" className="form-input mb-10" />
+                        <input
+                          type="email"
+                          className="form-input"
+                          value={item.email || ""}
+                          disabled={key === "completed"}
+                          onChange={(e) =>
+                            updatePendingField(index, "email", e.target.value)
+                          }
+                        />
+
                       </div>
                     </div>
                   </div>
@@ -384,53 +583,203 @@ const Feedbacks = () => {
                     <thead>
                       <tr>
                         <th style={{ width: "30%" }}>Service</th>
-                        <th style={{ width: "25%" }}>Rate</th>
                         <th style={{ width: "45%" }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {item.services.map((service, i) => (
-                        <tr key={i}>
-                          <td className="service-name">{service.name}</td>
-                          <td>{renderStars(service.rating)}</td>
-                          <td>
-                            <div className="action-buttons">
-                              <button
-                                className="btn "
-                                style={{
-                                  fontSize: "13px",
-                                  padding: 0,
-                                  backgroundColor: "#4972E8",
-                                }}
-                              >
-                                Message
-                              </button>
-                              <button
-                                className="btn "
-                                style={{
-                                  fontSize: "12px",
-                                  padding: 0,
-                                  backgroundColor: "#4972E8",
-                                }}
-                              >
-                                Video / Audio
-                              </button>
-                              <button
-                                className="btn"
-                                style={{
-                                  fontSize: "13px",
-                                  padding: 0,
-                                  backgroundColor: "#49E876",
-                                }}
-                              >
-                                Upload
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                        <React.Fragment key={i}>
+                          <tr >
+                            <td className="service-name">{service.name}</td>
+
+                            <td>
+                              <div className="action-buttons">
+                                <button
+                                  className="btn "
+                                  style={{
+                                    fontSize: "13px",
+                                    padding: 0,
+                                    backgroundColor: "#4972E8",
+                                  }}
+                                  onClick={() => setOpenMsgBox(openMsgBox === i ? null : i)}
+                                >
+                                  Message
+                                </button>
+                                <button
+                                  className="btn "
+                                  style={{
+                                    fontSize: "12px",
+                                    padding: 0,
+                                    backgroundColor: "#4972E8",
+                                  }}
+                                  onClick={() => {
+                                    setOpenVideoBox(openVideoBox === i ? null : i);
+                                    setOpenMsgBox(null); // Close message box if video is opened
+                                  }}
+                                >
+                                  Video / Audio
+                                </button>
+                                <button
+                                  className="btn"
+                                  style={{
+                                    fontSize: "13px",
+                                    padding: 0,
+                                    backgroundColor: "#49E876",
+                                  }}
+                                  onClick={() => document.getElementById(`file-upload-${i}`).click()}
+                                >
+                                  Upload
+                                </button>
+                                <input
+                                  type="file"
+                                  id={`file-upload-${i}`}
+                                  style={{ display: 'none' }}
+                                  onChange={(e) => handleFileUpload(item._id, i, e.target.files[0])}
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                          {/* NEW VIDEO/AUDIO INPUT ROW */}
+                          {openVideoBox === i && (
+                            <tr>
+                              <td colSpan="3" style={{ padding: "20px 35px", backgroundColor: "#f0f4ff", borderBottom: "1px solid #ddd" }}>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                                  <label className="form-label" style={{ fontSize: "12px", color: "#4972E8", fontWeight: "700" }}>
+                                    SHARE VIDEO/AUDIO LINK FOR: {service.name.toUpperCase()}
+                                  </label>
+                                  <input
+                                    type="text"
+                                    id={`video-input-${index}-${i}`}
+                                    className="form-input"
+                                    placeholder="Paste Google Drive / Dropbox / Loom link here..."
+                                    defaultValue={service.videoLink || ""}
+                                    style={{
+                                      width: "100%",
+                                      height: "40px",
+                                      padding: "8px 12px",
+                                      backgroundColor: "#fff",
+                                      boxShadow: "0px 1px 4px #9188889d",
+                                      border: "1px solid #4972E8"
+                                    }}
+                                  />
+                                  <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                                    <button className="btn btn-red"
+                                      style={{
+                                        height: "25px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        lineHeight: "normal"
+                                      }}
+                                      onClick={() => setOpenVideoBox(null)}>Cancel</button>
+                                    <button
+                                      className="btn btn-green"
+                                      style={{
+                                        height: "25px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        lineHeight: "normal"
+                                      }}
+                                      onClick={() => {
+                                        const val = document.getElementById(`video-input-${index}-${i}`).value;
+                                        // You can reuse handleSaveMessage or create handleSaveVideo
+                                        handleSaveMessage(item._id, i, val);
+                                        setOpenVideoBox(null);
+                                      }}
+                                    >
+                                      Save
+                                    </button>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+
+                          {/* DESIGNED MESSAGE INPUT ROW */}
+                          {openMsgBox === i && (
+                            <tr>
+                              <td colSpan="3" style={{ padding: "20px 35px", backgroundColor: "#f9f9f9", borderBottom: "1px solid #ddd" }}>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                                  <label className="form-label" style={{ fontSize: "12px", color: "#4972E8", fontWeight: "700" }}>
+                                    ADMIN NOTE FOR: {service.name.toUpperCase()}
+                                  </label>
+                                  <textarea
+                                    id={`msg-input-${index}-${i}`}
+                                    className="form-input"
+                                    placeholder="Explain the work done or changes made here..."
+                                    defaultValue={service.adminMessage || ""}
+                                    style={{
+                                      width: "100%",
+                                      height: "80px",
+                                      padding: "12px",
+                                      resize: "none",
+                                      backgroundColor: "#fff",
+                                      boxShadow: "0px 1px 4px #9188889d",
+                                      border: "1px solid #ccc"
+                                    }}
+                                  />
+                                  <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                                    <button
+                                      className="btn btn-red"
+                                      style={{
+                                        height: "25px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        lineHeight: "normal"
+                                      }}
+                                      onClick={() => setOpenMsgBox(null)}
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      className="btn btn-green"
+                                      style={{
+                                        height: "25px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        lineHeight: "normal"
+                                      }}
+                                      onClick={() => {
+                                        const val = document.getElementById(`msg-input-${index}-${i}`).value;
+                                        handleSaveMessage(item._id, i, val);
+                                        setOpenMsgBox(null);
+                                      }}
+                                    >
+                                      Save
+                                    </button>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>))}
                     </tbody>
                   </table>
+
+                  {/* Add this right below the </table> */}
+                  {key === "completed" && item.comment && (
+                    <div style={{ marginTop: "30px" }}>
+                      <label className="form-label" style={{ display: "block", marginBottom: "10px" }}>
+                        Detailed Feedback
+                      </label>
+                      <div
+                        className="form-input"
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                          minHeight: "60px",
+                          backgroundColor: "#f9f9f9",
+                          display: "flex",
+                          alignItems: "center"
+                        }}
+                      >
+                        {item.comment}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="bottom-actions">
                     <button
@@ -442,15 +791,20 @@ const Feedbacks = () => {
                     <button
                       className="btn btn-blue btn-bottom"
                       style={{ padding: 0 }}
+                      onClick={() => handleSendMail(item._id)} // Connect mail function
                     >
                       Mail
                     </button>
-                    <button
-                      className="btn btn-red btn-bottom"
-                      style={{ padding: 0 }}
-                    >
-                      Close
-                    </button>
+                    {key === "pending" && (
+                      <button
+                        className="btn btn-red btn-bottom"
+                        style={{ padding: 0 }}
+                        onClick={() => {
+                          setOpenMsgBox(null);
+                        }}>
+                        Save
+                      </button>
+                    )}
                   </div>
                 </div>
               )}

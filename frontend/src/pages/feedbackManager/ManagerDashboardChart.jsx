@@ -52,7 +52,7 @@ const ManagerDashboardChart = () => {
               value: 'Month',   
               position: 'insideBottom',
               offset: -10,
-              style: { textAnchor: 'middle', fill: '#222', fontSize: 22 },
+              style: { textAnchor: 'middle', fill: '#222', fontSize: 22 , fontWeight: 500},
             }}
           />
           <YAxis
@@ -63,10 +63,10 @@ const ManagerDashboardChart = () => {
             orientation="right"
             label={{
               value: 'Complaint',
-              angle: -90,
-              position: 'insideRight',
+              angle: +90,
+              position: 'insideLeft',
               offset: 22,
-              style: { textAnchor: 'middle', fill: '#222', fontSize: 22 },
+              style: { textAnchor: 'middle', fill: '#222', fontSize: 22, fontWeight : 500 },
             }}
             domain={[0, 'dataMax + 10']}
           />
