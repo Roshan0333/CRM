@@ -6,21 +6,24 @@ const Sales_Schema = new Schema({
     ClientId: {
         type: ObjectId,
         ref: "Client",
-        required: true
+        required: true,
+        unique : true
     },
     Date: {
         type: Date,
         required: true
     },
+    SalerId:{
+        type: ObjectId,
+        ref: "User"
+    },
     TeamLeaderId: {
-        type: Object,
-        ref: "User",
-        required: true
+        type: ObjectId,
+        ref: "User"
     },
     SalesExecutiveId: {
-        type: Object,
-        ref: "User",
-        required: true
+        type: ObjectId,
+        ref: "User"
     },
     Service: {
         type: String,
@@ -29,15 +32,7 @@ const Sales_Schema = new Schema({
     Amount: {
         type: Number,
         required: true
-    },
-    Activities: [{
-        Date: {
-            type: String,
-        },
-        Activity: {
-            type: String,
-        }
-    }]
+    }
 })
 
 const Sales_Model = mongoose.model("Sales", Sales_Schema);

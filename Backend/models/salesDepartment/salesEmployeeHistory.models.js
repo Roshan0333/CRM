@@ -8,23 +8,36 @@ const employeeHistorySchema = new mongoose.Schema(
       type: ObjectId,
       ref: "User",
       required: true,
-      index: true
     },
-
     clientId: {
       type: ObjectId,
       ref: "Client",
       required: true,
-      index: true
     },
-
+    companyName: {
+        type: String,
+    },
+    clientName: {
+        type: String,
+    },
+    email_Id: {
+        type: String,
+    },
+    contact_No: {
+        type: Number,
+    },
+    reminder_Date: {
+        type: String,
+    },
+    comment:{
+      type: String
+    },
     handledDate: {
       type: Date,
       required: true,
       index: true
     }
   },
-  { timestamps: true }
 );
 
 const employee_Model = mongoose.model("Sales_Employee_History",employeeHistorySchema);

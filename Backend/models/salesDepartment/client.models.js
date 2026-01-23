@@ -22,11 +22,25 @@ const client_Schema = new Schema({
         type: Number,
         unique: true
     },
+    AdderId:{
+        type: ObjectId,
+        ref: "User"
+    },
+    AddedBy:{
+        type: String
+    },
+    TeamId:{
+        type: ObjectId,
+        ref: "SalesTeams"
+    },
     CurrentStatus:{
         type: String,
-        required: true
+    },
+    SalesStatus: {
+        type: String
     },
     Comments:[{
+        EmployeeId:{type: ObjectId, ref: 'User'},
         Date: {
             type: String,
             required: true
@@ -41,10 +55,10 @@ const client_Schema = new Schema({
         }
     }],
     LastUpdate_Date: {
-        type: String,
+        type: Date,
     },
     Reminder_Date: {
-        type: String,
+        type: Date,
         required: true
     },
     ClientType:{

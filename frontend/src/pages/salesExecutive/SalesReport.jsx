@@ -1,5 +1,6 @@
-import React from "react";
-import "../../style/salesExecutive/salesReport.css"
+import React, { useEffect, useState } from "react";
+import "../../style/salesExecutive/salesReport.css";
+import {TotalSale} from "../../services/salesDepartmentApi";
 
 const SalesReport = () => {
   const data = [
@@ -53,6 +54,24 @@ const SalesReport = () => {
     },
   ];
 
+  const [totalSalesList, setTotalSalesList] = useState([]);
+
+  useEffect(() => {
+    ;(
+      async () => {
+        let salesApi_Response = await TotalSale();
+
+        if(!salesApi_Response.ok || !salesApi_Response.fetchMessage){
+          alert(salesApi_Response.data)
+        }
+        else{
+          setTotalSalesList(salesApi_Response.data.TotalSales[0].sales)
+        
+        }
+      }
+    )()
+  },[])
+
   return (
     <div id="sales-report-container" style={{ backgroundColor: "#fff" }}>
       {/* Heading */}
@@ -73,14 +92,14 @@ const SalesReport = () => {
               </tr>
             </thead>
             <tbody id="sales-report-tbody">
-              {data.map((row, index) => (
+              {totalSalesList.map((item, index) => (
                 <tr id={`sales-report-row-${index}`} key={index}>
-                  <td id={`td-company-${index}`}>{row.companyName}</td>
-                  <td id={`td-client-${index}`}>{row.clientName}</td>
-                  <td id={`td-email-${index}`}>{row.email}</td>
-                  <td id={`td-contact-${index}`}>{row.contact}</td>
-                  <td id={`td-services-${index}`}>{row.services}</td>
-                  <td id={`td-date-${index}`}>{row.date}</td>
+                  <td id={`td-company-${index}`}>{item.ClientDetails.CompanyName}</td>
+                  <td id={`td-client-${index}`}>{item.ClientDetails.ClientName}</td>
+                  <td id={`td-email-${index}`}>{item.ClientDetails.Email_Id}</td>
+                  <td id={`td-contact-${index}`}>{item.ClientDetails.Contact_No}</td>
+                  <td id={`td-services-${index}`}>{item.Service}</td>
+                  <td id={`td-date-${index}`}>{new Date(item.Date.toString()).toLocaleDateString("en-GB")}</td>
                 </tr>
               ))}
             </tbody>

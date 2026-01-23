@@ -9,10 +9,10 @@ export const DEPARTMENTS = [
 export const DEPARTMENT_ROLES = {
   "sales department": [
     "sales executive",
-    "sales team", 
+    "sales team lead", 
     "sales manager"
   ],
-  "finance department": ["finance employee,accountant"],
+  "finance department": ["finance employee", "accountant"],
   "management department": [
     "management employee",
     "management tl",

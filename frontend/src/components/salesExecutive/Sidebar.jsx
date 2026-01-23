@@ -10,12 +10,19 @@ import "../salesExecutive/sidebar.css";
 import { NavLink } from "react-router-dom";
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState("User");
 
-  useEffect(() => {
-    const name = localStorage.getItem("userName");
-    setUserName(name);
-  }, []);
+useEffect(() => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  if (storedUser) {
+    const fullName =
+      `${storedUser.firstName || ""} ${storedUser.lastName || ""}`.trim();
+
+    setUserName(fullName || "User");
+  }
+}, []);
+
 
 
   const toggleSidebar = () => setIsOpen(!isOpen);

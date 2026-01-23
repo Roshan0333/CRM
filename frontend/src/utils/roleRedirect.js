@@ -7,11 +7,11 @@ export const roleRedirectMap = {
 
   "management tl": "/managementTL/dashboard",
   "management employee": "/managementemployee/dashboard",
-  "manager management": "/managermanagement/dashboard",
+  "management manager": "/managermanagement/dashboard",
 
   "feedback manager": "/feedbackmanager/dashboard",
   "feedback employee": "/feedbackemployee/dashboard",
 
-  "finance": "/finance/dashboard",
+  "finance employee": "/financeemployee/dashboard",
   "accountant": "/accountant/dashboard",
 };

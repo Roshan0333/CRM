@@ -1,252 +1,275 @@
-import React, { useState } from "react";
-import "../../style/SalesTeamLead/SalesTeamLeadProspect.css";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "../../style/salesTeamLead/SalesTeamLeadProspect.css";
 import dot from "../../assets/salesTeamLead/dot.svg";
 
-function Prospect() {
-  const [member, setMember] = useState("");
-  const [dateRange, setDateRange] = useState("");
+const API = "http://localhost:5000/api/salesTeamLead";
 
-  // modal form state
+function Prospect() {
+  const [prospects, setProspects] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [searchClient, setSearchClient] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+
+  const [selectedItem, setSelectedItem] = useState(null);
   const [updateModal, setUpdateModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
-  const [callOutcome, setCallOutcome] = useState("talk");
+  const [callOutcome, setCallOutcome] = useState("Talk");
   const [comment, setComment] = useState("");
 
+  useEffect(() => {
+    const fetchProspects = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`${API}/prospects`);
+
+        const mapped = res.data.map(item => ({
+          id: item._id,
+          company: item.companyName,
+          client: item.clientName,
+          email: item.email,
+          contact: item.contact,
+          reminder: item.reminderDate
+            ? item.reminderDate.slice(0, 10)
+            : "",
+          history: item.callHistory || [],
+        }));
+
+        setProspects(mapped);
+        setFilteredData(mapped);
+        setError("");
+      } catch (err) {
+        setError("Failed to load prospects");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProspects();
+  }, []);
+
   const handleSearch = () => {
-    console.log("Searching for:", member, dateRange);
+    let temp = [...prospects];
+
+    if (searchClient.trim()) {
+      temp = temp.filter(p =>
+        p.client &&
+        p.client.toLowerCase().includes(searchClient.toLowerCase())
+      );
+    }
+
+    if (selectedDate) {
+      temp = temp.filter(p => p.reminder && p.reminder.includes(selectedDate));
+    }
+
+    setFilteredData(temp);
   };
 
-  const data = [
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-  ];
-
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    console.log("Update submitted:", { callOutcome, comment });
-    setUpdateModal(false);
-    setComment("");
-    setCallOutcome("talk");
+
+    if (!comment.trim()) {
+      alert("Please add a comment");
+      return;
+    }
+
+    try {
+      await axios.patch(
+        `${API}/prospects/${selectedItem.id}/call-update`,
+        { status: callOutcome, comment }
+      );
+
+      const res = await axios.get(`${API}/prospects`);
+      const mapped = res.data.map(item => ({
+        id: item._id,
+        company: item.companyName,
+        client: item.clientName,
+        email: item.email,
+        contact: item.contact,
+        reminder: item.reminderDate
+          ? item.reminderDate.slice(0, 10)
+          : "",
+        history: item.callHistory || [],
+      }));
+
+      setProspects(mapped);
+      setFilteredData(mapped);
+
+      setUpdateModal(false);
+      setComment("");
+      setCallOutcome("Talk");
+    } catch (error) {
+      alert("Failed to update call");
+    }
   };
+
+  if (loading) return <p style={{ padding: 20 }}>Loading prospects...</p>;
+  if (error) return <p style={{ padding: 20, color: "red" }}>{error}</p>;
 
   return (
-    <>
-      <div className="leadprospectContainer">
+    <div className="containerMember">
+      {/* HEADER + SEARCH */}
+      <div className="page-header">
         <h1>Prospect</h1>
 
-        <div className="filter" role="region" aria-label="Search controls">
-          <select
-            id="memberSelect"
-            className="selectControl"
-            value={member}
-            onChange={(e) => setMember(e.target.value)}
-            aria-label="Member name"
-          >
-            <option value="">Member Name</option>
-            <option value="member-1">Member 1</option>
-            <option value="member-2">Member 2</option>
-          </select>
-
-          <select
-            id="dateSelect"
-            className="selectControl"
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            aria-label="Select date range"
-          >
-            <option value="">Select Date</option>
-            <option value="last-7">Last 7 days</option>
-            <option value="last-30">Last 30 days</option>
-          </select>
-
-          <button type="button" className="searchBtn" onClick={handleSearch}>
-            Search
-          </button>
-        </div>
-
-        <div className="tableContainer">
-          <table id="stl-table" style={{ width: "100%" }}>
-            <thead>
-              <tr>
-                <th></th>
-                <th>Company Name</th>
-                <th>Client Name</th>
-                <th>Email_id</th>
-                <th>Contact no.</th>
-                <th>Reminder date</th>
-                <th>Activity</th>
-                <th>Last Update</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {data.map((item, index) => (
-                <tr key={index}>
-                  <td>
-                    <img src={dot} alt="dot icon" />
-                  </td>
-                  <td>{item.companyName}</td>
-                  <td>{item.clientName}</td>
-                  <td>{item.emailId}</td>
-                  <td>{item.contactNo}</td>
-                  <td>{item.reminderDate}</td>
-                  <td>
-                    <button onClick={() => setUpdateModal(true)}>Update</button>
-                  </td>
-                  <td>
-                    <button onClick={() => setViewModal(true)}>View</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="search-box">
+          <input
+            placeholder="Search Client"
+            value={searchClient}
+            onChange={(e) => setSearchClient(e.target.value)}
+          />
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+          />
+          <button onClick={handleSearch}>Search</button>
         </div>
       </div>
 
-      {/* Update Modal */}
+      {/* TABLE */}
+      <div
+        className="table-card"
+        style={{ position: "relative", zIndex: 1 }}   // 🔥 UI FIX
+      >
+        <table className="team-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Company Name</th>
+              <th>Client Name</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Reminder</th>
+              <th>Activity</th>
+              <th>Last Update</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredData.length ? (
+              filteredData.map(item => (
+                <tr key={item.id}>
+                  <td style={{ position: "relative", zIndex: 1 }}>
+                    <img src={dot} alt="dot" />
+                  </td>
+                  <td>{item.company}</td>
+                  <td>{item.client}</td>
+                  <td>{item.email}</td>
+                  <td>{item.contact}</td>
+                  <td>{item.reminder}</td>
+                  <td>
+                    <button
+                      className="update-link-btn"
+                      style={{
+                        position: "relative",
+                        zIndex: 10,
+                        pointerEvents: "auto",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        setSelectedItem(item);
+                        setUpdateModal(true);
+                      }}
+                    >
+                      Update
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      className="view-link-btn"
+                      style={{
+                        position: "relative",
+                        zIndex: 10,
+                        pointerEvents: "auto",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        setSelectedItem(item);
+                        setViewModal(true);
+                      }}
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8" style={{ textAlign: "center" }}>
+                  No data found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* UPDATE MODAL */}
       {updateModal && (
         <div id="popup-overlay" onClick={() => setUpdateModal(false)}>
           <div id="popup-box" onClick={(e) => e.stopPropagation()}>
-            <div id="popup-header">
-              <h3>Update Call Details</h3>
-            </div>
+            <h2>Update Call Details</h2>
 
-            <div id="popup-content">
-              <form onSubmit={handleUpdate}>
-                <div className="radio-group">
-                  <label>
-                    <input
-                      type="radio"
-                      name="status"
-                      value="talk"
-                      checked={callOutcome === "talk"}
-                      onChange={(e) => setCallOutcome(e.target.value)}
-                    />{" "}
-                    Talk
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="status"
-                      value="not-talk"
-                      checked={callOutcome === "not-talk"}
-                      onChange={(e) => setCallOutcome(e.target.value)}
-                    />{" "}
-                    Not Talk
-                  </label>
-                  <label>
-                    <input
-                      type="radio"
-                      name="status"
-                      value="delete"
-                      checked={callOutcome === "delete"}
-                      onChange={(e) => setCallOutcome(e.target.value)}
-                    />{" "}
-                    Delete Client’s Profile
-                  </label>
-                </div>
+            <form onSubmit={handleUpdate}>
+              <div className="radio-group">
+                <label>
+                  <input
+                    type="radio"
+                    value="Talk"
+                    checked={callOutcome === "Talk"}
+                    onChange={(e) => setCallOutcome(e.target.value)}
+                  /> Talk
+                </label>
 
-                <div className="comment-section">
-                  <label htmlFor="comment">Comment</label>
-                  <textarea
-                    id="comment"
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Write your comment..."
-                  ></textarea>
-                </div>
+                <label>
+                  <input
+                    type="radio"
+                    value="Not Talk"
+                    checked={callOutcome === "Not Talk"}
+                    onChange={(e) => setCallOutcome(e.target.value)}
+                  /> Not Talk
+                </label>
+              </div>
 
-                <button id="update-btn" type="submit">
-                  Update
-                </button>
-              </form>
-            </div>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Write your comment..."
+              />
+
+              <button type="submit">Update</button>
+            </form>
           </div>
         </div>
       )}
 
-      {/* View Modal */}
-      {viewModal && (
+      {/* VIEW MODAL */}
+      {viewModal && selectedItem && (
         <div id="popup-overlay" onClick={() => setViewModal(false)}>
           <div id="popup-box" onClick={(e) => e.stopPropagation()}>
-            <div id="popup-header">
-              <h3>Last Update</h3>
-              <button id="close-btn" onClick={() => setViewModal(false)}>
-                Close
-              </button>
-            </div>
+            <h3>Call History – {selectedItem.client}</h3>
 
-            <div id="popup-content">
-              <div className="update-row">
-                <p className="date">25/06/2025 07:04 PM</p>
-                <p className="desc">
-                  I cannot directly generate HTML and CSS from an image of a
-                  dashboard. My capabilities do not extend to converting visual
-                  layouts into code.
-                </p>
-              </div>
-
-              <div className="update-row">
-                <p className="date">25/06/2025 07:04 PM</p>
-                <p className="desc">
-                  I cannot directly generate HTML and CSS from an image of a
-                  dashboard. My capabilities do not extend to converting visual
-                  layouts into code.
-                </p>
-              </div>
-              <div className="update-row">
-                <p className="date">25/06/2025 07:04 PM</p>
-                <p className="desc">
-                  I cannot directly generate HTML and CSS from an image of a
-                  dashboard. My capabilities do not extend to converting visual
-                  layouts into code.
-                </p>
-              </div>
-            </div>
+            {selectedItem.history.length ? (
+              selectedItem.history.map((h, i) => (
+                <div key={i}>
+                  <p>
+                    <b>{new Date(h.updatedAt).toLocaleString()}</b> – {h.status}
+                  </p>
+                  <p>{h.note}</p>
+                  <hr />
+                </div>
+              ))
+            ) : (
+              <p>No updates found.</p>
+            )}
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

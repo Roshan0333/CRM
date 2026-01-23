@@ -1,182 +1,252 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import axios from "axios";
+
 import teamMember from "../../assets/salesTeamLead/Dashboard/teamMember.png";
 import totalCall from "../../assets/salesTeamLead/Dashboard/totalCall.png";
 import prospect from "../../assets/salesTeamLead/Dashboard/Prospect.png";
 import clientData from "../../assets/salesTeamLead/Dashboard/clientData.png";
+
 import "../../style/salesTeamLead/dashboard.css";
 
-const Dashboard = () => {
-  const [showUpdatePopup, setShowUpdatepopup] = useState(false);
-  const [showViewPopup, setShowViewpopup] = useState(false);
+const API = "http://localhost:5000/api/salesTeamLead";
 
-  const openUpdatePopup = () => setShowUpdatepopup(true);
-  const openViewPopup = () => setShowViewpopup(true);
-  const closeUpdatePopup = () => setShowUpdatepopup(false);
-  const closeViewPopup = () => setShowViewpopup(false);
+const Dashboard = () => {
+  const [showUpdatePopup, setShowUpdatePopup] = useState(false);
+  const [showViewPopup, setShowViewPopup] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  const [status, setStatus] = useState("");
+  const [comment, setComment] = useState("");
+
+  const [tableData, setTableData] = useState([]);
+  const [dashboardData, setDashboardData] = useState({
+    totalProspects: 0,
+    totalCalls: 0,
+  });
+
+  const token = localStorage.getItem("token");
+  const config = { headers: { Authorization: `Bearer ${token}` } };
+
+  /* ================= FETCH DATA ================= */
+  const fetchData = async () => {
+    const [dashRes, prospectRes] = await Promise.all([
+      axios.get(`${API}/dashboard`, config),
+      axios.get(`${API}/prospects`, config),
+    ]);
+
+    setDashboardData(dashRes.data);
+
+    const mapped = prospectRes.data.map((p) => ({
+      id: p._id,
+      client: p.clientName,
+      email: p.email,
+      contact: p.contact,
+      reminder: p.reminderDate
+        ? new Date(p.reminderDate).toLocaleDateString()
+        : "-",
+      updateHistory: p.updateHistory || [],
+    }));
+
+    setTableData(mapped);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  /* ================= STATS ================= */
+  const stats = useMemo(
+    () => ({
+      team: 10,
+      calls: dashboardData.totalCalls,
+      prospect: dashboardData.totalProspects,
+      clients: tableData.length,
+    }),
+    [dashboardData, tableData]
+  );
+
+  /* ================= UPDATE ================= */
+  const handleUpdate = async () => {
+    if (!status || !comment) {
+      alert("Please select status and write comment");
+      return;
+    }
+
+    await axios.put(
+      `${API}/update-prospect/${selectedRow.id}`,
+      { status, comment, date: new Date() },
+      config
+    );
+
+    setShowUpdatePopup(false);
+    setSelectedRow(null);
+    setStatus("");
+    setComment("");
+
+    await fetchData();
+    alert("Update saved successfully");
+  };
 
   return (
-    <main>
-      <div id="dashboard">
-        <div id="dashboard-container">
-          <section id="dashboard-data">
-            <h1>Dashboard</h1>
-            <div id="data-wrap">
-              <div id="data">
-                <h3>TEAM MEMBER</h3>
-                <div id="num-vector">
-                  <p>10</p>
-                  <img src={teamMember} alt="" />
-                </div>
-              </div>
+    <div id="dashboard-container">
+      {/* ================= DASHBOARD CARDS ================= */}
+      <section id="dashboard-data">
+        <h1>Dashboard</h1>
 
-              <div id="data">
-                <h3>TOTAL CALL BY TEAM</h3>
-                <div id="num-vector">
-                  <p>1600</p>
-                  <img src={totalCall} alt="" />
-                </div>
-              </div>
-
-              <div id="data">
-                <h3>TOTAL PROSPECT</h3>
-                <div id="num-vector">
-                  <p>8000</p>
-                  <img src={prospect} alt="" />
-                </div>
-              </div>
-
-              <div id="data">
-                <h3>TOTAL CLIENT DATA</h3>
-                <div id="num-vector">
-                  <p>16</p>
-                  <img src={clientData} alt="" />
-                </div>
-              </div>
+        <div id="data-wrap">
+          <div id="data">
+            <h3>TEAM MEMBER</h3>
+            <div id="num-vector">
+              <p>{stats.team}</p>
+              <img src={teamMember} alt="" />
             </div>
-          </section>
+          </div>
 
-          <section id="hot-clients">
-            <div id="container">
-              <div id="clients">
-                <h1>Total Call</h1>
-
-                <div
-                  id="client-list"
-                  style={{ overflowX: "auto", whiteSpace: "nowrap" }}
-                >
-                  <table id="stl-table">
-                    <thead>
-                      <tr>
-                        <th> </th>
-                        <th>Company Name</th>
-                        <th>Client Name</th>
-                        <th>Email_id</th>
-                        <th>Contact no.</th>
-                        <th>Reminder Date</th>
-                        <th>Activity</th>
-                        <th>Last Update</th>
-                      </tr>
-                    </thead>
-
-                    {Array(6)
-                      .fill(0)
-                      .map((_, i) => (
-                        <tr key={i}>
-                          <td>{i + 1}</td>
-                          <td>Graphura India</td>
-                          <td>Vivek Kumar</td>
-                          <td>vivek@gmail.com</td>
-                          <td>0123456789</td>
-                          <td>10/10/25</td>
-                          <td>
-                            <button onClick={openUpdatePopup}>Update</button>
-                          </td>
-                          <td>
-                            <button onClick={openViewPopup}>View</button>
-                          </td>
-                        </tr>
-                      ))}
-                  </table>
-
-                  {/* VIEW POPUP */}
-
-                  {/* UPDATE POPUP */}
-                  {showUpdatePopup && (
-                    <div id="popup-overlay" onClick={closeUpdatePopup}>
-                      <div id="popup-box" onClick={(e) => e.stopPropagation()}>
-                        <div id="popup-header">
-                          <h3>Update Call Details</h3>
-                          <button id="close-btn" onClick={closeUpdatePopup}>
-                            Close
-                          </button>
-                        </div>
-
-                        <div id="popup-content">
-                          <div className="radio-group">
-                            <label>
-                              <input type="radio" name="status" value="talk" />{" "}
-                              Talk
-                            </label>
-                            <label>
-                              <input
-                                type="radio"
-                                name="status"
-                                value="not-talk"
-                              />{" "}
-                              Not Talk
-                            </label>
-                            <label>
-                              <input
-                                type="radio"
-                                name="status"
-                                value="delete"
-                              />{" "}
-                              Delete Client’s Profile
-                            </label>
-                          </div>
-
-                          <div className="comment-section">
-                            <label htmlFor="comment">Comment</label>
-                            <textarea id="comment" placeholder=""></textarea>
-                          </div>
-
-                          <button id="update-btn">Update</button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+          <div id="data">
+            <h3>TOTAL CALL BY TEAM</h3>
+            <div id="num-vector">
+              <p>{stats.calls}</p>
+              <img src={totalCall} alt="" />
             </div>
-          </section>
+          </div>
+
+          <div id="data">
+            <h3>TOTAL PROSPECT</h3>
+            <div id="num-vector">
+              <p>{stats.prospect}</p>
+              <img src={prospect} alt="" />
+            </div>
+          </div>
+
+          <div id="data">
+            <h3>TOTAL CLIENT DATA</h3>
+            <div id="num-vector">
+              <p>{stats.clients}</p>
+              <img src={clientData} alt="" />
+            </div>
+          </div>
         </div>
-      </div>
-      {showViewPopup && (
-        <div id="popup-overlay" onClick={closeViewPopup}>
-          <div id="popup-box" onClick={(e) => e.stopPropagation()}>
+      </section>
+
+      {/* ================= TABLE ================= */}
+      <section id="hot-clients">
+        <table id="stl-table">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>Reminder</th>
+              <th>Activity</th>
+              <th>Last Update</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tableData.map((row, i) => (
+              <tr key={i}>
+                <td>{row.client}</td>
+                <td>{row.email}</td>
+                <td>{row.contact}</td>
+                <td>{row.reminder}</td>
+                <td>
+                  <button
+                    onClick={() => {
+                      setSelectedRow(row);
+                      setShowUpdatePopup(true);
+                    }}
+                  >
+                    Update
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => {
+                      setSelectedRow(row);
+                      setShowViewPopup(true);
+                    }}
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      {/* ================= UPDATE POPUP ================= */}
+      {showUpdatePopup && (
+        <div id="popup-overlay">
+          <div id="popup-box">
             <div id="popup-header">
-              <h3>Last Update</h3>
-              <button id="close-btn" onClick={closeViewPopup}>
+              <h3>Update Status</h3>
+              <button id="close-btn" onClick={() => setShowUpdatePopup(false)}>
+                Close
+              </button>
+            </div>
+
+            <div className="radio-group">
+              {["Interested", "Follow Up", "Not Interested", "Converted"].map(
+                (s) => (
+                  <label key={s}>
+                    <input
+                      type="radio"
+                      name="status"
+                      value={s}
+                      onChange={(e) => setStatus(e.target.value)}
+                    />
+                    {s}
+                  </label>
+                )
+              )}
+            </div>
+
+            <div className="comment-section">
+              <label>Comment</label>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+            </div>
+
+            <button id="update-btn" onClick={handleUpdate}>
+              Update
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ================= VIEW POPUP ================= */}
+      {showViewPopup && selectedRow && (
+        <div id="popup-overlay">
+          <div id="popup-box">
+            <div id="popup-header">
+              <h3>Last Updates</h3>
+              <button id="close-btn" onClick={() => setShowViewPopup(false)}>
                 Close
               </button>
             </div>
 
             <div id="popup-content">
-              {[1, 2, 3].map((item) => (
-                <div className="update-row" key={item}>
-                  <p className="date">25/06/2025 07:04 PM</p>
-                  <p className="desc">
-                    I cannot directly generate HTML and CSS from an image of a
-                    dashboard. My capabilities do not extend to converting
-                    visual layouts into code.
-                  </p>
-                </div>
-              ))}
+              {selectedRow.updateHistory.length > 0 ? (
+                selectedRow.updateHistory.map((u, i) => (
+                  <div className="update-row" key={i}>
+                    <div className="date">
+                      {new Date(u.date).toLocaleDateString()}
+                    </div>
+                    <div className="desc">
+                      <b>{u.status}</b> – {u.comment}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No updates found</p>
+              )}
             </div>
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 };
 

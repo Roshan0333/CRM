@@ -3,6 +3,11 @@
 
   import "./App.css"
 
+/* AUTH PAGES */
+import LoginForm from "./components/auth/LoginForm";
+import RegisterForm from "./components/auth/RegisterForm";
+
+// import Profile from "./pages/profile/ProfilePopup";
   /* AUTH PAGES */
   import LoginForm from "./components/auth/LoginForm";
   import RegisterForm from "./components/auth/RegisterForm";
@@ -143,7 +148,8 @@
               <Route path="/" element={<LoginForm onLoginSuccess={setRole}/>} />
               <Route path="/login" element={<LoginForm onLoginSuccess={setRole}/>} />
               <Route path="/register" element={<RegisterForm />} />
-              <Route path="/profile" element={<Profile />} />
+            
+
 
               <Route path="/submit-feedback/:token" element={<ClientFeedback />} />
             </Routes>
@@ -154,7 +160,7 @@
           {role === "sales team lead" && <SalesTeamLead />}
           {role === "sales manager" && <SalesManager />}
           {role === "management tl" && <ManagementTL />}
-          {role == "management employee" && <ManagementEmployee />}
+          {role === "management employee" && <ManagementEmployee />}
           {role === "management manager" && <ManagerManagement />}
           {role === "feedback manager" && <FeedbackManager />}
           {role === "feedback employee" && <FeedbackEmployee />}
@@ -180,7 +186,8 @@
             <Route path="/salesexecutive/sales-report" element={<SE_SalesReport />} />
             <Route path="/salesexecutive/report" element={<SE_Report />} />
             <Route path="/salesexecutive/userdata" element={<SE_UserData />} />
-            <Route path="*" element={<h2>Page Not Found</h2>} />
+            {/* <Route path="/salesexecutive/profile" element={<Profile />} /> */}
+          <Route path="*" element={<h2>Page Not Found</h2>} />
           </Routes>
         </div>
       </>

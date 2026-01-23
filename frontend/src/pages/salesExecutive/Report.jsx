@@ -1,39 +1,72 @@
 import React, { useState } from "react";
 import calender from "../../assets/salesExecutive/report/calander.png";
 import "../../style/salesExecutive/report.css";
+import { useEffect } from "react";
+import {todayCallingListApi, cutomerCallingListApi } from "../../services/salesDepartmentApi";
 
 const Report = () => {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({ callStatus: "", comment: "" });
 
-  const todaysCalls = Array(6)
-    .fill(null)
-    .map((_, i) => ({
-      id: i + 1,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      reminder: "Bold text column",
-    }));
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
 
-  const pastCalls = Array(5)
-    .fill(null)
-    .map((_, i) => ({
-      id: i + 1,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      reminder: "Bold text column",
-      comment: i === 0 ? "Select" : "Bold text column",
-    }));
+  const [todayCalls, setTodayCalls] = useState([]);
+  const [pastCalls, setPastCalls] = useState([]);
+
+  // const todaysCalls = Array(6)
+  //   .fill(null)
+  //   .map((_, i) => ({
+  //     id: i + 1,
+  //     company: "Bold text column",
+  //     client: "Bold text column",
+  //     email: "Bold text column",
+  //     contact: "Bold text column",
+  //     reminder: "Bold text column",
+  //   }));
+
+  // const pastCalls = Array(5)
+  //   .fill(null)
+  //   .map((_, i) => ({
+  //     id: i + 1,
+  //     company: "Bold text column",
+  //     client: "Bold text column",
+  //     email: "Bold text column",
+  //     contact: "Bold text column",
+  //     reminder: "Bold text column",
+  //     comment: i === 0 ? "Select" : "Bold text column",
+  //   }));
 
   const handleSubmit = () => {
-    console.log("Form submitted:", formData);
     setShowModal(false);
     setFormData({ callStatus: "", comment: "" });
   };
+
+  const pastReport =  async () => {
+    let pastApi_Response = await cutomerCallingListApi(startDate, endDate);
+
+    if(!pastApi_Response.ok || !pastApi_Response.fetchMessage){
+      alert(pastApi_Response.data)
+    }
+    else{
+      setPastCalls(pastApi_Response.data)
+    }
+  }
+
+  useEffect(() => {
+    ;(
+      async() => {
+        let today_CallListResponse = await todayCallingListApi();
+
+        if(!today_CallListResponse.ok || !today_CallListResponse.fetchMessage){
+          alert(todayCallingListApi.data);
+        }
+        else{
+          setTodayCalls(today_CallListResponse.data.TodayCallList)
+        }
+      }
+    )()
+  },[])
 
   return (
     <div
@@ -108,7 +141,7 @@ const Report = () => {
                     borderBottom: "1px solid #e5e7eb",
                   }}
                 >
-                  <th style={{ padding: "16px 20px", color: "#000000" }}></th>
+                  <th style={{ padding: "16px 20px", color: "#000000" }}>#</th>
                   <th style={{ padding: "16px 20px" }}>Company Name</th>
                   <th style={{ padding: "16px 20px" }}>Client Name</th>
                   <th style={{ padding: "16px 20px" }}>Email_id</th>
@@ -119,22 +152,22 @@ const Report = () => {
               </thead>
 
               <tbody>
-                {todaysCalls.map((row) => (
+                {todayCalls.map((item, index) => (
                   <tr
-                    key={row.id}
+                    key={index}
                     style={{
                       backgroundColor: "white",
                       borderBottom: "1px solid #e5e7eb",
                     }}
                   >
                     <td style={{ padding: "16px 20px" }}>
-                      <span style={{ color: "#000000" }}>⋮</span>
+                      <span style={{ color: "#000000" }}>{index+1}</span>
                     </td>
-                    <td style={{ padding: "16px 20px" }}>{row.company}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.client}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.email}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.contact}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.reminder}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.companyName}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.clientName}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.email_Id}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.contact_No}</td>
+                    <td style={{ padding: "16px 20px" }}>{new Date(item.reminder_Date.toString()).toLocaleDateString("en-GB")}</td>
                     <td style={{ padding: "16px 20px" }}>
                       <button
                         onClick={() => setShowModal(true)}
@@ -194,8 +227,10 @@ const Report = () => {
           {/* Start Date */}
           <div style={{ position: "relative", flex: "1", minWidth: "200px" }}>
             <input
-              type="text"
+              type="date"
               placeholder="Start Date"
+              value={startDate || ""}
+              onChange={(e) => setStartDate(e.target.value)}
               style={{
                 width: "100%",
                 height: "48px",
@@ -220,8 +255,10 @@ const Report = () => {
           {/* End Date */}
           <div style={{ position: "relative", flex: "1", minWidth: "200px" }}>
             <input
-              type="text"
+              type="date"
               placeholder="End Date"
+              value={endDate || ""}
+              onChange={(e) => setEndDate(e.target.value)}
               style={{
                 width: "100%",
                 height: "48px",
@@ -252,6 +289,7 @@ const Report = () => {
               borderRadius: "8px",
               cursor: "pointer",
             }}
+            onClick={pastReport}
           >
             Search
           </button>
@@ -293,9 +331,9 @@ const Report = () => {
               </thead>
 
               <tbody>
-                {pastCalls.map((row, i) => (
+                {pastCalls.map((item, index) => (
                   <tr
-                    key={row.id}
+                    key={index}
                     style={{
                       backgroundColor: "white",
                       borderBottom: "1px solid #e5e7eb",
@@ -304,18 +342,18 @@ const Report = () => {
                     <td style={{ padding: "16px 20px" }}>
                       <span style={{ color: "#6b7280" }}>⋮</span>
                     </td>
-                    <td style={{ padding: "16px 20px" }}>{row.company}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.client}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.email}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.contact}</td>
-                    <td style={{ padding: "16px 20px" }}>{row.reminder}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.companyName}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.clientName}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.email_Id}</td>
+                    <td style={{ padding: "16px 20px" }}>{item.contact_No}</td>
+                    <td style={{ padding: "16px 20px" }}>{new Date(item.reminder_Date.toString()).toLocaleDateString("en-GB")}</td>
                     <td
                       style={{
                         padding: "16px 20px",
-                        color: i === 0 ? "#000" : "#000",
+                        color: index === 0 ? "#000" : "#000",
                       }}
                     >
-                      {row.comment}
+                      {item.comment}
                     </td>
                   </tr>
                 ))}

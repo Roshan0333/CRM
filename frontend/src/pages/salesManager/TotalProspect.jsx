@@ -1,72 +1,141 @@
-import React, { useState } from "react";
-import "../../style/SalesTeamLead/SalesTeamLeadProspect.css";
+import React, { useEffect, useState } from "react";
+import "../../style/salesManager/totalprospect.css";
 import dot from "../../assets/salesTeamLead/dot.svg";
+import { allProspectList } from "../../services/salesDepartmentApi";
 
 function TotalProspect() {
-  const [member, setMember] = useState("");
   const [dateRange, setDateRange] = useState("");
-
-  // modal form state
   const [updateModal, setUpdateModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [callOutcome, setCallOutcome] = useState("talk");
   const [comment, setComment] = useState("");
+  const [commentList, setCommentList] = useState([]);
 
-  const handleSearch = () => {
-    console.log("Searching for:", member, dateRange);
+  let [prospectList, setProspectList] = useState([]);
+  const [filterList, setFilterList] = useState([]);
+  let [memberEmailList, setMemberEmailList] = useState([]);
+  const [selectedEmail, setSelectedEmail] = useState();
+
+
+  let handleSearch = () => {
+
+    if (!dateRange) {
+      let clientList = prospectList.filter((item) => { return item.AdderDetails.email === selectedEmail });
+      setFilterList(clientList);
+      return
+    }
+    else if (!selectedEmail) {
+      let day = 0;
+
+      if (dateRange === "last-7") {
+        day = 7
+      }
+      else {
+        day = 30
+      }
+
+      let lastDate = new Date();
+      let startDate = new Date();
+
+      startDate.setDate(lastDate.getDate() - day);
+
+      let clientList = prospectList.filter((item) => {
+        const addDate = new Date(item.AddDate)
+
+        return addDate >= startDate && addDate <= lastDate;
+      })
+
+      setFilterList(clientList);
+      return
+    }
+    else {
+
+      let day = 0;
+
+      if (dateRange === "last-7") {
+        day = 7
+      }
+      else {
+        day = 30
+      }
+
+      let lastDate = new Date();
+      let startDate = new Date();
+
+      startDate.setDate(lastDate.getDate()-day);
+
+      let clientList = prospectList.filter((item) => {
+        return item.AdderDetails.email === selectedEmail
+      });
+
+      let filterList = clientList.filter((item) => {
+        const addDate = new Date(item.AddDate);
+        return addDate >= startDate && addDate <= lastDate
+      })
+
+      setFilterList(filterList);
+      return
+    }
+
   };
 
-  const data = [
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-    {
-      companyName: "Bold text column",
-      clientName: "Bold text column",
-      emailId: "Bold text column",
-      contactNo: "Bold text column",
-      reminderDate: "Bold text column",
-    },
-  ];
+  // const data = [
+  //   {
+  //     companyName: "Bold text column",
+  //     clientName: "Bold text column",
+  //     emailId: "Bold text column",
+  //     contactNo: "Bold text column",
+  //     reminderDate: "Bold text column",
+  //   },
+  //   {
+  //     companyName: "Bold text column",
+  //     clientName: "Bold text column",
+  //     emailId: "Bold text column",
+  //     contactNo: "Bold text column",
+  //     reminderDate: "Bold text column",
+  //   },
+  //   {
+  //     companyName: "Bold text column",
+  //     clientName: "Bold text column",
+  //     emailId: "Bold text column",
+  //     contactNo: "Bold text column",
+  //     reminderDate: "Bold text column",
+  //   },
+  //   {
+  //     companyName: "Bold text column",
+  //     clientName: "Bold text column",
+  //     emailId: "Bold text column",
+  //     contactNo: "Bold text column",
+  //     reminderDate: "Bold text column",
+  //   },
+  // ];
+
+  useEffect(() => {
+    ; (
+      async () => {
+        let apiRespnse = await allProspectList();
+
+        if (!apiRespnse.fetchMessage) {
+          console.log(apiRespnse.data);
+          return
+        }
+        else if (!apiRespnse.ok) {
+          alert(apiRespnse.data || "Something Wrong");
+          return
+        }
+
+        let email = apiRespnse.data.ProspectList.map((item) => item.AdderDetails?.email)
+        const uniqueEmail = [...new Set(email)];
+
+        setProspectList(apiRespnse.data.ProspectList);
+        setMemberEmailList(uniqueEmail);
+      }
+    )()
+  }, [])
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    console.log("Update submitted:", { callOutcome, comment });
     setUpdateModal(false);
-    setComment("");
-    setCallOutcome("talk");
   };
 
   return (
@@ -74,76 +143,130 @@ function TotalProspect() {
       <div className="leadprospectContainer">
         <h1>Total Prospect</h1>
 
-        <div className="filter" role="region" aria-label="Search controls">
+        {/* Filter Section */}
+        <div className="filter">
           <select
-            id="memberSelect"
             className="selectControl"
-            value={member}
-            onChange={(e) => setMember(e.target.value)}
-            aria-label="Member name"
+            value={selectedEmail}
+            onChange={(e) => setSelectedEmail(e.target.value)}
           >
             <option value="">Member Name</option>
-            <option value="member-1">Member 1</option>
-            <option value="member-2">Member 2</option>
+            {memberEmailList.map((item, index) => {
+              return <option value={item}>{item}</option>
+            })}
           </select>
 
           <select
-            id="dateSelect"
             className="selectControl"
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            aria-label="Select date range"
           >
             <option value="">Select Date</option>
-            <option value="last-7">Last 7 days</option>
-            <option value="last-30">Last 30 days</option>
+            <option value="last-7">Last 7 Days</option>
+            <option value="last-30">Last 30 Days</option>
           </select>
 
-          <button type="button" className="searchBtn" onClick={handleSearch}>
+          <button className="searchBtn" onClick={handleSearch}>
             Search
           </button>
         </div>
 
+        {/* Table Container */}
         <div className="tableContainer">
-          <table id="stl-table" style={{ width: "100%" }}>
+          <table id="stl-table">
             <thead>
               <tr>
                 <th></th>
+                <th>Added By</th>
                 <th>Company Name</th>
                 <th>Client Name</th>
                 <th>Email_id</th>
-                <th>Contact no.</th>
-                <th>Reminder date</th>
+                <th>Contact No.</th>
+                <th>Reminder Date</th>
                 <th>Activity</th>
                 <th>Last Update</th>
               </tr>
             </thead>
 
             <tbody>
-              {data.map((item, index) => (
-                <tr key={index}>
-                  <td>
-                    <img src={dot} alt="dot icon" />
-                  </td>
-                  <td>{item.companyName}</td>
-                  <td>{item.clientName}</td>
-                  <td>{item.emailId}</td>
-                  <td>{item.contactNo}</td>
-                  <td>{item.reminderDate}</td>
-                  <td>
-                    <button onClick={() => setUpdateModal(true)}>Update</button>
-                  </td>
-                  <td>
-                    <button onClick={() => setViewModal(true)}>View</button>
-                  </td>
-                </tr>
-              ))}
+              {(filterList.length > 0) ?
+                filterList.length > 0 ? (
+                  filterList.map((item, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        <img src={dot} alt="" />
+                      </td>
+                      <td>{item.AdderDetails.firstName} {item.AdderDetails.lastName}</td>
+                      <td>{item.CompanyName}</td>
+                      <td>{item.ClientName}</td>
+                      <td>{item.Email_Id}</td>
+                      <td>{item.Contact_No}</td>
+                      <td>{new Date(item.Reminder_Date).toLocaleDateString("en-GB")}</td>
+                      <td>
+                        <button onClick={() => setUpdateModal(true)}>
+                          Update
+                        </button>
+                      </td>
+                      <td>
+                        <button onClick={() => {
+                          setViewModal(true);
+                          // setSelectIndex(idx);
+                          setCommentList(filterList[idx].Comments)
+                        }}>
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="8" style={{ padding: "20px", color: "#6b7280" }}>
+                      No prospects found.
+                    </td>
+                  </tr>
+                ) : prospectList.length > 0 ? (
+                  prospectList.map((item, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        <img src={dot} alt="" />
+                      </td>
+                      <td>{item.AdderDetails.firstName} {item.AdderDetails.lastName}</td>
+                      <td>{item.CompanyName}</td>
+                      <td>{item.ClientName}</td>
+                      <td>{item.Email_Id}</td>
+                      <td>{item.Contact_No}</td>
+                      <td>{new Date(item.Reminder_Date).toLocaleDateString("en-GB")}</td>
+                      <td>
+                        <button onClick={() => setUpdateModal(true)}>
+                          Update
+                        </button>
+                      </td>
+                      <td>
+                        <button onClick={() => {
+                          setViewModal(true);
+                          // setSelectIndex(idx);
+                          setCommentList(prospectList[idx].Comments)
+                        }}>
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="8" style={{ padding: "20px", color: "#6b7280" }}>
+                      No prospects found.
+                    </td>
+                  </tr>
+                )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Update Modal */}
+      {/* MODALS */}
+
+      {/* UPDATE MODAL */}
       {updateModal && (
         <div id="popup-overlay" onClick={() => setUpdateModal(false)}>
           <div id="popup-box" onClick={(e) => e.stopPropagation()}>
@@ -157,43 +280,41 @@ function TotalProspect() {
                   <label>
                     <input
                       type="radio"
-                      name="status"
                       value="talk"
                       checked={callOutcome === "talk"}
                       onChange={(e) => setCallOutcome(e.target.value)}
-                    />{" "}
+                    />
                     Talk
                   </label>
+
                   <label>
                     <input
                       type="radio"
-                      name="status"
                       value="not-talk"
                       checked={callOutcome === "not-talk"}
                       onChange={(e) => setCallOutcome(e.target.value)}
-                    />{" "}
+                    />
                     Not Talk
                   </label>
+
                   <label>
                     <input
                       type="radio"
-                      name="status"
                       value="delete"
                       checked={callOutcome === "delete"}
                       onChange={(e) => setCallOutcome(e.target.value)}
-                    />{" "}
+                    />
                     Delete Client’s Profile
                   </label>
                 </div>
 
                 <div className="comment-section">
-                  <label htmlFor="comment">Comment</label>
+                  <label>Comment</label>
                   <textarea
-                    id="comment"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     placeholder="Write your comment..."
-                  ></textarea>
+                  />
                 </div>
 
                 <button id="update-btn" type="submit">
@@ -205,7 +326,7 @@ function TotalProspect() {
         </div>
       )}
 
-      {/* View Modal */}
+      {/* VIEW MODAL */}
       {viewModal && (
         <div id="popup-overlay" onClick={() => setViewModal(false)}>
           <div id="popup-box" onClick={(e) => e.stopPropagation()}>
@@ -217,31 +338,12 @@ function TotalProspect() {
             </div>
 
             <div id="popup-content">
-              <div className="update-row">
-                <p className="date">25/06/2025 07:04 PM</p>
-                <p className="desc">
-                  I cannot directly generate HTML and CSS from an image of a
-                  dashboard. My capabilities do not extend to converting visual
-                  layouts into code.
-                </p>
-              </div>
-
-              <div className="update-row">
-                <p className="date">25/06/2025 07:04 PM</p>
-                <p className="desc">
-                  I cannot directly generate HTML and CSS from an image of a
-                  dashboard. My capabilities do not extend to converting visual
-                  layouts into code.
-                </p>
-              </div>
-              <div className="update-row">
-                <p className="date">25/06/2025 07:04 PM</p>
-                <p className="desc">
-                  I cannot directly generate HTML and CSS from an image of a
-                  dashboard. My capabilities do not extend to converting visual
-                  layouts into code.
-                </p>
-              </div>
+              {commentList.reverse().map((item, i) => {
+                return <div className="update-row">
+                  <p className="date">{item.Date} {item.Time}</p>
+                  <p className="desc">{item.Comment}</p>
+                </div>
+              })}
             </div>
           </div>
         </div>

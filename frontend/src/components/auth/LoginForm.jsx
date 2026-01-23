@@ -96,6 +96,7 @@ const LoginForm = ({onLoginSuccess}) => {
       if (onLoginSuccess) {
           onLoginSuccess(data.user.role); 
           navigate(redirectPath, { replace: true });
+          window.location.reload();
         }
       
 

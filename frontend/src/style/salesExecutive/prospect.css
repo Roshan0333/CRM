@@ -1,5 +1,6 @@
 /* prospect#css */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
 body {
   font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
@@ -78,6 +79,37 @@ body {
 #form-row textarea:focus {
   border-color: #3158c9;
   /* box-shadow: 0 0 5px rgba(49, 88, 201, 0.3); */
+}
+
+#clientTypeMain-Div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+#clientTypeMain-Div label {
+  width: 215px;
+  font-size: 21px;
+  font-weight: 500;
+  color: #000000;
+}
+
+#client-type {
+  width: 68%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+}
+
+#client-type div {
+  display: flex;
+  width: 150px;
+}
+
+#client-type label {
+  font-size: 17px;
+  color: #000000;
 }
 
 #update-btn {

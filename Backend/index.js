@@ -1,37 +1,4 @@
-// import express from 'express';
-// const app = express();
-// import dotenv from 'dotenv';
-// dotenv.config();
-// import cors from 'cors';
-// import authRoutes from "./routes/authRoutes.js"
 
-// app.use(cors({
-//   origin: "http://localhost:5173",
-//   credentials: true,
-// }));
-
-// const PORT = process.env.PORT || 5000;
-
-// import connectDB from './config/db.js';
-// // import userRoutes from './routes/userRoute.js';
-
-// app.use(express.json());
-// //database connection
-// connectDB();
-
-// app.get('/',(req,res)=>{
-//     res.send('server is running');  
-// })
-
-// // define routes
-
-// app.use("/api/auth", authRoutes);
-
-
-
-// app.listen(PORT,()=>{
-//     console.log(`server is running on port http://localhost:${PORT}`);
-// })
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env", debug: true });
@@ -44,6 +11,13 @@ import salesRoutes from './routes/salesDepartment/sales.route.js';
 import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
 import FeedbackRoutes from './routes/feedbackRoutes/FeedbackRoutes.js';
 import auth from "./middlewares/AuthMiddleware.js"
+import reminderCallRoutes from "./routes/salesDepartment/todayReminderCall.route.js"
+import salesTeamRoutes from "./routes/salesDepartment/salesTeam.route.js";
+
+import totalSalesRoutes from "./routes/SalesTeam/totalSalesRoutes.js";
+import untouchedRoutes from "./routes/SalesTeam/untouchedRoutes.js";
+import prospectRoutes from "./routes/SalesTeam/prospectRoutes.js";
+import salesTeamLeadRoutes from "./routes/SalesTeam/salesTeamLeadRoutes.js";
 
 
 
@@ -70,11 +44,19 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/client",auth, clientRoutes);
-app.use("/api/sales",auth, salesRoutes);
-app.use("/api/calllog",auth, callLogRoutes)
 
-app.use("/api/feedback",auth, FeedbackRoutes)
+app.use("/api/client", clientRoutes);
+app.use("/api/sales", salesRoutes);
+app.use("/api/calllog", callLogRoutes)
+app.use("/api/remindercall", reminderCallRoutes);
+app.use("/api/salesTeam", salesTeamRoutes);
+
+app.use("/api/salesTeamLead", salesTeamLeadRoutes);
+app.use("/api/prospects", prospectRoutes);
+app.use("/api/total-sales", totalSalesRoutes);
+app.use("/api/untouched", untouchedRoutes);
+
+app.use("/api/feedback", FeedbackRoutes)
 
 app.listen(PORT, () => {
   console.log(`server is running on port http://localhost:${PORT}`);

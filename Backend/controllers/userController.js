@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret123";
+const JWT_SECRET = process.env.JWT_SECRET || "graphura_jwt_secret";
 
 export const registerUser = async (req, res) => {
   try {
@@ -103,16 +103,60 @@ export const loginUser = async (req, res) => {
     res.json({
       message: "Login successful",
       token,
-      user: { 
-        id: user._id, 
-        name: `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-        email: user.email, 
-        department: user.department, 
-        role: user.role 
-      }
+     user: {
+  _id: user._id,
+
+  // 🔥 NAME FIELDS (SEPARATE)
+  firstName: user.firstName,
+  lastName: user.lastName,
+
+  // BASIC
+  email: user.email,
+  department: user.department,
+  role: user.role,
+
+  // 🔥 PROFILE DETAILS
+  contact: user.contact,
+  location: user.location,
+  joiningDate: user.joiningDate,
+  bankName: user.bankName,
+  ifsc: user.ifsc,
+  bankAccount: user.bankAccount,
+  upiId: user.upiId,
+}
+
     });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// ✅ NEW FUNCTION (ADD THIS)
+export const updateUser = async (req, res) => {
+  try {
+    // 🔍 confirm body
+    
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,               // 🔥 DIRECT body pass
+      {
+        new: true,
+        runValidators: false, // 🔥 MOST IMPORTANT
+      }
+    );
+
+    // console.log("UPDATED USER 👉", updatedUser);
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ user: updatedUser });
+  } catch (error) {
+    console.error("UPDATE ERROR 👉", error); // 🔥 THIS WILL SHOW REAL ERROR
+    res.status(500).json({ message: "Update failed" });
   }
 };

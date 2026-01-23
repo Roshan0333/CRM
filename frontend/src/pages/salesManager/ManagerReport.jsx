@@ -4,6 +4,8 @@ import payout from "../../assets/salesManager/managerReport/payout.png";
 import prospectNum from "../../assets/salesManager/managerReport/prospectNum.png";
 import totalSales from "../../assets/salesManager/managerReport/totalSales.png";
 import "../../style/salesManager/managerReport.css";
+import { todayCallingListApi, TotalSale, prospectList, cutomerCallingListApi } from "../../services/salesDepartmentApi";
+import { useEffect } from "react";
 // import { Button } from "bootstrap";
 
 const ManagerReport = () => {
@@ -14,6 +16,52 @@ const ManagerReport = () => {
   const openViewPopup = () => setShowViewpopup(true);
   const closeUpdatePopup = () => setShowUpdatepopup(false);
   const closeViewPopup = () => setShowViewpopup(false);
+
+  const [todayCallList, setTodayCallList] = useState([]);
+  const [totalSalesLength, setTotalSalesLength] = useState(0);
+  const [prospectLength, setProspectLength] = useState(0);
+  const [totalClientLength, setTotalClientLength] = useState(0);
+
+  useEffect(() => {
+    ; (
+      async () => {
+
+        let startDate = new Date();
+        startDate.setDate(1)
+        let endDate = new Date();
+        endDate.setMonth(endDate.getMonth()+1);
+        endDate.setDate(1)
+
+
+        const prospectApiResponse = await prospectList();
+        const apiResponse = await todayCallingListApi();
+        const salesApiResponse = await TotalSale();
+        // const clientApiResponse = await cutomerCallingListApi()
+
+        if (!prospectApiResponse.ok) {
+          alert(prospectApiResponse.data || "Failed");
+        } else {
+          setProspectLength(prospectApiResponse.data.ProspectList.length);
+        }
+
+        if (!salesApiResponse.ok) {
+          alert(salesApiResponse.data || "Failed");
+          return
+        }
+        else {
+          setTotalSalesLength(salesApiResponse.data.TotalSales.length);
+        }
+
+        if (!apiResponse.ok) {
+          alert(apiResponse.data || "Failed");
+          return
+        }
+        else {
+          setTodayCallList(apiResponse.data.TodayCallList);
+        }
+      }
+    )()
+  }, [])
 
   return (
     <main>
@@ -32,7 +80,7 @@ const ManagerReport = () => {
               <div id="data">
                 <h3>TOTAL SALES</h3>
                 <div id="num-vector">
-                  <p>7</p>
+                  <p>{totalSalesLength}</p>
                   <img src={totalSales} alt="" />
                 </div>
               </div>
@@ -46,7 +94,7 @@ const ManagerReport = () => {
               <div id="data">
                 <h3>PROSPECT NUMBER</h3>
                 <div id="num-vector">
-                  <p>16</p>
+                  <p>{prospectLength}</p>
                   <img src={prospectNum} alt="" />
                 </div>
               </div>
@@ -59,100 +107,46 @@ const ManagerReport = () => {
                 <div id="client-list">
                   <table id="mr-table">
                     <thead>
-                      <th> </th>
-                      <th>Company Name</th>
-                      <th>Client Name</th>
-                      <th>Email_id</th>
-                      <th>Contact no.</th>
-                      <th>Reminder Date</th>
-                      <th>Activity</th>
-                      <th>Last Update</th>
+                      <tr>
+                        <th>#</th>
+                        <th>Company Name</th>
+                        <th>Client Name</th>
+                        <th>Email_id</th>
+                        <th>Contact no.</th>
+                        <th>Reminder Date</th>
+                        <th>Activity</th>
+                        <th>Last Update</th>
+                      </tr>
                     </thead>
-                    <tr>
-                      <td>1</td>
-                      <td>Graphura India</td>
-                      <td>Vivek Kumar</td>
-                      <td>vivek@gmail.com</td>
-                      <td>0123456789</td>
-                      <td>10/10/25</td>
-                      <td>
-                        <button onClick={openUpdatePopup}>Update</button>
-                      </td>
-                      <td>
-                        <button onClick={openViewPopup}>View</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>Graphura India</td>
-                      <td>Vivek Kumar</td>
-                      <td>vivek@gmail.com</td>
-                      <td>0123456789</td>
-                      <td>10/10/25</td>
-                      <td>
-                        <button onClick={openUpdatePopup}>Update</button>
-                      </td>
-                      <td>
-                        <button onClick={openViewPopup}>View</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>Graphura India</td>
-                      <td>Vivek Kumar</td>
-                      <td>vivek@gmail.com</td>
-                      <td>0123456789</td>
-                      <td>10/10/25</td>
-                      <td>
-                        <button onClick={openUpdatePopup}>Update</button>
-                      </td>
-                      <td>
-                        <button onClick={openViewPopup}>View</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>4</td>
-                      <td>Graphura India</td>
-                      <td>Vivek Kumar</td>
-                      <td>vivek@gmail.com</td>
-                      <td>0123456789</td>
-                      <td>10/10/25</td>
-                      <td>
-                        <button onClick={openUpdatePopup}>Update</button>
-                      </td>
-                      <td>
-                        <button onClick={openViewPopup}>View</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>5</td>
-                      <td>Graphura India</td>
-                      <td>Vivek Kumar</td>
-                      <td>vivek@gmail.com</td>
-                      <td>0123456789</td>
-                      <td>10/10/25</td>
-                      <td>
-                        <button onClick={openUpdatePopup}>Update</button>
-                      </td>
-                      <td>
-                        <button onClick={openViewPopup}>View</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>6</td>
-                      <td>Graphura India</td>
-                      <td>Vivek Kumar</td>
-                      <td>vivek@gmail.com</td>
-                      <td>0123456789</td>
-                      <td>10/10/25</td>
-                      <td>
-                        <button onClick={openUpdatePopup}>Update</button>
-                      </td>
-                      <td>
-                        <button onClick={openViewPopup}>View</button>
-                      </td>
-                    </tr>
+
+                    <tbody>
+                      {todayCallList.length > 0 ? (
+                        todayCallList.map((item, index) => (
+                          <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td>{item.companyName}</td>
+                            <td>{item.clientName}</td>
+                            <td>{item.email_Id}</td>
+                            <td>{item.contact_No}</td>
+                            <td>{new Date(item.reminder_Date).toLocaleDateString()}</td>
+                            <td>
+                              <button onClick={openUpdatePopup}>Update</button>
+                            </td>
+                            <td>
+                              <button onClick={openViewPopup}>View</button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="8" style={{ textAlign: "center", padding: "10px" }}>
+                            No Records Found
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
                   </table>
+
                   {showUpdatePopup && (
                     <div id="popup-overlay" onClick={closeUpdatePopup}>
                       <div id="popup-box" onClick={(e) => e.stopPropagation()}>

@@ -396,3 +396,24 @@ td button {
 #update-btn:hover {
   background-color: #274dc9;
 }
+
+#data {
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* Hover improvement */
+#data:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+}
+
+/* Icon thoda clear dikhe */
+#num-vector img {
+  opacity: 0.85;
+}
+
+/* Hover pe icon thoda highlight */
+#data:hover #num-vector img {
+  opacity: 1;
+}

@@ -12,7 +12,7 @@ const isAuth = async (req, res, next) => {
     }
 
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token,"graphura_jwt_secret");
     const userId = decoded.userId || (decoded.user ? decoded.user._id : null);
 
     if (!userId) {
@@ -26,7 +26,8 @@ const isAuth = async (req, res, next) => {
       return res.status(401).json({ message: "User not found" });
     }
 
-    req.user = user; // 🔥 VERY IMPORTANT
+    req.user = user; 
+
     next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token" });

@@ -12,18 +12,21 @@ import "../salesManager/sidebar.css";
 import { NavLink } from "react-router-dom";
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState("User");
   const [role, setRole] = useState("");
 
   useEffect(() => {
-    const name = localStorage.getItem("userName");
-    const userRole = localStorage.getItem("role");
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+  
+    if (storedUser) {
+      const fullName =
+        `${storedUser.firstName || ""} ${storedUser.lastName || ""}`.trim();
+  
+      setUserName(fullName || "User");
+          setRole(storedUser.role || "");
 
-    console.log("SIDEBAR NAME:", name); // debug
-    setUserName(name);
-    setRole(userRole);
+    }
   }, []);
-
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
