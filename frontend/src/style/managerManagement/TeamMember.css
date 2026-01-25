@@ -14,3 +14,14 @@
   vertical-align: middle;  
 }
 
+/* Success (Active) */
+.badge-success {
+  background-color: #11CE4D !important;
+  border: none;
+}
+
+/* Danger (Inactive) */
+.badge-danger {
+  background-color: #D41A1A !important;
+  border: none;
+}

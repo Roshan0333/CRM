@@ -1,5 +1,7 @@
 export const isManager = (req, res, next) => {
-  if (req.user.role.toLowerCase() !== "manager") {
+
+  const role = req.user.role.toLowerCase();
+  if (role !== "manager" && role!== "feedback manager") {
     return res.status(403).json({ message: "Manager access only" });
   }
   next();

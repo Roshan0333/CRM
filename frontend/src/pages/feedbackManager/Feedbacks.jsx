@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import axios from "axios";
 
@@ -8,6 +8,10 @@ const Feedbacks = () => {
   const [openCompleted, setOpenCompleted] = useState(null);
   const [openMsgBox, setOpenMsgBox] = useState(null);
   const [openVideoBox, setOpenVideoBox] = useState(null);
+  const [pendingFeedbacks, setPendingFeedbacks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [completedFeedbacks, setCompletedFeedbacks] = useState([]);
+
   const toggleDropdownPending = (index) => {
     setOpenPending(openPending === index ? null : index);
   };
@@ -16,41 +20,59 @@ const Feedbacks = () => {
     setOpenCompleted(openCompleted === index ? null : index);
   };
 
-  const [pendingFeedbacks, setPendingFeedbacks] = useState([
-    {
-      _id: "65a1b2c3d4e5f6g7h8i9j0",
-      id: "1.",
-      company: "Company Name",
-      invoice: "Invoice no.",
-      client: "John Doe",
-      contact: "9876543210",
-      designation: "Manager",
-      email: "john@example.com",
-      services: [
-        { name: "Logo", rating: 5 },
-        { name: "Banner", rating: 4 },
-        { name: "Bold text column", rating: 3 },
-        { name: "Bold text column", rating: 5 },
-      ],
-    },
-    {
-      _id: "65a1b2c3djj5f6g7h8i9j0",
-      id: "2.",
-      company: "Company Name",
-      invoice: "Invoice no.",
-      client: "Jane Smith",
-      contact: "9876501234",
-      designation: "Executive",
-      email: "jane@example.com",
-      services: [
-        { name: "Landing Page", rating: 5 },
-        { name: "Poster Design", rating: 4 },
-        { name: "Logo", rating: 5 },
-      ],
-    },
-  ]);
+  // const [pendingFeedbacks, setPendingFeedbacks] = useState([
+  //   {
+  //     _id: "65a1b2c3d4e5f6g7h8i9j0",
+  //     id: "1.",
+  //     company: "Company Name",
+  //     invoice: "Invoice no.",
+  //     client: "John Doe",
+  //     contact: "9876543210",
+  //     designation: "Manager",
+  //     email: "john@example.com",
+  //     services: [
+  //       { name: "Logo", rating: 5 },
+  //       { name: "Banner", rating: 4 },
+  //       { name: "Bold text column", rating: 3 },
+  //       { name: "Bold text column", rating: 5 },
+  //     ],
+  //   },
+  //   {
+  //     _id: "65a1b2c3djj5f6g7h8i9j0",
+  //     id: "2.",
+  //     company: "Company Name",
+  //     invoice: "Invoice no.",
+  //     client: "Jane Smith",
+  //     contact: "9876501234",
+  //     designation: "Executive",
+  //     email: "jane@example.com",
+  //     services: [
+  //       { name: "Landing Page", rating: 5 },
+  //       { name: "Poster Design", rating: 4 },
+  //       { name: "Logo", rating: 5 },
+  //     ],
+  //   },
+  // ]);
 
-  const [completedFeedbacks, setCompletedFeedbacks] = useState([]);
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/feedback", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
+
+        const allData = res.data;
+        setPendingFeedbacks(allData.filter(f => f.status === "pending"));
+        setCompletedFeedbacks(allData.filter(f => f.status === "completed"));
+        setLoading(false);
+      } catch (err) {
+        console.error("Fetch error", err);
+      }
+    };
+    fetchFeedbacks();
+  }, []);
+
+  if (loading) return <div style={{ padding: "50px", textAlign: "center" }}>Loading Feedbacks...</div>;
 
   const markAsCompleted = (index) => {
     const completedItem = pendingFeedbacks[index];
@@ -93,52 +115,66 @@ const Feedbacks = () => {
     );
   };
 
- const handleFileUpload = async (feedbackId, serviceIndex, file) => {
-  if (!file) return;
 
-  const token = localStorage.getItem("token"); // Verify this key matches your login storage
-  
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("serviceIndex", serviceIndex);
+  const handleFileUpload = async (feedbackId, serviceIndex, file) => {
+    if (!file) return;
 
-  try {
-    await axios.patch(
-      `http://localhost:5000/api/feedback/upload/${feedbackId}`,
-      formData,
-      {
-        headers: {
-          "Authorization": `Bearer ${token}`, // Must match backend expectation
-          "Content-Type": "multipart/form-data",
-        },
+    // 1. Check file size (optional but recommended for stability)
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      return alert("File is too large. Please upload a file under 5MB.");
+    }
+
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("serviceIndex", serviceIndex); // Critical: tells backend which row to update
+
+    try {
+      // Show a temporary "Uploading..." status if you want
+      console.log(`Uploading file for service index: ${serviceIndex}`);
+
+      const response = await axios.patch(
+        `http://localhost:5000/api/feedback/upload/${feedbackId}`,
+        formData,
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert(`Success: ${file.name} uploaded for this service!`);
+        // Optional: Refresh data to show a "File Attached" icon
       }
-    );
-    alert("File uploaded successfully!");
-  } catch (err) {
-    console.error("Upload Error Details:", err.response?.data || err.message);
-    alert(err.response?.status === 401 ? "Session expired. Please login again." : "Upload failed.");
-  }
-};
-const handleSendMail = async (feedbackId) => {
-  const token = localStorage.getItem("token");
-  try {
-    await axios.post(
-      `http://localhost:5000/api/feedback/send-mail/${feedbackId}`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    alert("Mail sent to client successfully!");
-  } catch (err) {
-    alert("Failed to send mail: " + (err.response?.data?.message || err.message));
-  }
-};
-  const handleSaveMessage = async (feedbackId, serviceIndex, messageText) => {
+    } catch (err) {
+      console.error("Upload Error:", err.response?.data || err.message);
+      const errorMsg = err.response?.data?.message || "Upload failed.";
+      alert(`Error: ${errorMsg}`);
+    }
+  };
+
+  const handleSendMail = async (feedbackId) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post(
+        `http://localhost:5000/api/feedback/send-mail/${feedbackId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert("Mail sent to client successfully!");
+    } catch (err) {
+      alert("Failed to send mail: " + (err.response?.data?.message || err.message));
+    }
+  };
+  const handleSaveMessage = async (feedbackId, serviceIndex, messageText, type) => {
     try {
       const token = localStorage.getItem("token");
       await axios.patch(`http://localhost:5000/api/feedback/message/${feedbackId}`, {
         serviceIndex,
         message: messageText,
-        type : saveType
+        type: type
       },
         {
           headers: {
@@ -146,7 +182,7 @@ const handleSendMail = async (feedbackId) => {
           }
         }
       );
-        alert(`${saveType === 'video' ? 'Video link' : 'Message'} saved!`);
+      alert(`${type === 'video' ? 'Video link' : 'Message'} saved!`);
     } catch (err) {
       alert("Failed to save message.");
     }
@@ -169,7 +205,7 @@ const handleSendMail = async (feedbackId) => {
 
      
      
-          .container {
+          .feedback-page-container {
         width: 100%;
         padding: 40px 16px;
         margin-left: var(--sidebar-width);
@@ -177,7 +213,7 @@ const handleSendMail = async (feedbackId) => {
           }
 
 @media (max-width: 1020px) {
-  .container {
+  .feedback-page-container {
     margin-left: 0;
     max-width: 100%;
   }
@@ -265,9 +301,9 @@ const handleSendMail = async (feedbackId) => {
         }
 
         .header-left {
-          font-size: 25px;
+          font-size: 24px;
           font-weight: 700;
-          color: #211f1fff;
+          color: rgba(60, 59, 59, 0.92);
         }
 
         .header-right {
@@ -275,6 +311,9 @@ const handleSendMail = async (feedbackId) => {
         align-items: center;
         gap: 10px;
         white-space: nowrap;
+        font-size: 24px;
+          font-weight: 700;
+          color: rgba(60, 59, 59, 0.92);
         }
 
         .feedback-content {
@@ -422,12 +461,13 @@ const handleSendMail = async (feedbackId) => {
     padding: 8px 16px;
   }
 
-  .header-left,
-  .header-right {
+  .header-left
+   {
     font-size: 16px;
   }
-  
- 
+  .header-right{
+  font-size: 16px;
+    }
 
   .form-label {
     font-size: 12px;
@@ -463,7 +503,7 @@ const handleSendMail = async (feedbackId) => {
 
       `}</style>
 
-      <div className="container">
+      <div className="feedback-page-container">
         <div className="tabs-container">
           <button
             className={`tab-button ${key === "pending" ? "active" : ""}`}
@@ -492,11 +532,11 @@ const handleSendMail = async (feedbackId) => {
                 }
               >
                 <div className="header-left">
-                  {item.id} {item.company}
+                  {item.companyName}
                 </div>
                 <div className="header-right">
-                  <span style={{ fontWeight: "700", fontSize: "25px", color: "#211f1fff" }}>
-                    {item.invoice}
+                  <span >
+                    {item.invoiceNo}
                   </span>
                 </div>
                 <div className="header-right">
@@ -524,7 +564,7 @@ const handleSendMail = async (feedbackId) => {
                         <input
                           type="text"
                           className="form-input"
-                          value={item.client || ""}
+                          value={item.clientName || ""}
                           disabled={key === "completed"}
                           onChange={(e) =>
                             updatePendingField(index, "client", e.target.value)
@@ -593,50 +633,100 @@ const handleSendMail = async (feedbackId) => {
                             <td className="service-name">{service.name}</td>
 
                             <td>
-                              <div className="action-buttons">
-                                <button
-                                  className="btn "
-                                  style={{
-                                    fontSize: "13px",
-                                    padding: 0,
-                                    backgroundColor: "#4972E8",
-                                  }}
-                                  onClick={() => setOpenMsgBox(openMsgBox === i ? null : i)}
-                                >
-                                  Message
-                                </button>
-                                <button
-                                  className="btn "
-                                  style={{
-                                    fontSize: "12px",
-                                    padding: 0,
-                                    backgroundColor: "#4972E8",
-                                  }}
-                                  onClick={() => {
-                                    setOpenVideoBox(openVideoBox === i ? null : i);
-                                    setOpenMsgBox(null); // Close message box if video is opened
-                                  }}
-                                >
-                                  Video / Audio
-                                </button>
-                                <button
-                                  className="btn"
-                                  style={{
-                                    fontSize: "13px",
-                                    padding: 0,
-                                    backgroundColor: "#49E876",
-                                  }}
-                                  onClick={() => document.getElementById(`file-upload-${i}`).click()}
-                                >
-                                  Upload
-                                </button>
-                                <input
-                                  type="file"
-                                  id={`file-upload-${i}`}
-                                  style={{ display: 'none' }}
-                                  onChange={(e) => handleFileUpload(item._id, i, e.target.files[0])}
-                                />
-                              </div>
+                              {key === "pending" ? (
+                                <div className="action-buttons">
+                                  <button
+                                    className="btn "
+                                    style={{
+                                      fontSize: "13px",
+                                      padding: 0,
+                                      backgroundColor: "#4972E8",
+                                    }}
+                                    onClick={() => setOpenMsgBox(openMsgBox === i ? null : i)}
+                                  >
+                                    Message
+                                  </button>
+                                  <button
+                                    className="btn "
+                                    style={{
+                                      fontSize: "12px",
+                                      padding: 0,
+                                      backgroundColor: "#4972E8",
+                                    }}
+                                    onClick={() => {
+                                      setOpenVideoBox(openVideoBox === i ? null : i);
+                                      setOpenMsgBox(null); // Close message box if video is opened
+                                    }}
+                                  >
+                                    Video / Audio
+                                  </button>
+                                  <button
+                                    className="btn"
+                                    style={{
+                                      fontSize: "13px",
+                                      padding: 0,
+                                      backgroundColor: "#49E876",
+                                    }}
+                                    onClick={() => document.getElementById(`file-upload-${index}-${i}`).click()}
+                                  >
+                                    Upload
+                                  </button>
+                                  <input
+                                    type="file"
+                                    id={`file-upload-${index}-${i}`}
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => {
+                                      const file = e.target.files[0];
+                                      if (file) {
+                                        handleFileUpload(item._id, i, file);
+                                        e.target.value = "";
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              ) : (
+                                <>
+                                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                    {renderStars(service.rating || 0)}
+                                    <span style={{ fontSize: "11px", color: "#666", marginTop: "4px" }}>
+                                      ({service.rating || 0} / 5)
+                                    </span>
+                                  </div>
+
+                                  <div style={{ textAlign: "center" }}>
+                                    {service.fileUrl ? (
+                                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "5px" }}>
+                                        <img
+                                          src={`http://localhost:5000/${service.fileUrl}`}
+                                          alt="Logo"
+                                          style={{ width: "40px", height: "40px", borderRadius: "4px", border: "1px solid #eee", objectFit: "cover" }}
+                                        />
+                                        <a
+                                          href={`http://localhost:5000/${service.fileUrl}`}
+                                          download={`${service.name}_logo`} // This suggests the filename to the browser
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          style={{ fontSize: "10px", color: "#4972E8", textDecoration: "none", fontWeight: "bold" }}
+                                        >
+                                          Download
+                                        </a>
+                                      </div>
+                                    ) : <span style={{ fontSize: "11px", color: "#ccc" }}>No Logo</span>}
+                                  </div>
+
+                                  <div style={{ textAlign: "center" }}>
+                                    {service.videoLink ? (
+                                      <a
+                                        href={service.videoLink}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{ color: "#4972E8", fontSize: "12px", fontWeight: "600", textDecoration: "underline" }}
+                                      >
+                                        Watch Video
+                                      </a>
+                                    ) : <span style={{ fontSize: "11px", color: "#ccc" }}>No Video</span>}
+                                  </div>
+                                </>)}
                             </td>
                           </tr>
                           {/* NEW VIDEO/AUDIO INPUT ROW */}
@@ -760,7 +850,7 @@ const handleSendMail = async (feedbackId) => {
                   </table>
 
                   {/* Add this right below the </table> */}
-                  {key === "completed" && item.comment && (
+                  {key === "completed" && item.clientComment && (
                     <div style={{ marginTop: "30px" }}>
                       <label className="form-label" style={{ display: "block", marginBottom: "10px" }}>
                         Detailed Feedback
@@ -776,7 +866,7 @@ const handleSendMail = async (feedbackId) => {
                           alignItems: "center"
                         }}
                       >
-                        {item.comment}
+                        {item.clientComment}
                       </div>
                     </div>
                   )}
@@ -791,7 +881,7 @@ const handleSendMail = async (feedbackId) => {
                     <button
                       className="btn btn-blue btn-bottom"
                       style={{ padding: 0 }}
-                      onClick={() => handleSendMail(item._id)} // Connect mail function
+                      onClick={() => handleSendMail(item._id)}
                     >
                       Mail
                     </button>

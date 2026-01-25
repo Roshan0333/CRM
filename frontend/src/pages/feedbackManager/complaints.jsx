@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const Popup = ({ show, onClose, title, children, footer, showCloseX = true }) => {
   if (!show) return null;
@@ -25,7 +26,9 @@ const Complaints = () => {
   const [activeTab, setActiveTab] = useState("solved");
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
-  const [__, setSelectedComplaint] = useState(null);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const openView = (item) => {
     setSelectedComplaint(item || null);
@@ -33,29 +36,78 @@ const Complaints = () => {
   };
 
   const openUpdate = (item) => {
-    setSelectedComplaint(item || null);
+    setSelectedComplaint(item);
+    setUpdateForm({
+      status: item.status,
+      priority: item.priority || "Low",
+      updateText: ""
+    });
     setShowUpdatePopup(true);
   };
 
-  const solvedData = [
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved" },
-  ];
+  const fetchComplaints = async () => {
+    setLoading(true);
+    try {
 
-  const unsolvedData = [
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Follow Up" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Send Reminder" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved", action: "Send Reminder" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Send Reminder" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Send Reminder" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved", action: "Send Reminder" },
-  ];
+      const statusQuery = activeTab === "solved" ? "Solved" : "Unsolved";
 
-  const renderTable = (data, isUnsolved = false) => (
+      const response = await axios.get(`http://localhost:5000/api/complaint?status=${statusQuery}`);
+
+      setComplaints(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error("Error fetching complaints:", error);
+      setComplaints([])
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchComplaints();
+  }, [activeTab]);
+
+  const [updateForm, setUpdateForm] = useState({
+    status: "Unsolved",
+    priority: "Low",
+    updateText: ""
+  });
+
+  const handleUpdateSubmit = async () => {
+    if (!selectedComplaint) return;
+
+    try {
+      const response = await axios.patch(`http://localhost:5000/api/complaint/${selectedComplaint._id}`, updateForm);
+
+      if (response.status === 200) {
+        setShowUpdatePopup(false);
+        setUpdateForm({ status: "Unsolved", priority: "Low", updateText: "" }); // Reset
+        fetchComplaints(); // Refresh the list
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+      alert("Failed to update complaint");
+    }
+  };
+
+  // const solvedData = [
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved" },
+  // ];
+
+  // const unsolvedData = [
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Follow Up" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Send Reminder" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved", action: "Send Reminder" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Send Reminder" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Send Reminder" },
+  //   { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved", action: "Send Reminder" },
+  // ];
+
+  const renderTable = (isUnsolved = false) => (
     <table className="custom-table">
       <thead>
         <tr>
@@ -69,31 +121,35 @@ const Complaints = () => {
         </tr>
       </thead>
       <tbody>
-        {data.map((item, index) => (
-          <tr key={index}>
-            <td>{item.companyName}</td>
-            <td>{item.subject}</td>
-            <td>{item.email_id}</td>
-            <td>{item.issuedDate}</td>
-            <td>
-              <button className="btn btn-view" onClick={() => openView(item)}>View</button>
-            </td>
-            <td>
-              {item.status === "Solved" ? (
-                <span className="badge badge-success">Solved</span>
-              ) : (
-                <span className="badge badge-danger">Unsolved</span>
-              )}
-            </td>
-            {isUnsolved && (
+        {loading ? (
+          <tr><td colSpan={isUnsolved ? 7 : 6}>Loading...</td></tr>
+        ) : (Array.isArray(complaints) && complaints.length === 0) ? (
+          <tr><td colSpan={isUnsolved ? 7 : 6}>No complaints found.</td></tr>
+        ) : (
+          complaints.map((item) => (
+            <tr key={item._id}>
+              <td>{item.companyName}</td>
+              <td>{item.subject}</td>
+              <td>{item.email_id}</td>
+              <td>{new Date(item.issuedDate).toLocaleDateString()}</td>
               <td>
-                <button className="btn btn-update" onClick={() => openUpdate(item)}>
-                  Update
-                </button>
+                <button className="btn btn-view" onClick={() => openView(item)}>View</button>
               </td>
-            )}
-          </tr>
-        ))}
+              <td>
+                <span className={`badge ${item.status === "Solved" ? "badge-success" : "badge-danger"}`}>
+                  {item.status}
+                </span>
+              </td>
+              {isUnsolved && (
+                <td>
+                  <button className="btn btn-update" onClick={() => openUpdate(item)}>
+                    Update
+                  </button>
+                </td>
+              )}
+            </tr>
+          ))
+        )}
       </tbody>
     </table>
   );
@@ -376,7 +432,7 @@ const Complaints = () => {
       <div className="complaints-wrapper">
         {/* Tabs */}
         <div className="tabs-container">
-          <button className={`tab-button ${activeTab === "solved" ? "active" : ""}`} onClick={() => setActiveTab("solved")}>  
+          <button className={`tab-button ${activeTab === "solved" ? "active" : ""}`} onClick={() => setActiveTab("solved")}>
             Solved Complaints
           </button>
           <button className={`tab-button ${activeTab === "unsolved" ? "active" : ""}`} onClick={() => setActiveTab("unsolved")}>
@@ -387,8 +443,8 @@ const Complaints = () => {
         {/* Table Content */}
         <div className="tab-content">
           {activeTab === "solved"
-            ? renderTable(solvedData)
-            : renderTable(unsolvedData, true)}
+            ? renderTable(false)
+            : renderTable(true)}
         </div>
 
         {/* View Popup */}
@@ -398,19 +454,24 @@ const Complaints = () => {
           showCloseX={false}
           title={
             <>
-              Company Name
-              <button
-                className="btn btn-close-custom"
-                onClick={() => setShowViewPopup(false)}
-              >
-                Close
-              </button>
+              {selectedComplaint?.companyName || "Company Name"}
+              <button className="btn btn-close-custom" onClick={() => setShowViewPopup(false)}>Close</button>
             </>
           }
           footer={null}
         >
           <div className="client-activity-box">
-            <h3 className="client-activity-title">Client Activity</h3>
+            {/* Show previous updates here */}
+            <div style={{ width: '100%' }}>
+              <h3 className="client-activity-title" style={{ fontSize: '24px', textAlign: 'center' }}>Update History</h3>
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                {selectedComplaint?.updates?.map((u, i) => (
+                  <li key={i} style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
+                    <strong>{new Date(u.date).toLocaleString()}:</strong> {u.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </Popup>
 
@@ -421,44 +482,49 @@ const Complaints = () => {
           showCloseX={false}
           title={
             <>
-              Company Name
-              <button
-                className="btn btn-close-custom"
-                onClick={() => setShowUpdatePopup(false)}
-              >
-                Close
-              </button>
+              {selectedComplaint?.companyName || "Update Complaint"}
+              <button className="btn btn-close-custom" onClick={() => setShowUpdatePopup(false)}>Close</button>
             </>
+
           }
           footer={
-            <div style={{display:'flex',justifyContent:"flex-start",gap:"10px", width:'100%'}}>
-              <button className="btn btn-primary" onClick={() => setShowUpdatePopup(false)}>Submit</button>
+            <div style={{ display: 'flex', justifyContent: "flex-start", gap: "10px", width: '100%' }}>
+              <button className="btn btn-primary" onClick={handleUpdateSubmit}>Submit</button>
             </div>
           }
         >
           <div className="update-popup-content">
             <div className="update-left">
               <label className="form-label">Select Complaint Status</label>
-              <select className="form-select">
-                <option>Select Status</option>
-                <option>Solved</option>
-                <option>Unsolved</option>
+              <select
+                className="form-select"
+                value={updateForm.status}
+                onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value })}>
+                <option value="Unsolved">Unsolved</option>
+                <option value="Solved">Solved</option>
               </select>
 
               <label className="form-label">Select Priority</label>
-              <select className="form-select">
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
+              <select
+                className="form-select"
+                value={updateForm.priority}
+                onChange={(e) => setUpdateForm({ ...updateForm, priority: e.target.value })}
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
               </select>
 
-              <textarea className="form-control" rows="6" placeholder="Type Update"></textarea>
-            </div>
-            <div className="update-right">
-              <div className="activity-box" style={{ height: '340px' }}>
-                <h6 className="form-label" style={{ textAlign: "center", marginBottom: '10px', fontSize : '12px' }}>Client Activity</h6>
-              </div>
-            </div>
+              <textarea
+                className="form-control"
+                rows="6"
+                placeholder="Type Update"
+                value={updateForm.updateText}
+                onChange={(e) => setUpdateForm({ ...updateForm, updateText: e.target.value })}
+              >
+                </textarea>           
+               </div>
+            
           </div>
         </Popup>
       </div>

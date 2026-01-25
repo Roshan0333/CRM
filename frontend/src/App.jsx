@@ -8,10 +8,6 @@ import LoginForm from "./components/auth/LoginForm";
 import RegisterForm from "./components/auth/RegisterForm";
 
 // import Profile from "./pages/profile/ProfilePopup";
-  /* AUTH PAGES */
-  import LoginForm from "./components/auth/LoginForm";
-  import RegisterForm from "./components/auth/RegisterForm";
-  import Profile from "./pages/Profile";
 
   /* ROLE BASED COMPONENTS */
 
@@ -93,7 +89,7 @@ import RegisterForm from "./components/auth/RegisterForm";
   import FM_Dashboard from "./pages/feedbackManager/Dashboard";
   import FM_Feedbacks from "./pages/feedbackManager/Feedbacks";
   import FM_Salary from "./pages/feedbackManager/FeedbackSalary";
-  import FM_Complaint from "./pages/feedbackManager/Complaints";
+  import FM_Complaint from "./pages/feedbackManager/complaints";
   import FM_TeamReport from "./pages/feedbackManager/TeamReport";
   import FM_TeamMember from "./pages/feedbackManager/TeamMember";
   import ClientFeedback from "./pages/feedbackManager/clientFeedback";
@@ -151,7 +147,7 @@ import RegisterForm from "./components/auth/RegisterForm";
             
 
 
-              <Route path="/submit-feedback/:token" element={<ClientFeedback />} />
+              <Route path="/feedback-form/:token" element={<ClientFeedback />} />
             </Routes>
           )}
 

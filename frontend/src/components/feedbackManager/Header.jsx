@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import myProfile from "../../assets/salesExecutive/Dashboard/myProfile.png";
 import myProfileArrow from "../../assets/salesExecutive/Dashboard/myProfileArrow.png";
-import "../salesManager/header.css";
+import "../salesExecutive/header.css";
 import ProfilePopup from "../../pages/profile/ProfilePopup";
 
 

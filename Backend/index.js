@@ -9,7 +9,6 @@ import userRoutes from "./routes/userRoutes.js";
 import clientRoutes from "./routes/salesDepartment/client.route.js";
 import salesRoutes from './routes/salesDepartment/sales.route.js';
 import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
-import FeedbackRoutes from './routes/feedbackRoutes/FeedbackRoutes.js';
 import auth from "./middlewares/AuthMiddleware.js"
 import reminderCallRoutes from "./routes/salesDepartment/todayReminderCall.route.js"
 import salesTeamRoutes from "./routes/salesDepartment/salesTeam.route.js";
@@ -19,7 +18,9 @@ import untouchedRoutes from "./routes/SalesTeam/untouchedRoutes.js";
 import prospectRoutes from "./routes/SalesTeam/prospectRoutes.js";
 import salesTeamLeadRoutes from "./routes/SalesTeam/salesTeamLeadRoutes.js";
 
-
+import FeedbackRoutes from './routes/feedbackRoutes/FeedbackRoutes.js';
+import ComplaintRoutes from './routes/feedbackRoutes/ComplaintRoutes.js';
+import TeamRoutes from './routes/feedbackRoutes/TeamRoutes.js'; 
 
 const app = express();
 
@@ -37,6 +38,8 @@ app.use(
 
 app.use(express.json());
 connectDB();
+
+app.use("/uploads", express.static("uploads"));
 
 app.get("/", (req, res) => {
   res.send("server is running");
@@ -56,7 +59,9 @@ app.use("/api/prospects", prospectRoutes);
 app.use("/api/total-sales", totalSalesRoutes);
 app.use("/api/untouched", untouchedRoutes);
 
-app.use("/api/feedback", FeedbackRoutes)
+app.use("/api/feedback", FeedbackRoutes);
+app.use("/api/complaint", ComplaintRoutes);
+app.use("/api/team-members", TeamRoutes )
 
 app.listen(PORT, () => {
   console.log(`server is running on port http://localhost:${PORT}`);
