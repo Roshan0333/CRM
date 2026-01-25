@@ -1,5 +1,5 @@
 
-./Backend/node_modules
-./Backend/uploads/
+/Backend/node_modules
+/Backend/uploads/
 .env
 build/
