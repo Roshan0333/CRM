@@ -3,6 +3,10 @@ import mongoose, { Schema } from "mongoose";
 const { ObjectId } = mongoose.Schema.Types;
 
 const SalesTeam_Schema = new Schema({
+    ManagerId:{
+        type: ObjectId,
+        ref: "User"
+    },
     TLId: {
         type: ObjectId,
         ref: "User",

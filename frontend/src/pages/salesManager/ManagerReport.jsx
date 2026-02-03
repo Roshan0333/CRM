@@ -29,14 +29,14 @@ const ManagerReport = () => {
         let startDate = new Date();
         startDate.setDate(1)
         let endDate = new Date();
-        endDate.setMonth(endDate.getMonth()+1);
+        endDate.setMonth(endDate.getMonth() + 1);
         endDate.setDate(1)
 
 
         const prospectApiResponse = await prospectList();
         const apiResponse = await todayCallingListApi();
         const salesApiResponse = await TotalSale();
-        // const clientApiResponse = await cutomerCallingListApi()
+        const clientApiResponse = await cutomerCallingListApi(startDate, endDate);
 
         if (!prospectApiResponse.ok) {
           alert(prospectApiResponse.data || "Failed");
@@ -46,7 +46,6 @@ const ManagerReport = () => {
 
         if (!salesApiResponse.ok) {
           alert(salesApiResponse.data || "Failed");
-          return
         }
         else {
           setTotalSalesLength(salesApiResponse.data.TotalSales.length);
@@ -54,10 +53,19 @@ const ManagerReport = () => {
 
         if (!apiResponse.ok) {
           alert(apiResponse.data || "Failed");
-          return
         }
         else {
           setTodayCallList(apiResponse.data.TodayCallList);
+        }
+
+        if (!clientApiResponse.ok) {
+          alert(clientApiResponse.data || "Failed");
+        }
+        else{
+          const clientList = clientApiResponse.data;
+          const ClientArray = clientList.map((item) => item._id);
+
+          setTotalClientLength(new Set(ClientArray).size)
         }
       }
     )()
@@ -73,7 +81,7 @@ const ManagerReport = () => {
               <div id="data">
                 <h3>TOTAL CLIENT'S DATA</h3>
                 <div id="num-vector">
-                  <p>300</p>
+                  <p>{totalClientLength}</p>
                   <img src={clientData} alt="" />
                 </div>
               </div>

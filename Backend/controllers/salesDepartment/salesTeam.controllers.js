@@ -3,6 +3,8 @@ import SalesTeam_Model from "../../models/salesDepartment/salesTeams.models.js";
 
 const addTeam_SalesTeamLead = async (req, res) => {
     try {
+        let {_id} = req.user;
+
         let { firstName, lastName, email, contact, location, joiningDate } = req.body
 
         let employeeDetail = await User.findOne({ email: email });
@@ -35,6 +37,7 @@ const addTeam_SalesTeamLead = async (req, res) => {
         }
 
         let teamDetails = SalesTeam_Model({
+            ManagerId: _id,
             TLId: employeeDetail._id,
             TLStatus: "Active",
             TLName: `${firstName} ${lastName}`,
@@ -114,4 +117,22 @@ const addTeam_SalesExcutive = async (req, res) => {
     }
 }
 
-export { addTeam_SalesTeamLead, addTeam_SalesExcutive };
+const getAllTeam = async (req, res) => {
+    try{
+        const {_id} = req.user;
+
+        const teamList = await SalesTeam_Model.find(
+            {ManagerId:_id}
+        )
+        if(teamList.length === 0){
+            return res.status(404).json({msg:"No team found."});
+        }
+
+        return res.status(200).json({msg:"Successful", teamList: teamList})
+    }
+    catch(err){
+        return res.status(500).json({error: err.message});
+    }
+}
+
+export { addTeam_SalesTeamLead, addTeam_SalesExcutive, getAllTeam };
