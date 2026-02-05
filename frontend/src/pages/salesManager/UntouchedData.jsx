@@ -3,6 +3,8 @@ import totalProspectus from "../../assets/salesManager/untouchedData/totalProspe
 import totalUntouchedData from "../../assets/salesManager/untouchedData/totalUntouchedData.png";
 import call from "../../assets/salesManager/untouchedData/call.png";
 import dropbox from "../../assets/salesManager/untouchedData/dropbox.png";
+import { useRef, useState } from "react";
+import axios from "axios";
 
 const UntouchedData = () => {
   const untouchedData = [
@@ -68,6 +70,80 @@ const UntouchedData = () => {
     },
   ];
 
+  // const [file, setFile] = useState(null);
+  // const [fileExt, setFileExt] = useState("");
+  const fileInputRef = useRef(null);
+
+  const openFilePicker = () => {
+    fileInputRef.current.click();
+  }
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+
+    if (!selectedFile) return;
+
+    const ext = selectedFile.name.split(".").pop().toLowerCase();
+    const allowExt = ["xlsx", "csv"];
+
+    if (!allowExt.includes(ext)) {
+      alert("Only excel or csv files allowed.");
+      return
+    }
+
+    // setFileExt(ext);
+    // setFile(e.target.files[0]);
+
+    leadUpload(selectedFile, ext);
+  }
+
+  const leadUpload = async (selectedFile, ext) => {
+    try {
+      if (!selectedFile) {
+        alert("Please select a file");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      let url;
+
+      if (ext === "xlsx") {
+        url = "http://localhost:5000/api/clientLead/excelFileLead"
+      }
+      else {
+        url = "http://localhost:5000/api/clientLead/csvFileLead"
+      }
+
+      const apiResponse = await axios.post(
+        url,
+        formData,
+        {
+          headers: {
+            "Content-Type": 'multipart/form-data',
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      )
+
+      console.log(apiResponse)
+
+      if (apiResponse.status === 500) {
+        console.error(apiResponse.data.error)
+        return
+      }
+      else {
+        alert(apiResponse.data.msg);
+        return
+      }
+
+    }
+    catch (err) {
+      return console.error(err.message);
+    }
+  }
+
   const statsCards = [
     {
       title: "TOTAL DATA",
@@ -119,34 +195,52 @@ const UntouchedData = () => {
               Untouched Data
             </h1>
           </div>
-         <div className="importBtn tracking-wider">
-  <button
-    style={{
-      backgroundColor: "#4972E8",
-      color: "#FFFFFF",
-      fontSize: "16px",
-      padding: "8px 16px",
-      border: "none",
-      cursor: "pointer",
-      borderRadius: "4px",
-      letterSpacing: "0.01em",
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",      
-    }}
-  >
-    Import Data
-    <img
-      src={dropbox}
-      alt="import"
-      style={{
-        width: "18px",
-        height: "18px",
-        display: "block",
-      }}
-    />
-  </button>
-</div>
+          <div className="importBtn tracking-wider">
+            <button
+            onClick={openFilePicker}
+              style={{
+                backgroundColor: "#4972E8",
+                color: "#FFFFFF",
+                fontSize: "16px",
+                padding: "8px 16px",
+                border: "none",
+                cursor: "pointer",
+                borderRadius: "4px",
+                letterSpacing: "0.01em",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              Import Data
+              <img
+                src={dropbox}
+                alt="import"
+                style={{
+                  width: "18px",
+                  height: "18px",
+                  display: "block",
+                }}
+              />
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                // hidden
+                accept=".xlsx, .csv"
+                onChange={handleFileChange}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "18px",
+                  height: "100%",
+                  opacity: 0,
+                  cursor: "pointer",
+                }}
+              />
+            </button>
+          </div>
 
         </div>
 
@@ -246,13 +340,13 @@ const UntouchedData = () => {
                       background: "#fff",
                       borderRadius: "8px",
                       padding: "8px",
-                      
+
                     }}
                   >
                     <img
                       src={card.icon}
                       alt={card.title}
-                      style={{ width: "55px", height: "53px",backgroundColor:"#fff" }}
+                      style={{ width: "55px", height: "53px", backgroundColor: "#fff" }}
                     />
                   </div>
                 </div>

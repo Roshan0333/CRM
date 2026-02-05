@@ -4,7 +4,6 @@ import isAuth from "../../middlewares/AuthMiddleware.js";
 
 const router =Router();
 
-console.log("Enter")
 router.route("/addClient").post(isAuth, add_Client);
 router.route("/updateClientData").put(isAuth, update_ClientData);
 router.route("/prospectList").get(isAuth, get_CurrentMonthProspect);

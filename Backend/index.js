@@ -12,6 +12,7 @@ import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
 import auth from "./middlewares/AuthMiddleware.js"
 import reminderCallRoutes from "./routes/salesDepartment/todayReminderCall.route.js"
 import salesTeamRoutes from "./routes/salesDepartment/salesTeam.route.js";
+import clientLeadRoutes from "./routes/salesDepartment/clientLeads.route.js";
 
 import totalSalesRoutes from "./routes/SalesTeam/totalSalesRoutes.js";
 import untouchedRoutes from "./routes/SalesTeam/untouchedRoutes.js";
@@ -48,6 +49,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
+app.use("/api/clientLead", clientLeadRoutes)
 app.use("/api/client", clientRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/calllog", callLogRoutes)

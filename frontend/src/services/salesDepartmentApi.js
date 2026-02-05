@@ -362,3 +362,32 @@ export const currentYearSales = async () => {
     }
   }
 }
+
+export const getAllTeam = async () => {
+  try{
+    const response = await axios.get(
+      `${API_URL}/salesTeam/getAllTeam`,
+      {
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":`Bearer ${token}`
+        }
+      }
+    );
+
+    return {ok: true, fetchMessage: true, data:response.data.teamList}
+  }
+  catch(err){
+    if(err.response){
+      if(err.response.status < 500){
+        return {ok: false, fetchMessage: true, data: err.response.data.msg};
+      }
+      else{
+        return {ok: false, fetchMessage: true, data: err.response.data.error}
+      }
+    }
+    else{
+      return {ok: false, fetchMessage: false, data: err.message}
+    }
+  }
+}
