@@ -32,6 +32,13 @@ const Sales_Schema = new Schema({
     Amount: {
         type: Number,
         required: true
+    },
+    PayAmount:{
+        type: Number,
+    },
+    Confirm:{
+        type: Boolean,
+        default: false
     }
 })
 
