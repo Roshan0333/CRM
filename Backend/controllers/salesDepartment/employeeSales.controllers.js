@@ -21,7 +21,9 @@ const post_Sale = async (req, res) => {
                 TeamLeaderId: null,
                 SalesExecutiveId: null,
                 Service: Service,
-                Amount: Amount
+                Amount: Amount,
+                PayAmount: 0,
+                Confirm:false,
             });
         }
         else if (role === "sales team lead") {
@@ -89,7 +91,8 @@ const TotalSalesBy_Id = async (req, res) => {
                     Date: {
                         $gte: startOfMonth,
                         $lt: endOfMonth
-                    }
+                    },
+                    Confirm: true
                 }
             },
             {
@@ -160,7 +163,8 @@ const currentYearSales = async (req, res) => {
                 $match: {
                     Date: {
                         $gte: date
-                    }
+                    },
+                    Confirm: true
                 }
             },
             {
