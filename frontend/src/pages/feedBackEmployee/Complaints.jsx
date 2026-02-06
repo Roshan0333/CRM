@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const Popup = ({ show, onClose, title, children, footer, showCloseX = true }) => {
   if (!show) return null;
@@ -21,11 +22,20 @@ const Popup = ({ show, onClose, title, children, footer, showCloseX = true }) =>
   );
 };
 
+
+
 const Complaints = () => {
-  const [activeTab, setActiveTab] = useState("solved");
+  const [activeTab, setActiveTab] = useState("unsolved");
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
-  const [__, setSelectedComplaint] = useState(null);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [currentStatus, setCurrentStatus] = useState("");
+  const [currentPriority, setCurrentPriority] = useState("Low");
+  const [updateText, setUpdateText] = useState("");
 
   const openView = (item) => {
     setSelectedComplaint(item || null);
@@ -33,27 +43,87 @@ const Complaints = () => {
   };
 
   const openUpdate = (item) => {
-    setSelectedComplaint(item || null);
+    setSelectedComplaint(item);
+    setCurrentStatus(item.status);
+    setCurrentPriority(item.priority || "Low");
+    setUpdateText(""); 
     setShowUpdatePopup(true);
   };
 
-  const solvedData = [
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved" },
-  ];
+  const fetchMyComplaints = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:5000/api/complaints/my-tasks", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const data = response.data;
+      setComplaints(Array.isArray(data) ? data : []);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching employee complaints:", error);
+      setLoading(false);
+    }
+  };
 
-  const unsolvedData = [
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Follow Up" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Send Reminder" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved", action: "Send Reminder" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Send Reminder" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Unsolved", action: "Send Reminder" },
-    { companyName: "Bold text column", subject: "Bold text column", email_id: "Bold text column", issuedDate: "Bold text column", Discussion: "Bold text column", status: "Solved", action: "Send Reminder" },
-  ];
+  useEffect(() => {
+    fetchMyComplaints();
+  }, []);
+
+
+  const handleUpdateSubmit = async () => {
+    try {
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found in localStorage");
+        return;
+      }
+      const response = await axios.put(
+        `http://localhost:5000/api/complaints/update/${selectedComplaint._id}`,
+        {
+          status: currentStatus,
+          priority: currentPriority,
+          note: updateText
+        },
+        { headers: { "Authorization": `Bearer ${token}` } }
+      );
+
+      if (response.status === 200) {
+        setUpdateText("");
+        setSelectedComplaint(response.data);
+        setShowUpdatePopup(false);
+        fetchMyComplaints();
+      }
+    } catch (error) {
+      console.error("Update failed", error);
+    }
+  };
+
+
+  const renderDiscussion = (text) => {
+    if (!text) return <p className="no-data">No history available.</p>;
+
+    return text.split("------------------").map((entry, i) => {
+      if (!entry.trim()) return null;
+
+      const dateMatch = entry.match(/\[(.*?)\]/);
+      const timestamp = dateMatch ? dateMatch[1] : "Earlier";
+      const content = entry.replace(/\[.*?\]/, "").replace("UPDATE:", "").trim();
+
+      return (
+        <div key={i} className="update-row">
+          <div className="update-date">{timestamp}</div>
+          <div className="update-text">{content}</div>
+        </div>
+      );
+    });
+  };
+
+  const solvedData = complaints.filter(c => c.status === "Solved");
+  const unsolvedData = complaints.filter(c => c.status !== "Solved");
 
   const renderTable = (data, isUnsolved = false) => (
     <table className="custom-table">
@@ -68,33 +138,41 @@ const Complaints = () => {
           {isUnsolved && <th>Action</th>}
         </tr>
       </thead>
+
       <tbody>
-        {data.map((item, index) => (
-          <tr key={index}>
-            <td>{item.companyName}</td>
-            <td>{item.subject}</td>
-            <td>{item.email_id}</td>
-            <td>{item.issuedDate}</td>
-            <td>
-              <button className="btn btn-view" onClick={() => openView(item)}>View</button>
-            </td>
-            <td>
-              {item.status === "Solved" ? (
-                <span className="badge badge-success">Solved</span>
-              ) : (
-                <span className="badge badge-danger">Unsolved</span>
-              )}
-            </td>
-            {isUnsolved && (
+        {data.length > 0 ? (
+          data.map((item, index) => (
+            <tr key={item._id || index}>
+              <td>{item.companyName}</td>
+              <td>{item.subject}</td>
+              <td>{item.email_id}</td>
+              <td>{new Date(item.issuedDate || item.createdAt).toLocaleDateString()}</td>
               <td>
-                <button className="btn btn-update" onClick={() => openUpdate(item)}>
-                  Update
-                </button>
+                <button className="btn btn-view" onClick={() => openView(item)}>View</button>
               </td>
-            )}
+              <td>
+                <span className={`badge ${item.status === "Solved" ? "badge-success" : "badge-danger"}`}>
+                  {item.status}
+                </span>
+              </td>
+              {isUnsolved && (
+                <td>
+                  <button className="btn btn-update" onClick={() => openUpdate(item)}>
+                    Update
+                  </button>
+                </td>
+              )}
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan={isUnsolved ? 7 : 6} style={{ padding: "20px" }}>
+              {loading ? "Loading complaints..." : "No complaints found."}
+            </td>
           </tr>
-        ))}
+        )}
       </tbody>
+
     </table>
   );
 
@@ -112,13 +190,75 @@ const Complaints = () => {
           width: calc(100% - 250px);
           transition: margin-left 0.3s ease;
         }
+          /* Discussion UI */
+        .discussion-container {
+          background: #ffffff;
+          border: 1px solid #e3e6f0;
+          border-radius: 8px;
+          height: 350px;
+          display: flex;
+          flex-direction: column;
+        }
+        .discussion-header {
+          padding: 10px;
+          background: #f8f9fc;
+          border-bottom: 1px solid #e3e6f0;
+          text-align: center;
+          font-weight: bold;
+          color: #4e73df;
+        }
+    .discussion-body {
+          flex: 1;
+          overflow-y: auto;
+          padding: 10px 20px;
+          background: #ffffff;
+        }
+      .update-row {
+          display: flex;
+          padding: 15px 0;
+          border-bottom: 1px solid #f0f0f0;
+          gap: 30px;
+        }
+        .update-date {
+          min-width: 160px;
+          font-size: 14px;
+          font-weight: 800;
+          color: #333;
+        }
+        .update-text {
+          flex: 1;
+          font-size: 18px;
+          line-height: 1.5;
+          color: #161616;
+          white-space: pre-wrap;
+        }
 
+        .view-header-wrapper { width: 100%; text-align: center; }
+        .last-update-title { font-size: 24px; font-weight: bold; margin: 0; }
+        .client-info-subrow { color: #353434; margin-top: 5px; font-weight: 500; font-size: 18px; }
+        
+        .view-header-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          margin-bottom: 20px;
+        }
+
+        .last-update-title {
+          font-size: 24px;
+          font-weight: bold;
+          text-align: center;
+          flex-grow: 1;
+        }
         @media (max-width: 1020px) {
           .complaints-wrapper {
             margin-left: 0;
             width: 100%;
             padding: 20px 15px;
+            
           }
+            .update-popup-content { grid-template-columns: 1fr; }
         }
 
         /* --- TAB DESIGN (from Figma style) --- */
@@ -272,7 +412,7 @@ const Complaints = () => {
           z-index: 1200;
         }
         .popup-box {
-          width: 1000px;
+          width: 900px;
           max-width: calc(100% - 48px);
           background: #fff;
           border-radius: 12px;
@@ -339,12 +479,22 @@ const Complaints = () => {
         .form-select {
           margin-bottom: 1rem;
         }
+          .activity-box p,
+          .client-activity-box p {
+            word-wrap: break-word;
+            text-align: left;
+            line-height: 1.5;
+            padding: 10px;
+            white-space: pre-wrap;
+            color: #4a5568;
+}
         .activity-box {
           border: 1px solid #dee2e6;
           border-radius: 8px;
           padding: 1rem;
           background: #f8f9fa;
           height: 260px;
+          overflow-y: auto;
         }
         .row { display: flex; gap: 1rem; }
         .col-md-6 { flex: 1; }
@@ -376,7 +526,7 @@ const Complaints = () => {
       <div className="complaints-wrapper">
         {/* Tabs */}
         <div className="tabs-container">
-          <button className={`tab-button ${activeTab === "solved" ? "active" : ""}`} onClick={() => setActiveTab("solved")}>  
+          <button className={`tab-button ${activeTab === "solved" ? "active" : ""}`} onClick={() => setActiveTab("solved")}>
             Solved Complaints
           </button>
           <button className={`tab-button ${activeTab === "unsolved" ? "active" : ""}`} onClick={() => setActiveTab("unsolved")}>
@@ -397,20 +547,21 @@ const Complaints = () => {
           onClose={() => setShowViewPopup(false)}
           showCloseX={false}
           title={
-            <>
-              Company Name
-              <button
-                className="btn btn-close-custom"
-                onClick={() => setShowViewPopup(false)}
-              >
-                Close
-              </button>
-            </>
+            <div className="view-header-wrapper" style={{ width: '100%' }}>
+              <div className="view-header-row">
+                <div style={{ width: '80px' }}></div> 
+                <h2 className="last-update-title">{selectedComplaint?.companyName}</h2>
+              </div>
+
+              
+              <div className="client-info-subrow">
+                <span>Client Activity</span>
+              </div>
+            </div>
           }
-          footer={null}
         >
-          <div className="client-activity-box">
-            <h3 className="client-activity-title">Client Activity</h3>
+          <div className="discussion-body" style={{ maxHeight: '60vh' }}>
+            {renderDiscussion(selectedComplaint?.discussion)}
           </div>
         </Popup>
 
@@ -418,51 +569,49 @@ const Complaints = () => {
         <Popup
           show={showUpdatePopup}
           onClose={() => setShowUpdatePopup(false)}
-          showCloseX={false}
-          title={
-            <>
-              Company Name
-              <button
-                className="btn btn-close-custom"
-                onClick={() => setShowUpdatePopup(false)}
-              >
-                Close
-              </button>
-            </>
-          }
-          footer={
-            <div style={{display:'flex',justifyContent:"flex-start",gap:"10px", width:'100%'}}>
-              <button className="btn btn-primary" onClick={() => setShowUpdatePopup(false)}>Submit</button>
-            </div>
-          }
+          title={` ${selectedComplaint?.companyName}`}
+           showCloseX={false}
+          footer={<button className="btn btn-primary" onClick={handleUpdateSubmit}>Send Update</button>}
         >
           <div className="update-popup-content">
             <div className="update-left">
-              <label className="form-label">Select Complaint Status</label>
-              <select className="form-select">
-                <option>Select Status</option>
-                <option>Solved</option>
-                <option>Unsolved</option>
+              <label className="form-label">Status</label>
+              <select className="form-select" value={currentStatus} onChange={(e) => setCurrentStatus(e.target.value)}>
+                <option value="Unsolved">Unsolved</option>
+                <option value="Solved">Solved</option>
               </select>
 
-              <label className="form-label">Select Priority</label>
-              <select className="form-select">
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
+              <label className="form-label">Priority</label>
+              <select className="form-select" value={currentPriority} onChange={(e) => setCurrentPriority(e.target.value)}>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
               </select>
 
-              <textarea className="form-control" rows="6" placeholder="Type Update"></textarea>
+              <label className="form-label">New Message</label>
+              <textarea
+                className="form-control"
+                rows="5"
+                placeholder="Type your reply here..."
+                value={updateText}
+                onChange={(e) => setUpdateText(e.target.value)}
+              ></textarea>
             </div>
+
             <div className="update-right">
-              <div className="activity-box" style={{ height: '340px' }}>
-                <h6 className="form-label" style={{ textAlign: "center", marginBottom: '10px' }}>Client Activity</h6>
+              <div className="discussion-container">
+                <div className="discussion-header">Client Activity</div>
+                <div className="discussion-body">
+                  {renderDiscussion(selectedComplaint?.discussion)}
+                </div>
               </div>
             </div>
           </div>
         </Popup>
       </div>
     </>
+
+
   );
 };
 

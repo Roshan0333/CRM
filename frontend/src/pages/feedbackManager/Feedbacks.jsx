@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, CheckCircle } from "lucide-react";
 import axios from "axios";
 
 const Feedbacks = () => {
@@ -19,40 +19,6 @@ const Feedbacks = () => {
   const toggleDropdownCompleted = (index) => {
     setOpenCompleted(openCompleted === index ? null : index);
   };
-
-  // const [pendingFeedbacks, setPendingFeedbacks] = useState([
-  //   {
-  //     _id: "65a1b2c3d4e5f6g7h8i9j0",
-  //     id: "1.",
-  //     company: "Company Name",
-  //     invoice: "Invoice no.",
-  //     client: "John Doe",
-  //     contact: "9876543210",
-  //     designation: "Manager",
-  //     email: "john@example.com",
-  //     services: [
-  //       { name: "Logo", rating: 5 },
-  //       { name: "Banner", rating: 4 },
-  //       { name: "Bold text column", rating: 3 },
-  //       { name: "Bold text column", rating: 5 },
-  //     ],
-  //   },
-  //   {
-  //     _id: "65a1b2c3djj5f6g7h8i9j0",
-  //     id: "2.",
-  //     company: "Company Name",
-  //     invoice: "Invoice no.",
-  //     client: "Jane Smith",
-  //     contact: "9876501234",
-  //     designation: "Executive",
-  //     email: "jane@example.com",
-  //     services: [
-  //       { name: "Landing Page", rating: 5 },
-  //       { name: "Poster Design", rating: 4 },
-  //       { name: "Logo", rating: 5 },
-  //     ],
-  //   },
-  // ]);
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
@@ -188,6 +154,60 @@ const Feedbacks = () => {
     }
   };
 
+  const handleAssignBadFeedback = async (feedbackItem) => {
+    // 1. Client-side check: prevent clicking if we already know it's assigned
+    if (feedbackItem.assignedEmployee) {
+      alert(`Already assigned to: ${feedbackItem.assignedEmployee.name || feedbackItem.assignedEmployee.email}`);
+      return;
+    }
+
+    const confirmAction = window.confirm(
+      `Are you sure you want to file a complaint for ${feedbackItem.companyName}?`
+    );
+
+    if (!confirmAction) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const payload = {
+        feedbackId: feedbackItem._id,
+        companyName: feedbackItem.companyName,
+        email_id: feedbackItem.email_id || feedbackItem.email,
+        description: feedbackItem.clientComment || "No specific comments provided.",
+        subject: `Feedback Complaint - ${feedbackItem.companyName}`,
+        priority: "Medium"
+      };
+
+      const response = await axios.post(
+        "http://localhost:5000/api/complaints/generate-from-feedback",
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const { assignedTo, assignedName } = response.data;
+      setCompletedFeedbacks(prev =>
+        prev.map(item =>
+          item._id === feedbackItem._id
+            ? {
+              ...item,
+              assignedEmployee: {
+                email: assignedTo,
+                name: assignedName
+              }
+            }
+            : item
+        )
+      );
+
+      alert(`Complaint generated and assigned to: ${assignedTo}`);
+    } catch (err) {
+      // 3. Handle backend "Already Exists" error
+      const errorMsg = err.response?.data?.message || err.message;
+      alert("Notice: " + errorMsg);
+
+      // If backend says it's already there, we should probably refresh the list
+    }
+  };
   return (
     <div
       className="main-content-wrapper"
@@ -534,10 +554,45 @@ const Feedbacks = () => {
                 <div className="header-left">
                   {item.companyName}
                 </div>
-                <div className="header-right">
+                <div className="header-right" >
+
                   <span >
                     {item.invoiceNo}
                   </span>
+                  {/* Status Badge for Completed Tab */}
+                  {key === "completed" && (
+                    item.assignedEmployee ? (
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        backgroundColor: "#fff4e5",
+                        color: "#b05d22",
+                        padding: "4px 10px",
+                        borderRadius: "20px",
+                        fontSize: "12px",
+                        border: "1px solid #ffe2b3",
+                        marginRight: "15px"
+                      }}>
+                        <Clock size={14} /> Assigned / In Progress
+                      </div>
+                    ) : (
+                      <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        backgroundColor: "#e7f6ed",
+                        color: "#20844a",
+                        padding: "4px 10px",
+                        borderRadius: "20px",
+                        fontSize: "12px",
+                        border: "1px solid #c2e7d1",
+                        marginRight: "15px"
+                      }}>
+                        <CheckCircle size={14} /> Good Feedback
+                      </div>
+                    )
+                  )}
                 </div>
                 <div className="header-right">
                   {key === "pending" ? (
@@ -872,19 +927,38 @@ const Feedbacks = () => {
                   )}
 
                   <div className="bottom-actions">
-                    <button
-                      className="btn btn-green btn-bottom"
-                      style={{ padding: 0 }}
-                    >
-                      Assign
-                    </button>
-                    <button
-                      className="btn btn-blue btn-bottom"
-                      style={{ padding: 0 }}
-                      onClick={() => handleSendMail(item._id)}
-                    >
-                      Mail
-                    </button>
+                    {key === "completed" && (
+                      <button
+                        className="btn btn-red btn-bottom"
+                        style={{
+                          padding: "0 12px",
+                          backgroundColor: item.assignedEmployee ? "#575f66" : "#dc3545",
+                          color: item.assignedEmployee ? "#fafafb" : "#ffffff",
+                          minWidth: "140px",
+                          width: "auto",
+                          height: "auto",
+                          minHeight: "28px",
+                          cursor: item.assignedEmployee ? "not-allowed" : "pointer",
+                          opacity: item.assignedEmployee ? 0.8 : 1
+                        }}
+                        onClick={() => handleAssignBadFeedback(item)}
+                        disabled={!!item.assignedEmployee}
+                      >
+                        {item.assignedEmployee ? (
+                          `Assigned : ${item.assignedEmployee.email}`
+                        ) : (
+                          "Assign Complaint"
+                        )}
+                      </button>
+                    )}
+                    {key === "pending" && (
+                      <button
+                        className="btn btn-blue btn-bottom"
+                        style={{ padding: 0 }}
+                        onClick={() => handleSendMail(item._id)}
+                      >
+                        Mail
+                      </button>)}
                     {key === "pending" && (
                       <button
                         className="btn btn-red btn-bottom"

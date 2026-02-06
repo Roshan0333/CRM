@@ -61,6 +61,11 @@ const feedbackSchema = new mongoose.Schema({
     type: String, 
     default: "" 
   },
+  assignedEmployee: { 
+    id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    email: { type: String },
+    name : { type: String },
+  },
 }, { timestamps: true });
 
 const Feedback = mongoose.model("Feedback", feedbackSchema);
