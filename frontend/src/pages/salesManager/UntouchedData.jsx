@@ -3,172 +3,149 @@ import totalProspectus from "../../assets/salesManager/untouchedData/totalProspe
 import totalUntouchedData from "../../assets/salesManager/untouchedData/totalUntouchedData.png";
 import call from "../../assets/salesManager/untouchedData/call.png";
 import dropbox from "../../assets/salesManager/untouchedData/dropbox.png";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import axios from "axios";
 
 const UntouchedData = () => {
-  const untouchedData = [
-    {
-      id: 1,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Select",
-    },
-    {
-      id: 2,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-    {
-      id: 3,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-    {
-      id: 4,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-    {
-      id: 5,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-    {
-      id: 6,
-      company: "Bold text column",
-      client: "Bold text column",
-      email: "Bold text column",
-      contact: "Bold text column",
-      lastCall: "Bold text column",
-      salesExecutive: "Bold text column",
-      transferDate: "Bold text column",
-    },
-  ];
 
-  // const [file, setFile] = useState(null);
-  // const [fileExt, setFileExt] = useState("");
+  const [untouchedData, setUntouchedData] = useState([]);
+  const [notAssignData, setNotAssignData] = useState([]);
+
+  const [untouchPage, setUntouchPage] = useState(1);
+  const [unAssignPage, setUnAssignPage] = useState(1);
+  const [limit] = useState(10);
+
+  const [untouchTotalPages, setUntouchTotalPages] = useState(1);
+  const [unAssignTotalPages, setUnAssignTotalPages] = useState(1);
+
+  const [totalUntouchData, setUntouchData] = useState(0);
+
+  const [employeeEmail, setEmployeeEmail] = useState("");
+
+  const [searchFlag, setSearchFlag] = useState(false);
+
   const fileInputRef = useRef(null);
 
   const openFilePicker = () => {
     fileInputRef.current.click();
-  }
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-
     if (!selectedFile) return;
 
     const ext = selectedFile.name.split(".").pop().toLowerCase();
-    const allowExt = ["xlsx", "csv"];
-
-    if (!allowExt.includes(ext)) {
+    if (!["xlsx", "csv"].includes(ext)) {
       alert("Only excel or csv files allowed.");
-      return
+      return;
     }
 
-    // setFileExt(ext);
-    // setFile(e.target.files[0]);
-
     leadUpload(selectedFile, ext);
-  }
+  };
 
-  const leadUpload = async (selectedFile, ext) => {
+  const leadUpload = async (file, ext) => {
     try {
-      if (!selectedFile) {
-        alert("Please select a file");
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const url =
+        ext === "xlsx"
+          ? "http://localhost:5000/api/clientLead/excelFileLead"
+          : "http://localhost:5000/api/clientLead/csvFileLead";
+
+      const apiResponse = await axios.post(url, formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      alert(apiResponse.data.msg);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  const searchByEmail = async (page = untouchPage) => {
+    try {
+      if (!employeeEmail) {
+        alert("Please select employee email");
         return;
       }
 
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-
-      let url;
-
-      if (ext === "xlsx") {
-        url = "http://localhost:5000/api/clientLead/excelFileLead"
-      }
-      else {
-        url = "http://localhost:5000/api/clientLead/csvFileLead"
-      }
-
-      const apiResponse = await axios.post(
-        url,
-        formData,
+      const apiResponse = await axios.get(
+        `http://localhost:5000/api/clientLead/search?email=${employeeEmail}&page=${page}&limit=${limit}`,
         {
           headers: {
-            "Content-Type": 'multipart/form-data',
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
-          }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      )
+      );
 
-      console.log(apiResponse)
+      console.log(apiResponse.data)
 
-      if (apiResponse.status === 500) {
-        console.error(apiResponse.data.error)
-        return
-      }
-      else {
-        alert(apiResponse.data.msg);
-        return
-      }
-
+      setUntouchedData(apiResponse.data.untouchLead.data);
+      setUntouchTotalPages(apiResponse.data.untouchLead.totalPages);
+      return
     }
     catch (err) {
-      return console.error(err.message);
+      if (err.response) {
+        if (err.response.status === 500) {
+          alert("Failed");
+          console.error(`Error: ${err.response.data.error}`);
+          return
+        }
+        else {
+          alert(err.response.data.msg || "Failed");
+          console.error(`Error: ${err.response.data.msg}`);
+          return
+        }
+      }
+      else {
+        console.error(`Error: ${err.message}`);
+        return
+      }
     }
   }
 
+  const fetchUntouchData = async () => {
+    try {
+      const apiResponse = await axios.get(
+        `http://localhost:5000/api/clientLead/untouchLead?` +
+        `page=${untouchPage}&unAssignPage=${unAssignPage}&limit=${limit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      setUntouchData(apiResponse.data.untouchLead.totalRecords + apiResponse.data.unAssignData.totalRecords)
+
+      setUntouchedData(apiResponse.data.untouchLead.data);
+      setNotAssignData(apiResponse.data.unAssignData.data);
+
+      setUntouchTotalPages(apiResponse.data.untouchLead.totalPages);
+      setUnAssignTotalPages(apiResponse.data.unAssignData.totalPages);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  useEffect(() => {
+    if (searchFlag) {
+      searchByEmail(untouchPage)
+      return
+    }
+
+    fetchUntouchData();
+
+  }, [untouchPage, unAssignPage, searchFlag]);
+
   const statsCards = [
-    {
-      title: "TOTAL DATA",
-      value: "10",
-      icon: clientData,
-      color: "#2d4fd7",
-    },
-    {
-      title: "TODAY CALLS",
-      value: "1600",
-      icon: call,
-      color: "#19a974",
-    },
-    {
-      title: "TOTAL PROSPECT",
-      value: "8000",
-      icon: totalProspectus,
-      color: "#00a8e8",
-    },
-    {
-      title: "TOTAL UNTOUCHED DATA",
-      value: "16",
-      icon: totalUntouchedData,
-      color: "#f2b705",
-    },
+    { title: "TOTAL DATA", value: "10", icon: clientData, color: "#2d4fd7" },
+    { title: "TODAY CALLS", value: "1600", icon: call, color: "#19a974" },
+    { title: "TOTAL PROSPECT", value: "8000", icon: totalProspectus, color: "#00a8e8" },
+    { title: "TOTAL UNTOUCHED DATA", value: totalUntouchData, icon: totalUntouchedData, color: "#f2b705" },
   ];
 
   return (
@@ -181,6 +158,7 @@ const UntouchedData = () => {
       }}
     >
       <div className="row g-0">
+
         {/* Header */}
         <div
           className="col-12"
@@ -191,13 +169,17 @@ const UntouchedData = () => {
           }}
         >
           <div className="d-flex justify-content-between align-items-center mb-3 pt-4 px-3">
-            <h1 className="h3  fw-semibold m-0" style={{ color: "#5A5C69" }}>
+            <h1
+              className="h3 fw-semibold m-0"
+              style={{ color: "#5A5C69" }}
+            >
               Untouched Data
             </h1>
           </div>
+
           <div className="importBtn tracking-wider">
             <button
-            onClick={openFilePicker}
+              onClick={openFilePicker}
               style={{
                 backgroundColor: "#4972E8",
                 color: "#FFFFFF",
@@ -213,6 +195,7 @@ const UntouchedData = () => {
               }}
             >
               Import Data
+
               <img
                 src={dropbox}
                 alt="import"
@@ -226,7 +209,6 @@ const UntouchedData = () => {
               <input
                 type="file"
                 ref={fileInputRef}
-                // hidden
                 accept=".xlsx, .csv"
                 onChange={handleFileChange}
                 style={{
@@ -241,10 +223,9 @@ const UntouchedData = () => {
               />
             </button>
           </div>
-
         </div>
 
-        {/* Filter Section */}
+
         <div className="col-12 px-3">
           <div
             style={{
@@ -254,16 +235,27 @@ const UntouchedData = () => {
               marginBottom: "20px",
             }}
           >
-            <div style={{ minWidth: "250px", flex: "1" }}>
+            {/* <div style={{ minWidth: "250px", flex: "1" }}>
               <select className="form-select">
                 <option>Member Name</option>
               </select>
-            </div>
+            </div> */}
+
             <div style={{ minWidth: "250px", flex: "1" }}>
+              <input
+                type="email"
+                placeholder="Member Email"
+                value={employeeEmail}
+                onChange={e => setEmployeeEmail(e.target.value)}
+              />
+            </div>
+
+            {/* <div style={{ minWidth: "250px", flex: "1" }}>
               <select className="form-select">
                 <option>Select Date</option>
               </select>
-            </div>
+            </div> */}
+
             <div style={{ minWidth: "120px" }}>
               <button
                 style={{
@@ -277,9 +269,23 @@ const UntouchedData = () => {
                   fontWeight: 500,
                   cursor: "pointer",
                 }}
+                onClick={() => {
+                  if (searchFlag) {
+                    setSearchFlag(false);
+                    setUntouchPage(1);
+                  } else {  
+                    if (!employeeEmail) {
+                      alert("Please select employee email");
+                      return;
+                    }
+                    setSearchFlag(true);
+                    setUntouchPage(1);
+                  }
+                }}
               >
-                Search
+                {searchFlag ? "Clear" : "Search"}
               </button>
+
             </div>
           </div>
         </div>
@@ -302,7 +308,7 @@ const UntouchedData = () => {
                   borderRadius: "10px",
                   boxShadow: "0 2px 8px rgba(44, 62, 80, 0.07)",
                   padding: "16px 18px",
-                  borderLeft: `4px solid ${card.color}`,
+                  borderLeft: `4px solid ${card.color}`, // ✅ fixed
                 }}
               >
                 <h3
@@ -335,18 +341,22 @@ const UntouchedData = () => {
                   >
                     {card.value}
                   </p>
+
                   <div
                     style={{
                       background: "#fff",
                       borderRadius: "8px",
                       padding: "8px",
-
                     }}
                   >
                     <img
                       src={card.icon}
                       alt={card.title}
-                      style={{ width: "55px", height: "53px", backgroundColor: "#fff" }}
+                      style={{
+                        width: "55px",
+                        height: "53px",
+                        backgroundColor: "#fff",
+                      }}
                     />
                   </div>
                 </div>
@@ -355,45 +365,68 @@ const UntouchedData = () => {
           </div>
         </div>
 
-        {/* Data Table */}
-        <div className="col-12 px-3 pb-4">
-          <div
-            className="card shadow-lg rounded-3 overflow-hidden mt-3"
-            style={{ maxWidth: "100%" }}
-          >
-            <div
-              className="table-responsive"
-              style={{ overflowX: "auto", width: "100%" }}
-            >
-              <table className="table m-0 align-middle text-nowrap">
-                <thead className="border-bottom">
-                  <tr>
-                    <th className="small fw-bold p-3">Company Name</th>
-                    <th className="small fw-bold p-3">Client Name</th>
-                    <th className="small fw-bold p-3">Email ID</th>
-                    <th className="small fw-bold p-3">Contact No.</th>
-                    <th className="small fw-bold p-3">Last Call</th>
-                    <th className="small fw-bold p-3">Sales Executive Name</th>
-                    <th className="small fw-bold p-3">Transfer Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {untouchedData.map((data) => (
-                    <tr key={data.id} className="border-top">
-                      <td className="small p-3">{data.company}</td>
-                      <td className="small p-3">{data.client}</td>
-                      <td className="small p-3">{data.email}</td>
-                      <td className="small p-3">{data.contact}</td>
-                      <td className="small p-3">{data.lastCall}</td>
-                      <td className="small p-3">{data.salesExecutive}</td>
-                      <td className="small p-3"> {data.transferDate}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <h1 className="TeamMemberContainerHeading mt-4">Un-Touch Assigned Data</h1>
+
+        <table className="table align-middle">
+          <thead>
+            <tr>
+              <th>Company Name</th>
+              <th>Client Name</th>
+              <th>Email ID</th>
+              <th>Contact No.</th>
+              <th>Role</th>
+              <th>Transfer Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {untouchedData.map((d, i) => (
+              <tr key={i}>
+                <td>{d.CompanyName}</td>
+                <td>{d.ClientName}</td>
+                <td>{d.Email}</td>
+                <td>{d.Contact_No}</td>
+                <td>{d.Role}</td>
+                <td>{new Date(d.TransferDate).toLocaleDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="text-center">
+          <button disabled={untouchPage === 1} onClick={() => setUntouchPage(p => p - 1)}>Prev</button>
+          <span className="mx-3">Page {untouchPage} of {untouchTotalPages}</span>
+          <button disabled={untouchPage === untouchTotalPages} onClick={() => setUntouchPage(p => p + 1)}>Next</button>
         </div>
+
+        <h1 className="TeamMemberContainerHeading mt-4">Un-Assigned Data</h1>
+
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Company Name</th>
+              <th>Client Name</th>
+              <th>Email ID</th>
+              <th>Contact No.</th>
+            </tr>
+          </thead>
+          <tbody>
+            {notAssignData.map((d, i) => (
+              <tr key={i}>
+                <td>{d.company_name}</td>
+                <td>{d.client_name}</td>
+                <td>{d.email}</td>
+                <td>{d.contact}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="text-center mb-4">
+          <button disabled={unAssignPage === 1} onClick={() => setUnAssignPage(p => p - 1)}>Prev</button>
+          <span className="mx-3">Page {unAssignPage} of {unAssignTotalPages}</span>
+          <button disabled={unAssignPage === unAssignTotalPages} onClick={() => setUnAssignPage(p => p + 1)}>Next</button>
+        </div>
+
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ const Dashboard = () => {
           return
         }
         else if (!apiResponse.ok) {
-          alert(apiResponse.data || "No Sales")
+          console.log(apiResponse.data || "No Sales")
           return
         }
         else {

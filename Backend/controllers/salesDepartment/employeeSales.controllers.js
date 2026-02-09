@@ -136,7 +136,6 @@ const TotalSalesBy_Id = async (req, res) => {
     }
 };
 
-
 // const teamLeader_TotalSales = async (req, res) => {
 //     try {
 //         const { _id } = req.user;

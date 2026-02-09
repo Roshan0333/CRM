@@ -36,15 +36,15 @@ function ProspectForm() {
 
     if(!apiResponse.ok){
       console.log(apiResponse.data);
-      alert("Client Add Failed")
+      console.log("Client Add Failed")
       return
     }
     else if(!apiResponse.fetchMessage){
-      alert(apiResponse.data || "Client Add Failed");
+      console.log(apiResponse.data || "Client Add Failed");
       return
     }
 
-    alert(apiResponse.data.msg);
+    console.log(apiResponse.data.msg);
     setCompanyName("");
     setClientName("");
     setEmail("");

@@ -1,158 +1,214 @@
 import React, { useState, useEffect } from "react";
 import "../../style/salesManager/transferdata.css";
-import { getAllTeam } from "../../services/salesDepartmentApi";
+import { getAllEmployee } from "../../services/salesDepartmentApi";
 import axios from "axios";
 
 function Teamreport() {
-  // const [day, setDay] = useState("");
-  // const [teamLeader, setTeamLeader] = useState("");
-
-  // const handleDayChange = (e) => setDay(e.target.value);
-  // const handleTeamLeaderChange = (e) => setTeamLeader(e.target.value);
-
+  const [reportType, setReportType] = useState("team");
   const [teamList, setTeamList] = useState([]);
+  const [employeeList, setEmployeeList] = useState([]);
   const [distributionList, setDistribution] = useState([]);
-  const [teamLeadEmail, setTeamLeadEmail] = useState("");
+  const [employeeEmail, setEmployeeEmail] = useState("");
   const [leadCounts, setLeadCount] = useState(0);
-  const [teamLeaderList, setTeamLeaderList] = useState(new Map());
-
-  // const transferdata = [
-  //   ...Array(6).fill({
-  //     EmployeeName: "Bold text column",
-  //     Transferdatainno: "Bold text column",
-  //     Date: "Bold text column",
-  //     Transferby: "Bold text column",
-  //     Totaldata: "Bold text column",
-  //   }),
-  // ];
+  const [employeeDetailList, setEmployeeDetailList] = useState(new Map());
 
   const distribution = () => {
-    try {
+    if (!employeeEmail || leadCounts <= 0) {
+      alert("Please select team lead and enter valid lead count");
+      return;
+    }
 
-      if (!teamLeadEmail || leadCounts <= 0) {
-        alert("Please select team lead and enter valid lead count");
-        return;
-      }
+    const exists = distributionList.some(
+      item => item.employeeEmail === employeeEmail
+    );
 
-      const exists = distributionList.some(
-        item => item.teamLeaderEmail === teamLeadEmail
-      );
+    if (exists) {
+      alert("Team leader already added");
+      return;
+    }
 
-      if (exists) {
-        alert("Team leader already added");
-        return;
-      }
+    const name = employeeDetailList.get(employeeEmail) || "Unknown";
 
-      let name = teamLeaderList.get(teamLeadEmail)
-
-      const obj = {
-        teamLeaderEmail: teamLeadEmail,
+    setDistribution(prev => [
+      ...prev,
+      {
+        employeeEmail,
         leaderName: name,
-        leadCount: parseInt(leadCounts)
-      };
+        leadCount: Number(leadCounts)
+      }
+    ]);
 
-      const list = [...distributionList, obj];
-
-      setLeadCount(0);
-      setTeamLeadEmail("");
-      setDistribution(list);
-    }
-    catch (err) {
-      return console.error(err.message);
-    }
-  }
-
+    setEmployeeEmail("");
+    setLeadCount(0);
+  };
 
   const distributionLeadApi = async () => {
     try {
-      const apiResponse = await axios.put(
-        "http://localhost:5000/api/clientLead/teamAssignedLead",
-        {distributionList:distributionList},
+      const apiResponse = await axios.patch(
+        reportType === "team"
+          ? "http://localhost:5000/api/clientLead/teamAssignedLead"
+          : "http://localhost:5000/api/clientLead/assignByManager",
+        { distributionList },
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
+            Authorization: `Bearer ${localStorage.getItem("token")}`
           }
         }
-      )
+      );
 
-      if (apiResponse.status === 500) {
-        return console.error(`Error: ${apiResponse.data.error} Name: ${apiResponse.data.name}`);
-      }
-      else {
-        return alert(apiResponse.data.msg)
-      }
+      alert(apiResponse.data.msg);
+      setDistribution([]);
+      setEmployeeEmail("");
+      setLeadCount(0);
+
+    } catch (err) {
+      console.error(err.message);
     }
-    catch (err) {
-      return console.error(`Error;: ${err.message}  ${err.name}`)
-    }
-  }
+  };
 
   useEffect(() => {
-    ; (
-      async () => {
-        try {
-          let apiResponse = await getAllTeam();
+    (async () => {
+      try {
+        let page = 1;
+        const limit = 10;
+        let totalPages = 1;
 
-          if (!apiResponse.fetchMessage) {
-            console.log(apiResponse.data);
-            return
-          }
+        const teamSet = new Set();
+        const employeeSet = new Set();
+        const detailMap = new Map();
 
-          if (!apiResponse.ok && apiResponse.fetchMessage) {
-            alert(apiResponse.data);
-            return
-          }
+        while (page <= totalPages) {
+          const apiResponse = await getAllEmployee(page, limit);
 
-          setTeamList(apiResponse.data);
+          if (!apiResponse.ok) break;
 
-          const teamLeaderList = new Map(
-            apiResponse.data.map(item => [item.TLEmail_Id, item.TLName])
-          )
+          const userDetails = apiResponse.data.userDetails;
+          const pagination = apiResponse.data.pagination;
 
-          setTeamLeaderList(teamLeaderList);
+          totalPages = pagination.totalPages;
+
+          userDetails.forEach(item => {
+            // Manager
+            if (item.managerInfo?.email) {
+              employeeSet.add(item.managerInfo.email);
+              detailMap.set(
+                item.managerInfo.email,
+                item.managerInfo.firstName
+              );
+            }
+
+            if (item.TLInfo?.email) {
+              teamSet.add(item.TLInfo.email);
+              detailMap.set(
+                item.TLInfo.email,
+                item.TLInfo.firstName
+              );
+            }
+
+            item.Members?.forEach(member => {
+              if (member.MemberInfo?.email) {
+                employeeSet.add(member.MemberInfo.email);
+                detailMap.set(
+                  member.MemberInfo.email,
+                  member.MemberInfo.firstName
+                );
+              }
+            });
+          });
+
+          page++;
         }
-        catch (err) {
-          console.log(err.message);
-          return
-        }
+
+        setTeamList([...teamSet]);
+        setEmployeeList([...employeeSet]);
+        setEmployeeDetailList(detailMap);
+
+      } catch (err) {
+        console.error(err.message);
       }
-    )()
-  }, [])
+    })();
+  }, []);
+
+  useEffect(() => {
+    setDistribution([]);
+    setEmployeeEmail("");
+    setLeadCount(0);
+  }, [reportType]);
 
   return (
     <div className="tdata-container">
-      <div>
-        <h2 className="tdata-title">Transfer Data</h2>
-      </div>
-      <div className="tdata-filters">
+      <h2 className="tdata-title">Transfer Data</h2>
 
+      <div className="tdata-radio-group">
+        <label className="radio-label">
+          <input
+            type="radio"
+            value="team"
+            checked={reportType === "team"}
+            onChange={e => setReportType(e.target.value)}
+          />
+          Team
+        </label>
+
+        <label className="radio-label">
+          <input
+            type="radio"
+            value="own"
+            checked={reportType === "own"}
+            onChange={e => setReportType(e.target.value)}
+          />
+          Own / Sales Executive
+        </label>
+      </div>
+
+      <div className="tdata-filters">
         <div>
-          <select className="tdata-dropdown" onChange={(e) => setTeamLeadEmail(e.target.value)}>
-            <option value="">Team Lead Email</option>
-            {teamList.map((item, index) => { return <option value={item.TLEmail_Id} key={index}>{item.TLEmail_Id}</option> }
+          <select
+            className="tdata-dropdown"
+            value={employeeEmail}
+            onChange={e => setEmployeeEmail(e.target.value)}
+          >
+            <option value="">
+              {reportType === "team"
+                ? "Team Lead Email"
+                : "Manager/ Sales Executive Email"}
+            </option>
+
+            {(reportType === "team" ? teamList : employeeList).map(
+              (item, index) => (
+                <option key={index} value={item}>
+                  {item}
+                </option>
+              )
             )}
-            {/* Add more days as needed */}
           </select>
 
-          <input type="number" onChange={(e) => setLeadCount(e.target.value)} className="lead-input" />
+          <input
+            type="number"
+            className="lead-input"
+            placeholder="Lead Count"
+            value={leadCounts}
+            onChange={e => setLeadCount(e.target.value)}
+          />
         </div>
+
         <div className="tdata-filter-action">
-
-          <button className="tdata-search-btn" onClick={distribution}>Add</button>
-
-          <button className="tdata-search-btn" onClick={distributionLeadApi}>Transfer</button>
+          <button className="tdata-search-btn" onClick={distribution}>
+            Add
+          </button>
+          <button className="tdata-search-btn" onClick={distributionLeadApi}>
+            Transfer
+          </button>
         </div>
       </div>
 
       <div className="tdata-table-container">
-        <div>
-          <h2 className="tdata-title">Team Transfer Data</h2>
-        </div>
+        <h2 className="tdata-title">Team Transfer Data</h2>
         <table className="tdata-table">
           <thead>
             <tr>
-              <th>Team Leader Name</th>
+              <th>Employee Name</th>
               <th>Email</th>
               <th>Transfer data in no</th>
             </tr>
@@ -161,39 +217,11 @@ function Teamreport() {
             {distributionList.map((item, idx) => (
               <tr key={idx}>
                 <td className="bold">{item.leaderName}</td>
-                <td className="bold">{item.teamLeaderEmail}</td>
+                <td className="bold">{item.employeeEmail}</td>
                 <td className="bold">{item.leadCount}</td>
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
-
-      <div className="tdata-table-container">
-        <div>
-          <h2 className="tdata-title">Transfer Data History</h2>
-        </div>
-        <table className="tdata-table">
-          <thead>
-            <tr>
-              <th>Employee Name</th>
-              <th>Transfer data in no</th>
-              <th>Date</th>
-              <th>Transfer By</th>
-              <th>Total data in account</th>
-            </tr>
-          </thead>
-          {/* <tbody>
-            {teamList.map((row, idx) => (
-              <tr key={idx}>
-                <td className="bold">{row.EmployeeName}</td>
-                <td className="bold">{row.Transferdatainno}</td>
-                <td className="bold">{row.Date}</td>
-                <td className="bold">{row.Transferby}</td>
-                <td className="bold">{row.Totaldata}</td>
-              </tr>
-            ))}
-          </tbody> */}
         </table>
       </div>
     </div>

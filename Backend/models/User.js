@@ -27,5 +27,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.index({department: 1});
+userSchema.index({role:1});
+userSchema.index({ department: 1, role: 1 });
+
 const User = mongoose.model("User", userSchema);
 export default User;
