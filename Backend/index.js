@@ -62,7 +62,7 @@ app.use("/api/total-sales", totalSalesRoutes);
 app.use("/api/untouched", untouchedRoutes);
 
 app.use("/api/feedback", FeedbackRoutes);
-app.use("/api/complaint", ComplaintRoutes);
+app.use("/api/complaints", ComplaintRoutes);
 app.use("/api/team-members", TeamRoutes )
 
 app.listen(PORT, () => {

@@ -15,7 +15,7 @@ export const isTL = (req, res, next) => {
 };
 
 export const isEmployee = (req, res, next) => {
-  if (req.user.role.toLowerCase() !== "employee") {
+  if (req.user.role.toLowerCase() !== "employee" && req.user.role.toLowerCase() !== "feedback employee") {
     return res.status(403).json({ message: "Employee access only" });
   }
   next();

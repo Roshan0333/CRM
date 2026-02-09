@@ -51,7 +51,7 @@ const Complaints = () => {
 
       const statusQuery = activeTab === "solved" ? "Solved" : "Unsolved";
 
-      const response = await axios.get(`http://localhost:5000/api/complaint?status=${statusQuery}`);
+      const response = await axios.get(`http://localhost:5000/api/complaints?status=${statusQuery}`);
 
       setComplaints(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
@@ -76,7 +76,7 @@ const Complaints = () => {
     if (!selectedComplaint) return;
 
     try {
-      const response = await axios.patch(`http://localhost:5000/api/complaint/${selectedComplaint._id}`, updateForm);
+      const response = await axios.patch(`http://localhost:5000/api/complaints/${selectedComplaint._id}`, updateForm);
 
       if (response.status === 200) {
         setShowUpdatePopup(false);

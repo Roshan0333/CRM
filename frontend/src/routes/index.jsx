@@ -69,7 +69,7 @@ import FM_TeamMember from "../pages/feedbackManager/TeamMember";
 // feedbackEmployee
 import FE_Dashboard from "../pages/feedBackEmployee/Dashboard";
 import FE_Feedbacks from "../pages/feedBackEmployee/Feedbacks";
-import FE_Complaints from "../pages/feedbackEmployee/Complaints";
+import FE_Complaints from "../pages/feedBackEmployee/Complaints";
 import FE_Salary from "../pages/feedBackEmployee/Salary";
 
 // finance
