@@ -3,16 +3,15 @@ import mongoose, { Schema } from "mongoose";
 const { ObjectId } = mongoose.Schema.Types;
 
 const SalesTeam_Schema = new Schema({
-    ManagerId:{
+    ManagerId: {
         type: ObjectId,
         ref: "User"
     },
     TLId: {
         type: ObjectId,
-        ref: "User",
-        unique: true
+        ref: "User"
     },
-    TLStatus:{
+    TLStatus: {
         type: String,
         default: "Active"
     },
@@ -20,14 +19,12 @@ const SalesTeam_Schema = new Schema({
         type: String,
     },
     TLContact_No: {
-        type: Number,
+        type: String,
         required: true,
-        unique: true,
     },
     TLEmail_Id: {
         type: String,
         required: true,
-        unique: true
     },
     TLLocation: {
         type: String,
@@ -40,7 +37,6 @@ const SalesTeam_Schema = new Schema({
         MemberId: {
             type: ObjectId,
             ref: "User",
-            unique: true
         },
         Status: {
             type: String,
@@ -50,9 +46,8 @@ const SalesTeam_Schema = new Schema({
             type: String,
         },
         Contact_No: {
-            type: Number,
+            type: String,
             required: true,
-            unique: true
         },
         Email_Id: {
             type: String,
@@ -67,6 +62,16 @@ const SalesTeam_Schema = new Schema({
         },
     }]
 });
+
+SalesTeam_Schema.index({ ManagerId: 1 })
+SalesTeam_Schema.index({ TLEmail_Id: 1 })
+SalesTeam_Schema.index({ TLId: 1 });
+SalesTeam_Schema.index({ ManagerId: 1, TLId: 1, TLEmail_Id: 1 });
+SalesTeam_Schema.index({ "Members.Email_Id": 1 })
+SalesTeam_Schema.index(
+    { "Members.MemberId": 1 },
+    { sparse: true }
+);
 
 const SalesTeam_Model = mongoose.model("SalesTeams", SalesTeam_Schema);
 

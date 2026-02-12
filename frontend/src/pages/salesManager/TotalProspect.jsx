@@ -18,6 +18,7 @@ function TotalProspect() {
 
 
   let handleSearch = () => {
+    
 
     if (!dateRange) {
       let clientList = prospectList.filter((item) => { return item.AdderDetails.email === selectedEmail });
@@ -120,7 +121,7 @@ function TotalProspect() {
           return
         }
         else if (!apiRespnse.ok) {
-          alert(apiRespnse.data || "Something Wrong");
+          console.log(apiRespnse.data || "Something Wrong");
           return
         }
 

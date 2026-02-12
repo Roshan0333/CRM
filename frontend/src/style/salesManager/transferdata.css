@@ -140,6 +140,22 @@
   background: #f8faff;
 }
 
+.tdata-radio-group {
+  display: flex;
+  gap: 20px;
+  margin: 15px 0;
+}
+
+.radio-label {
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+
 @media (max-width: 1024px) {
   .tdata-container {
     margin-left: 1rem;

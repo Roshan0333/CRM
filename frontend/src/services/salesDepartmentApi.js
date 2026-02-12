@@ -363,10 +363,10 @@ export const currentYearSales = async () => {
   }
 }
 
-export const getAllTeam = async () => {
+export const getAllEmployee = async (page, limit) => {
   try{
     const response = await axios.get(
-      `${API_URL}/salesTeam/getAllTeam`,
+      `${API_URL}/salesTeam/getAllEmployee?page=${page}&limit=${limit}`,
       {
         headers:{
           "Content-Type":"application/json",
@@ -375,7 +375,7 @@ export const getAllTeam = async () => {
       }
     );
 
-    return {ok: true, fetchMessage: true, data:response.data.teamList}
+    return {ok: true, fetchMessage: true, data:response.data}
   }
   catch(err){
     if(err.response){
