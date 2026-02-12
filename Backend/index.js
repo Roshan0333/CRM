@@ -9,7 +9,11 @@ import userRoutes from "./routes/userRoutes.js";
 import clientRoutes from "./routes/salesDepartment/client.route.js";
 import salesRoutes from './routes/salesDepartment/sales.route.js';
 import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
+// <<<<<<< Updated upstream
 import auth from "./middlewares/AuthMiddleware.js"
+// =======
+
+// >>>>>>> Stashed changes
 import reminderCallRoutes from "./routes/salesDepartment/todayReminderCall.route.js"
 import salesTeamRoutes from "./routes/salesDepartment/salesTeam.route.js";
 import clientLeadRoutes from "./routes/salesDepartment/clientLeads.route.js";
@@ -19,9 +23,18 @@ import untouchedRoutes from "./routes/SalesTeam/untouchedRoutes.js";
 import prospectRoutes from "./routes/SalesTeam/prospectRoutes.js";
 import salesTeamLeadRoutes from "./routes/SalesTeam/salesTeamLeadRoutes.js";
 
+// <<<<<<< Updated upstream
 import FeedbackRoutes from './routes/feedbackRoutes/FeedbackRoutes.js';
 import ComplaintRoutes from './routes/feedbackRoutes/ComplaintRoutes.js';
 import TeamRoutes from './routes/feedbackRoutes/TeamRoutes.js'; 
+// =======
+// import auth from "./middlewares/AuthMiddleware.js";
+import teamRouter from "./routes/managementRoutes/TeamRoutes.js";
+// import isAuth from "./middlewares/AuthMiddleware.js";
+
+
+dotenv.config({ path: "./.env", debug: true });
+// >>>>>>> Stashed changes
 
 const app = express();
 
@@ -49,7 +62,11 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
+// <<<<<<< Updated upstream
 app.use("/api/clientLead", clientLeadRoutes)
+// =======
+
+// >>>>>>> Stashed changes
 app.use("/api/client", clientRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/calllog", callLogRoutes)
@@ -60,6 +77,11 @@ app.use("/api/salesTeamLead", salesTeamLeadRoutes);
 app.use("/api/prospects", prospectRoutes);
 app.use("/api/total-sales", totalSalesRoutes);
 app.use("/api/untouched", untouchedRoutes);
+app.use("/api/client",auth, clientRoutes);
+app.use("/api/sales",auth, salesRoutes);
+app.use("/api/calllog",auth, callLogRoutes);
+app.use("/team",auth,teamRouter);
+
 
 app.use("/api/feedback", FeedbackRoutes);
 app.use("/api/complaints", ComplaintRoutes);

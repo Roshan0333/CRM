@@ -1,154 +1,286 @@
 import React, { useState } from "react";
-import "../../style/ManagerManagement/TeamMember.css";
+import "../../style/managerManagement/TeamMember.css"
+import { useEffect } from "react";
+import { axiosInstance } from "../../api/managementApi/axiosInstance";
+// import { useNavigate } from "react-router-dom";
+import UpdateMember from "./UpdateMember";
 
 function TeamMember() {
   const [viewModal, setViewModal] = useState(false);
+  const [loading, setLoading] = useState(true)
+  const [teamMember, setTeamMember] = useState([]);
 
-  const teamMemberData = [
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Active",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Inactive",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Active",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Active",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Inactive",
-    },
-    {
-      Name: "Bold text column",
-      Location: "Bold text column",
-      Email_id: "Bold text column",
-      Contact_no: "Bold text column",
-      Joining: "Bold text column",
-      Status: "Inactive",
-    },
-  ];
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [designation, setDesignation] = useState("ALL")
+  // const navigate = useNavigate()
+
+  const [formData, setFormData] = useState({
+    name: "",
+    position: "",
+    contact: "",
+    bankName: "",
+    email: "",
+    accountNo: "",
+    location: "",
+    ifsc: "",
+    joinDate: "",
+    upiId: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const addMemberHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("Authentication required");
+        return;
+      }
+
+      const res = await axiosInstance.post(
+        "/create",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+
+      );
+
+      // add new member instantly to table
+
+      // reset form
+      setFormData({
+        name: "",
+        position: "",
+        contact: "",
+        bankName: "",
+        email: "",
+        accountNo: "",
+        location: "",
+        ifsc: "",
+        joinDate: "",
+        upiId: "",
+      });
+
+      alert("Team member added successfully ✅");
+      await fetchTeamMembers()
+
+    } catch (error) {
+      console.error(error);
+      alert(
+        error.response?.data?.message || "Failed to add team member"
+      );
+    }
+  };
+
+  const fetchTeamMembers = async () => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      const res = await axiosInstance.get(`/getTeamMembers?designation=${designation}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(res.data)
+
+      setTeamMember(res.data);
+    } catch (error) {
+      console.error("Failed to fetch team members:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTeamMembers()
+  }, [designation])
+
+  //   const addMemberHandler =async(e)=> {
+  //     e.preventDefault()
+
+
+  //     const addMember = axiosInstance.post("/create",
+  //       formData,
+  //       {
+  //         headers:{
+  //           Authorization: `Bearer ${token}`,
+  //         }
+  //       }
+  //     )
+  // setTeamMember((prev)=> [res.data.teamMember, ...prev])
+
+  // setFormData({
+  //     name: "",
+  //       position: "",
+  //       contact: "",
+  //       bankName: "",
+  //       email: "",
+  //       bankName,
+  //       accountNo: "",
+  //       location: "",
+  //       ifscCode: "",
+  //       joinDate: "",
+  //       upiId: "",
+  // })
+  // alert("Team added successfully")
+
+  //   }
+
+
 
   return (
     <>
       <div className="SalesManagerTeamMemberContainer">
         <h1 className="TeamMemberContainerHeading">Team Member</h1>
+        <select
+          value={designation}
+          onChange={(e) => setDesignation(e.target.value)}
+          className="form-select"
+          style={{ marginBottom: "8px", width: "40%" }}
+        >
+          <option value="ALL">All</option>
+          <option value="Management TL">Management TL</option>
+          <option value="Management Employee">Management Employee</option>
+        </select>
 
         <section className="tableContainer">
           <table style={{ width: "100%" }}>
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Location</th>
+                <th>Position</th>
                 <th>Email ID</th>
                 <th>Contact No.</th>
-                <th>Joinning Date</th>
+                <th>Joining Date</th>
                 <th>Status</th>
                 <th>More</th>
               </tr>
             </thead>
-            {teamMemberData.map((member, index) => (
-              <tbody key={index}>
+
+            <tbody>
+              {loading ? (
                 <tr>
-                  <td>{member.Name}</td>
-                  <td>{member.Location}</td>
-                  <td>{member.Email_id}</td>
-                  <td>{member.Contact_no}</td>
-                  <td>{member.Joining}</td>
-                  <td
-                    className={
-                      member.Status.toLowerCase() === "active"
-                        ? "badge badge-success"
-                        : "badge badge-danger"
-                    }
-                    style={{ marginTop: 15, cursor: "pointer" }}
-                  >
-                    {member.Status}
-                  </td>
-                  <td>
-                    <button
-                      className="viewbtn"
-                      onClick={() => setViewModal(true)}
-                    >
-                      Update
-                    </button>
+                  <td colSpan="7" style={{ textAlign: "center" }}>
+                    Loading team members...
                   </td>
                 </tr>
-              </tbody>
-            ))}
+              ) : teamMember?.length > 0 ? (
+                teamMember.map((member) => (
+                  <tr key={member._id}>
+                    <td>{member.name || "-"}</td>
+                    <td>{member.position || "-"}</td>
+                    <td>{member.email || "-"}</td>
+                    <td>{member.contact || "-"}</td>
+                    <td>
+                      {member.joinDate
+                        ? new Date(member.joinDate).toLocaleDateString()
+                        : "-"}
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <span
+                        className={`status-badge ${member.status?.toLowerCase() === "active"
+                            ? "status-active"
+                            : "status-inactive"
+                          }`}
+                      >
+                        {member.status || "Inactive"}
+                      </span>
+                    </td>
+
+
+                    <td>
+                      <button
+                        className="viewbtn"
+                        onClick={() => {
+                          setSelectedMember(member);
+                          setViewModal(true);
+                        }}
+                      >
+                        Update
+                      </button>
+
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: "center" }}>
+                    No team members available
+                  </td>
+                </tr>
+              )}
+            </tbody>
+
+
           </table>
         </section>
+
 
         <section className="teamMemberForm">
           <form className="user-data-form">
             <div className="form-grid">
               <div className="form-group">
-                <input type="text" id="name" name="name" placeholder="Name" />
+                <input type="text" id="name" name="name" value={formData.name} placeholder="Name" onChange={handleChange} />
               </div>
               <div className="form-group">
-                <select id="position" name="position">
+                <select id="position" name="position" value={formData.position} onChange={handleChange}>
                   <option value="">Position</option>
-                  <option value="sales-executive">Sales Executive</option>
-                  <option value="team-leader">Team Leader</option>
-                  <option value="manager">Manager</option>
+                  <option value="Management TL">Management TL</option>
+                  <option value="Management Employee">Management Employee</option>
                 </select>
               </div>
               <div className="form-group">
                 <input
                   type="text"
                   id="contact-no"
-                  name="contact_no"
+                  name="contact"
+                  value={formData.contact}
                   placeholder="Contact no."
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-group">
                 <input
                   type="text"
                   id="bank-name"
-                  name="bank_name"
+                  name="bankName"
+                  value={formData.bankName}
                   placeholder="Bank Name"
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-group">
                 <input
                   type="email"
                   id="email-id"
-                  name="email_id"
+                  name="email"
+                  value={formData.email}
                   placeholder="Email_id"
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-group">
                 <input
                   type="text"
                   id="account-no"
-                  name="account_no"
+                  name="accountNo"
+                  value={formData.accountNo}
                   placeholder="Account No."
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-group">
@@ -156,107 +288,57 @@ function TeamMember() {
                   type="text"
                   id="location"
                   name="location"
+                  value={formData.location}
                   placeholder="Location"
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-group">
                 <input
                   type="text"
                   id="ifsc-code"
-                  name="ifsc_code"
+                  name="ifsc"
+                  value={formData.ifsc}
                   placeholder="IFSC code"
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-group">
                 <input
                   type="text"
                   id="joining-date"
-                  name="joining_date"
+                  name="joinDate"
+                  value={formData.joinDate}
                   placeholder="Joining date"
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-group">
                 <input
                   type="text"
                   id="upi-id"
-                  name="upi_id"
+                  name="upiId"
+                  value={formData.upiId}
                   placeholder="UPI Id"
+                  onChange={handleChange}
                 />
               </div>
             </div>
             <div className="form-actions">
-              <button type="submit" className="add-button">
+              <button type="submit" onClick={addMemberHandler} className="add-button">
                 ADD
               </button>
             </div>
           </form>
         </section>
-
-        {viewModal && (
-          <div id="popupoverlay" onClick={() => setViewModal(false)}>
-            <div id="popupbox" onClick={(e) => e.stopPropagation()}>
-              <div id="popupheader">
-                <h3 id="popuptitle">User Name</h3>
-              </div>
-              <div id="popupbody">
-                <div className="modal-content-wrapper">
-                  {/* Left Side - Bank Details */}
-                  <div className="bank-details-section">
-                    <h3 className="section-title">Bank Details</h3>
-                    <div className="form-field">
-                      <label htmlFor="bank-name">Bank Name</label>
-                      <input type="text" id="bank-name" name="bank-name" />
-                    </div>
-                    <div className="form-field">
-                      <label htmlFor="ifsc-code">IFSC code</label>
-                      <input type="text" id="ifsc-code" name="ifsc-code" />
-                    </div>
-                    <div className="form-field">
-                      <label htmlFor="account-no">Account no.</label>
-                      <input type="text" id="account-no" name="account-no" />
-                    </div>
-                    <div className="form-field">
-                      <label htmlFor="upi-id">UPI Id</label>
-                      <input type="text" id="upi-id" name="upi-id" />
-                    </div>
-                  </div>
-
-                  {/* Right Side - Payout & Status Details */}
-                  <div className="user-details-section">
-                    <div className="detail-item">
-                      <span className="detail-label">Current Month Payout</span>
-                      <span className="detail-value">:2000/-</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Total Payout</span>
-                      <span className="detail-value detail-value2">
-                        :2000/-
-                      </span>
-                    </div>
-                    <div className="status-item">
-                      <span className="status-label">Status</span>
-                      <button className="status-active-btn">Active</button>
-                    </div>
-
-                    <div className="modal-actions">
-                      <button className="update-btn">Update Profile</button>
-                      <button
-                        className="close-btn"
-                        onClick={() => setViewModal(false)}
-                      >
-                        Close
-                      </button>
-                      <button className="delete-btn">Delete Profile</button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom Action Buttons */}
-              </div>
-            </div>
-          </div>
-        )}
+        <UpdateMember
+          isOpen={viewModal}
+          onClose={() => setViewModal(false)}
+          member={selectedMember}
+          refreshMembers={fetchTeamMembers}
+        />
       </div>
+
     </>
   );
 }
