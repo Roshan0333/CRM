@@ -43,7 +43,7 @@ const PORT = process.env.PORT || 5000;
 // 🔐 CORS
 app.use(
   cors({
-    origin: "http://localhost:5173",        // Vite default URL
+    origin: "http://localhost:5174",        // Vite default URL
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: false,                     // cookie वापरत नाहीस
