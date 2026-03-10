@@ -1,0 +1,106 @@
+:root {
+  --sidebar-width: 280px;
+}
+
+/* PAGE WRAPPER */
+#tsm-totalSales-wrapper {
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+}
+
+/* TITLE */
+.tsm-title {
+  padding-left: 30px;
+  font-size: 36px;
+}
+
+/* SELECT */
+.tsm-select {
+  max-width: 450px;
+  height: 50px;
+}
+
+/* SEARCH BUTTON */
+.tsm-search-btn {
+  white-space: nowrap;
+  background-color: #3660DE !important;
+}
+
+/* TABLE CONTAINER */
+.tsm-table-container {
+  width: 100%;
+  max-width: 1200px;
+  min-height: 380px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding: 0px 20px;
+  background: white;
+  border-radius: 12px;
+}
+
+/* TABLE WRAPPER */
+.tsm-table-wrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+}
+
+/* TABLE */
+.tsm-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+/* HEADER */
+.tsm-table thead th {
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  background-color: #f8f9fa;
+  border: none !important;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* CELLS */
+.tsm-table td {
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  border: none !important;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* HOVER */
+.tsm-table tbody tr:hover {
+  background-color: #f7f9fc;
+}
+
+/* VIEW BUTTON */
+.tsm-view-btn {
+  padding: 4px 14px;
+  height: 25px;
+  font-size: 13px;
+  background-color: #3660DE;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@media (max-width: 1025px) {
+  :root {
+  --sidebar-width: 0pxx;
+}
+
+/* PAGE WRAPPER */
+#tsm-totalSales-wrapper {
+  margin-left: 0px;
+  width: 100%;
+}
+}

@@ -1,0 +1,129 @@
+.feedbackemployee-salary-container{
+    padding: 1.5rem;
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+}
+
+.salary-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+/* Filters Area */
+.filters {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    align-items: center;
+    width: 500px;
+}
+
+.filter-group {
+    position: relative;
+    flex-grow: 1; /* Allow filter to take up space */
+    max-width: 200px; /* Max width for dropdown */
+}
+
+.filter-group select {
+    width: 422px;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: #fff;
+    -webkit-appearance: none; /* Remove default dropdown arrow */
+    -moz-appearance: none;
+    appearance: none;
+     font-size: 22px;
+    color: #000000;
+    cursor: pointer;
+}
+
+.filter-group select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.filter-group .dropdown-arrow {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Make icon unclickable */
+    color: #6c757d;
+}
+
+.search-btn {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    width: 108px;
+    height: 33px;
+    line-height: 5px;
+    margin-left: 250px;
+}
+
+.search-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Table Container & Table Styles */
+.table-container {
+    overflow-x: auto; /* Ensures table is scrollable on small screens */
+}
+
+.salary-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px; /* Adjust as needed for content */
+}
+
+.salary-table th,
+.salary-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 15px;
+}
+
+.salary-table th {
+    background-color: #e9ecef;
+    font-weight: 600;
+    color: #000000;
+    text-transform: uppercase;
+}
+
+.salary-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.salary-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa; /* Light grey background for even rows */
+}
+
+.salary-table td {
+    color: #444;
+}
+
+/* Specific styling for 'Amount' column's first row */
+.salary-table tbody tr:first-child td:last-child {
+    font-weight: 600; /* Makes 4000/- bold as in image */
+}

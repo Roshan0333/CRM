@@ -1,0 +1,136 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+.containerMember {
+  padding: 30px 50px;
+  background-color: #f4f7fe; /* Dashboard background */
+  min-height: 100vh;
+  margin-left: 250px;
+  font-family: 'Inter', sans-serif;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #000000; /* Dark Black */
+  margin-bottom: 25px;
+}
+
+/* =========================================
+   TEXT AREA 1: VIEW (CLEAN & BORDERLESS)
+   ========================================= */
+.text-area-view {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.03);
+  margin-bottom: 30px;
+}
+
+.team-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.team-table th {
+  color: #000000; /* Dark Black Header */
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+  padding: 15px;
+  border-bottom: 1.5px solid #f1f4f9; /* Sirf niche line */
+}
+
+.team-table td {
+  padding: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #000000; /* Dark Black Data */
+  font-weight: 600;
+  border-bottom: 1px solid #f8f9fc; /* Sirf row separator */
+}
+
+/* Status Button Style */
+.status-pill {
+  border: none;
+  border-radius: 8px;
+  padding: 5px 15px;
+  font-size: 11px;
+  font-weight: 800;
+  color: white;
+  cursor: pointer;
+  min-width: 80px;
+}
+.status-pill.active { background: #05cd99; }
+.status-pill.inactive { background: #ee5d50; }
+
+/* =========================================
+   TEXT AREA 2: ADD FORM (PROFESSIONAL)
+   ========================================= */
+.text-area-add {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 40px 50px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.03);
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.compact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+}
+
+.input-row label {
+  width: 140px;
+  color: #000000; /* Dark Black Label */
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.input-row input {
+  flex: 1;
+  border: 1px solid #e0e5f2;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 14px;
+  color: #000000;
+  background: #fcfdfe;
+}
+
+.input-row input:focus {
+  outline: none;
+  border-color: #4318ff;
+  background: #ffffff;
+}
+
+/* =========================================
+   ADD BUTTON (BLUE)
+   ========================================= */
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.add-submit-btn {
+  background-color: #4318ff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 45px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0px 8px 15px rgba(67, 24, 255, 0.2);
+}
+
+.add-submit-btn:hover {
+  background-color: #3311cc;
+  transform: translateY(-2px);
+}

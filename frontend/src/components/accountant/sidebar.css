@@ -1,0 +1,184 @@
+:root {
+  --sidebar-width: 280px;
+  --bg-color: #3158c9;
+  --text-color-primary: #ffffff;
+  --text-color-secondary: #ffffff;
+  --active-bg-color: #ebf5ff;
+  --active-text-color: #3d68e7;
+  --separator-color: #e0e0e0;
+}
+
+/* ------------------- SIDEBAR ------------------- */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  transition: transform 0.3s ease;
+}
+
+/* ------------------- HEADER / LOGO ------------------- */
+#sidebar-header {
+  padding: 30px;
+  background-color: var(--bg-color);
+  display: flex;
+  justify-content: center;
+}
+
+#logo-img {
+  max-width: 100%;
+  height: 45px;
+}
+
+/* ------------------- PROFILE SECTION ------------------- */
+#profile-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+#profile-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#profile-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#profile-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-color-primary);
+  margin: 0;
+}
+
+#profile-title {
+  font-size: 0.9rem;
+  color: var(--text-color-primary);
+  margin: 0;
+}
+
+/* ------------------- NAVIGATION MENU ------------------- */
+#nav-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-left: 3px solid #fff;
+}
+
+#nav-icon {
+  width: 23px;
+  height: 20px;
+  margin-right: 15px;
+}
+
+.nav-item a {
+  text-decoration: none;
+  font-size: 1.3rem;
+  color: var(--text-color-primary);
+  flex-grow: 1;
+}
+
+.nav-item.active {
+  background-color: var(--active-bg-color);
+}
+
+.nav-item.active a {
+  color: var(--active-text-color);
+  font-weight: 700;
+}
+
+/* ------------------- HORIZONTAL LINES ------------------- */
+.nav-separator {
+  border: none;
+  border-bottom: 1px solid var(--separator-color);
+  margin: 0 0 0 38px; /* align after icon */
+}
+
+/* ------------------- HAMBURGER MENU ------------------- */
+#menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 22px;
+  cursor: pointer;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 200;
+}
+
+#menu-toggle span {
+  display: block;
+  height: 3px;
+  background: #000000; /* white lines for dark navbar */
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+#menu-toggle.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+#menu-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+#menu-toggle.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* ------------------- MOBILE RESPONSIVE ------------------- */
+@media (max-width: 1024px) {
+  #menu-toggle {
+    display: flex;
+  }
+
+  .sidebar {
+    width: 80%;
+    transform: translateX(-100%); /* hidden by default on mobile */
+  }
+
+  .sidebar.open {
+    transform: translateX(0); /* slide in when open */
+  }
+}
+
+/* smaller mobiles */
+@media (max-width: 600px) {
+  .sidebar {
+    width: 80%;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}

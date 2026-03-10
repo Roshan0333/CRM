@@ -1,0 +1,106 @@
+/* OVERLAY (image 1 style) */
+.profile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+/* MODAL CONTAINER */
+.profile-modal {
+  width: 90%;
+  max-width: 1100px;
+  background: #f4f6f8;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* HEADER */
+.profile-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.profile-modal-header .back {
+  color: #2563eb;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.profile-modal-header .close {
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* BODY LAYOUT (image 2 style) */
+.profile-modal-body {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* LEFT CARD */
+.profile-left {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.profile-left .avatar {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.profile-left .role {
+  color: #6b7280;
+  margin-bottom: 15px;
+}
+
+.profile-left .info {
+  text-align: left;
+  font-size: 14px;
+}
+
+/* RIGHT FORM */
+.profile-right {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.profile-right h2 {
+  margin-bottom: 20px;
+}
+
+.profile-right input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.save-btn {
+  margin-top: 10px;
+  background: #2563eb;
+  color: #fff;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}

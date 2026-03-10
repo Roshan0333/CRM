@@ -1,0 +1,141 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  --sidebar-width: 280px;
+}
+
+/* ================= MAIN CONTAINER ================= */
+#transferData-container {
+  padding: 32px;
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  background: #f8f9fc;
+  font-family: "Inter", sans-serif;
+}
+
+/* Mobile */
+@media (max-width: 1024px) {
+  #transferData-container {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* ===== FORCE HEADING TO LEFT (FLEX OVERRIDE) ===== */
+.page-title {
+  align-self: flex-start !important;   /* 🔥 KEY FIX */
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: left !important;
+  width: 100%;
+}
+
+
+/* ================= TRANSFER BOX ================= */
+.transfer-box {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 0 40px 0;       /* ✅ left aligned */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* DROPDOWNS */
+.pro-select {
+  width: 100%;
+  height: 52px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* BUTTON ROW */
+.text-end {
+  grid-column: span 2;
+  text-align: left;         /* ✅ left aligned */
+  margin-top: 6px;
+}
+
+.transfer-btn {
+  background: #4e73df;
+  color: #fff;
+  font-weight: 700;
+  padding: 12px 42px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  box-shadow: 0 6px 16px rgba(78, 115, 223, 0.35);
+  transition: all 0.25s ease;
+}
+
+.transfer-btn:hover {
+  background: #2e59d9;
+  transform: translateY(-1px);
+}
+
+/* ================= HISTORY TITLE ================= */
+.history-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #5a5c69;
+  margin: 20px 0 24px;
+}
+
+/* ================= TABLE WRAPPER ================= */
+.table-wrapper {
+  background: #ffffff;
+  padding: 26px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* ================= TABLE ================= */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* HEADER */
+.custom-table thead th {
+  padding: 16px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  color: #000;
+  background: #f3f6fb;
+}
+
+/* BODY */
+.custom-table td {
+  padding: 16px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.custom-table tbody tr:nth-child(even) {
+  background: #f9fbff;
+}
+
+.custom-table tbody tr:hover {
+  background: #eef3ff;
+}
+
+/* EMPTY */
+.empty {
+  padding: 24px;
+  text-align: center;
+  color: #888;
+}
+
+/* TRANSFER BY BADGE */
+.transfer-by {
+  background: #eef2ff;
+  color: #1d4ed8;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+}

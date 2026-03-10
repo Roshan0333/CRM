@@ -1,0 +1,253 @@
+.managermgmt-container {
+  margin: 2rem auto;
+  /* width: 80%; */
+  padding: 2rem;
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  border-radius: 15px;
+  text-align: left;
+}
+
+.managermgmt-title {
+  color: #5a5c69;
+  font-size: 36px;
+  margin-bottom: 20px;
+  font-weight: semibold;
+}
+
+.managermgmt-filters {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+.managermgmt-dropdown {
+  padding: 5px 12px;
+  font-size: 22px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.06);
+  min-width: 422px;
+  font-weight: 500px;
+}
+
+.managermgmt-search {
+  display: flex;
+  width: 100%;
+  justify-content: right;
+  text-align: center;
+}
+
+.managermgmt-search-btn,
+.teamReport-veiw {
+  width: 108px;
+  height: 33px;
+  border: none;
+  background: #4979f7;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.teamReport-veiw {
+  width: 68px;
+  height: 21px;
+}
+
+.managermgmt-table-container {
+  margin-top: 2rem;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.managermgmt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.26);
+  background: #fff;
+  font-family: inter;
+}
+
+.managermgmt-table thead {
+  background: #f7f8fa;
+  font-weight: 700;
+}
+
+.managermgmt-table th {
+  padding: 16px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: left;
+  font-weight: 700;
+}
+
+.managermgmt-table td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: left;
+  font-weight: 500;
+}
+
+@media (max-width: 1024px) {
+  .managermgmt-filters {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .managermgmt-title {
+    font-size: 1.5rem;
+  }
+
+  .managermgmt-table {
+    width: 100%;
+  }
+
+  .managermgmt-container {
+    margin-left: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    padding-top: 1rem;
+  }
+}
+
+/* Overlay background */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(80, 80, 80, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+/* Popup box */
+.popup-container {
+  background: #fff;
+  border-radius: 15px;
+  padding: 2rem 3rem;
+  width: 80%;
+  max-width: 750px;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  animation: popup-fade 0.3s ease-in-out;
+}
+
+/* Title */
+.popup-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 2rem;
+}
+
+/* Buttons grid */
+.popup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Individual download buttons */
+.popup-btn {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.06);
+}
+
+.popup-btn:hover {
+  background: #f5f7ff;
+  border-color: #4979f7;
+  color: #4979f7;
+}
+
+/* Download icon */
+.popup-icon {
+  font-size: 1rem;
+}
+
+/* Close button */
+.popup-close-btn {
+  background: #4979f7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.popup-close-btn:hover {
+  background: #2f5be3;
+}
+
+/* Button to open popup */
+.open-popup-btn {
+  background: #4979f7;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 2rem;
+  font-weight: 600;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.open-popup-btn:hover {
+  background: #2f5be3;
+}
+
+/* Animation */
+@keyframes popup-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .popup-container {
+    width: 90%;
+    padding: 1.5rem;
+  }
+
+  .popup-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .popup-title {
+    font-size: 1.5rem;
+  }
+}

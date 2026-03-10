@@ -1,0 +1,351 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  --sidebar-width: 280px;
+}
+/* === GLOBAL STYLES === */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* === DASHBOARD CONTAINER === */
+#dashboard-container {
+  display: flex;
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#heading {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  align-items: center;
+  gap: 10px;
+}
+
+#heading-btn {
+  border: none;
+  outline: none;
+  background-color: #3660de;
+  color: #ffffff;
+  font-size: 13px;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 15px;
+}
+
+/* === DASHBOARD DATA SECTION === */
+#dashboard-data {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  width: 100%;
+}
+
+/* === DATA WRAP (HOLDING BOXES) === */
+#data-wrap {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+}
+
+/* === DASHBOARD HEADING === */
+#dashboard-data h1 {
+  color: #5a5c69;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* === EACH DATA BOX === */
+#data {
+  flex: 1 1 230px;
+  max-width: 240px;
+  height: 120px;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* === BORDER COLORS === */
+#data:nth-child(1) {
+  border-left: 7px solid #2563eb;
+}
+#data:nth-child(2) {
+  border-left: 7px solid #1cc88a;
+}
+#data:nth-child(3) {
+  border-left: 7px solid #36b9cc;
+}
+#data:nth-child(4) {
+  border-left: 7px solid #f6c23e;
+}
+
+/* === TEXT COLORS === */
+#data:nth-child(1) h3 {
+  color: #2563eb;
+}
+#data:nth-child(2) h3 {
+  color: #1cc88a;
+}
+#data:nth-child(3) h3 {
+  color: #36b9cc;
+}
+#data:nth-child(4) h3 {
+  color: #f6c23e;
+}
+
+/* === NUMBER + ICON ROW === */
+#num-vector {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* === NUMBER STYLE === */
+#num-vector p {
+  font-size: 32px;
+  color: #5b5757;
+  font-weight: 500;
+}
+
+/* === BOX TITLE === */
+#data h3 {
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+
+/* === ICON STYLE === */
+#num-vector img {
+  width: 50px;
+  height: 54px;
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* For tablets (2 boxes per row) */
+@media (max-width: 992px) {
+  #dashboard-container {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  #data {
+    flex: 1 1 45%;
+    max-width: 45%;
+  }
+}
+
+/* For mobile screens (1 box per row) */
+@media (max-width: 600px) {
+  #dashboard-data {
+    padding: 20px;
+  }
+
+  #data {
+    flex: 1 1 100%;
+    max-width: 100%;
+    height: auto;
+  }
+
+  #num-vector p {
+    font-size: 28px;
+  }
+
+  #num-vector img {
+    width: 40px;
+    height: 42px;
+  }
+
+  #dashboard-data h1 {
+    font-size: 20px;
+  }
+}
+
+#hot-clients #container {
+  display: flex;
+  flex-direction: column;
+}
+
+#hot-clients {
+  width: 100%;
+  padding: 20px 30px;
+  box-sizing: border-box;
+}
+
+#hot-clients #container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#clients {
+  border-radius: 5px;
+}
+#client-list {
+  border-radius: 5px;
+}
+
+#clients {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  padding: 10px 10px 30px 10px;
+}
+
+#clients h1 {
+  font-size: 24px;
+  padding: 10px;
+}
+
+#client-list {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  overflow-x: auto;
+}
+
+#mr-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px 19px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+td {
+  font-size: 13px;
+}
+
+th {
+  color: #000000;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+tr:hover {
+  background-color: #f9fafc;
+}
+
+td button {
+  width: 68px;
+  height: 21px;
+  border: none;
+  border-radius: 4px;
+  background-color: #3660de;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* === POPUP OVERLAY === */
+#popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* === POPUP BOX === */
+#popup-box {
+  background-color: #ffffff;
+  width: 937px;
+  height: 530px;
+  max-width: 90%;
+  border-radius: 15px;
+  padding: 25px 30px;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* === POPUP HEADER === */
+#popup-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 25px;
+}
+
+#popup-header h3 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#close-btn {
+  position: absolute;
+  right: 30px;
+  background-color: #3660de;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  padding: 6px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+#close-btn:hover {
+  background-color: #2749b3;
+}
+
+/* === POPUP CONTENT === */
+#popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* === EACH UPDATE ROW === */
+.update-row {
+  display: flex;
+  gap: 30px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.update-row .date {
+  font-weight: 600;
+  font-size: 22px;
+  color: #000;
+  /* width: 180px; */
+  min-width: 180px;
+}
+
+.update-row .desc {
+  color: #000000;
+  font-size: 20px;
+  line-height: 1.5;
+  width: 542px;
+}
+
+/* === ANIMATION === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

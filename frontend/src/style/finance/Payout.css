@@ -1,0 +1,41 @@
+/* Horizontal layout */
+#payout-placeholders {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;            /* spacing between items */
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Input + Select (equal height) */
+#payout-placeholders input,
+#payout-placeholders select {
+  height: 50px;
+  padding: 0 15px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 16px;
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* Search field should be wider */
+#payout-placeholders input {
+  flex: 2;           /* bigger width */
+}
+
+/* Month dropdown normal width */
+#payout-placeholders select {
+  flex: 1;           /* medium width */
+}
+
+/* Button */
+#payout-placeholders button {
+  flex: 1.2;         /* little wider */
+  height: 50px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}

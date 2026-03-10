@@ -1,0 +1,119 @@
+/* prospect#css */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+body {
+  font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+#prospect-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #ffffff;
+  font-family: "Poppins", sans-serif;
+}
+
+#prospect-container h1 {
+  margin-bottom: 20px;
+  font-size: 36px;
+  font-weight: 600;
+  color: #5a5c69;
+}
+
+#card {
+  background-color: #fff;
+  /* width: 600px; */
+  padding: 30px 40px;
+  border-radius: 10px;
+}
+
+#prospect-form {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+  padding: 40px 55px;
+}
+
+#prospect-form h1 {
+  font-size: 36px;
+  color: #444;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+#form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+#form-row label {
+  width: 215px;
+  font-size: 21px;
+  font-weight: 500;
+  color: #000000;
+}
+
+#foem-row input {
+  height: 52px;
+}
+
+#form-row input,
+#form-row textarea {
+  /* flex: 2; */
+  width: 433px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  background-color: #fefefe;
+  box-shadow: -2px -2px 3px rgba(0, 0, 0, 0.05), 4px 4px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  resize: none;
+}
+
+#form-row input:focus,
+#form-row textarea:focus {
+  border-color: #3158c9;
+  /* box-shadow: 0 0 5px rgba(49, 88, 201, 0.3); */
+}
+
+#update-btn {
+  background-color: #4972E8;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 26px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#update-btn:hover {
+  background-color: #2448ad;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  #card {
+    width: 90%;
+    padding: 25px;
+  }
+
+  #form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #form-row label {
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  #update-btn {
+    width: 100%;
+  }
+}

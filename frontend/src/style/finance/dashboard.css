@@ -1,0 +1,136 @@
+:root {
+  --sidebar-width: 280px;
+}
+
+#finance-main-content {
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+}
+
+#finance-dashboard {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  padding: 35px;
+}
+
+#dropdowns {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+#dashboard-cards {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+#dashboard-cards #card {
+  /* width: 100%; */
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 230px;
+  /* max-width: 180px; */
+  height: 120px;
+  padding: 10px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#dashboard-cards h6 {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#dashboard-cards h3 {
+  font-size: 24px;
+  color: #5b5757;
+}
+
+#vector-img {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#cards-img {
+  filter: brightness(0) saturate(100%) invert(89%) sepia(1%) saturate(191%)
+    hue-rotate(148deg) brightness(98%) contrast(93%);
+  width: 50px;
+  height: 50px;
+}
+
+#texts {
+  margin: 10px;
+}
+
+#texts-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 30px;
+  gap: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 15px;
+}
+
+#point-text:nth-child(1) ul {
+  /* max-width: 400px; */
+  background-color: #d7ffef;
+  padding: 20px 30px;
+  border-radius: 10px;
+}
+
+#point-text:nth-child(2) ul {
+  /* max-width: 400px; */
+  background-color: #fcffc8;
+  padding: 20px 30px;
+  border-radius: 10px;
+}
+
+#point-text ul li {
+  border-bottom: 0.1px solid #a0a0a0;
+  margin: 10px;
+}
+
+#charts {
+  padding: 30px;
+}
+
+/* Tooltip container */
+.recharts-tooltip-wrapper {
+  z-index: 999;
+}
+
+/* Tooltip box */
+.recharts-default-tooltip {
+  background: white !important;
+  border-radius: 10px !important;
+  padding: 10px 14px !important;
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.15) !important;
+  border: 1px solid #e5e5e5 !important;
+}
+
+/* Tooltip label (month) */
+.recharts-tooltip-label {
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  margin-bottom: 6px !important;
+}
+
+/* Tooltip text (value) */
+.recharts-tooltip-item {
+  font-size: 13px !important;
+  color: #31D076 !important;
+  font-weight: 600 !important;
+}

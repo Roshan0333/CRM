@@ -1,0 +1,217 @@
+.feedbackManagerDashboardMainContainer {
+  padding: 1.5rem;
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+}
+
+.feedbackManagerDashboardMainContainer h1 {
+  color: #5d5f6c;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  /* background-color: red; */
+  height: 400px;
+  width: 100%;
+  grid-template-columns: 2.5fr 1fr;
+}
+
+.left {
+  width: 100%;
+}
+
+.right {
+  /* background-color: rgb(156, 63, 63); */
+  width: 300px;
+  height: 385px;
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+  padding: 16px;
+  box-shadow:
+    6px 10px 5px #00000024,
+    -3px -3px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #00000024;
+  border-radius: 5px;
+  margin-left: 50px;
+}
+
+.complaints {
+  margin: 0;
+  font-size: 1.37rem;
+}
+
+.bottom {
+  margin-top: 30px;
+  height: 300px;
+  width: 100%;
+}
+
+#manager-dashboard-data {
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  width: 100%;
+}
+
+/* === DATA WRAP (HOLDING BOXES) === */
+#data-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* === DASHBOARD HEADING === */
+#dashboard-data h1 {
+  color: #5a5c69;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* === EACH DATA BOX === */
+#data {
+  flex: 1 1 230px;
+  max-width: 240px;
+  height: 120px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.1), 3px 0px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* === BORDER COLORS === */
+#data:nth-child(1) {
+  border-left: 7px solid #2563eb;
+}
+
+#data:nth-child(2) {
+  border-left: 7px solid #1cc88a;
+}
+
+#data:nth-child(3) {
+  border-left: 7px solid #36b9cc;
+}
+
+#data:nth-child(4) {
+  border-left: 7px solid #f6c23e;
+}
+
+/* === TEXT COLORS === */
+#data:nth-child(1) h3 {
+  color: #2563eb;
+}
+
+#data:nth-child(2) h3 {
+  color: #1cc88a;
+}
+
+#data:nth-child(3) h3 {
+  color: #36b9cc;
+}
+
+#data:nth-child(4) h3 {
+  color: #f6c23e;
+}
+
+/* === NUMBER + ICON ROW === */
+#num-vector {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* === NUMBER STYLE === */
+#num-vector p {
+  font-size: 32px;
+  color: #5b5757;
+  font-weight: 500;
+}
+
+/* === BOX TITLE === */
+#data h3 {
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+
+/* === ICON STYLE === */
+#num-vector img {
+  width: 50px;
+  height: 54px;
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* For tablets (2 boxes per row) */
+@media (max-width: 992px) {
+  #dashboard-container {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  #data {
+    flex: 1 1 45%;
+    max-width: 45%;
+  }
+}
+
+/* For mobile screens (1 box per row) */
+@media (max-width: 600px) {
+  #dashboard-data {
+    padding: 20px;
+  }
+
+  #data {
+    flex: 1 1 100%;
+    max-width: 100%;
+    height: auto;
+  }
+
+  #num-vector p {
+    font-size: 28px;
+  }
+
+  #num-vector img {
+    width: 40px;
+    height: 42px;
+  }
+
+  #dashboard-data h1 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .feedbackManagerDashboardMainContainer {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .right {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .feedbackManagerDashboardMainContainer h1 {
+    font-size: 1.4rem;
+  }
+
+  .left {
+    overflow-x: auto;
+  }
+}
