@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import "../../style/managementEmployee/PayOut.css";
 import calender from "../../assets/managementEmployee/PayOut/calender.png";
 import money from "../../assets/managementEmployee/PayOut/money.png";
 
 function PayOut() {
+
+  const [payout,setPayout] = useState("")
   return (
     <>
       <main id='payout-main'>
@@ -47,7 +49,7 @@ function PayOut() {
           </div>
 
           <div id="payout-table-card">
-            <table id='payout-table'>
+            <table id="payout-table">
               <thead>
                 <tr>
                   <th>Company Name</th>
@@ -58,19 +60,32 @@ function PayOut() {
                   <th>Project File</th>
                 </tr>
               </thead>
-              <tbody id='payout-tbody'>
-                {[1,2,3,4,5,6].map((row, index) => (
-                  <tr key={index}>
-                    <td>Bold Text Columns</td>
-                    <td>Bold Text Columns</td>
-                    <td>Bold Text Columns</td>
-                    <td>Bold Text Columns</td>
-                    <td>Bold Text Columns</td>
-                    <td>
-                      <button>View</button>
+
+              <tbody id="payout-tbody">
+                {payout.length > 0 ? (
+                  payout.map((project) => (
+                    <tr key={project.id}>
+                      <td>{project.companyName}</td>
+                      <td>{project.invoiceNo}</td>
+                      <td>{project.services}</td>
+                      <td>{project.totalAmount}</td>
+                      <td>{project.completedDate}</td>
+                      <td>
+                        <button
+                          onClick={() => window.open(project.fileUrl, "_blank")}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: "center" }}>
+                      No payout data available
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

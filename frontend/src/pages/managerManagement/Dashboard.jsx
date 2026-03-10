@@ -7,9 +7,22 @@ import totalEmployee from "../../assets/managerManagement/Dashboard/totalEmploye
 import income from "../../assets/managerManagement/Dashboard/income.png";
 import importData from "../../assets/managerManagement/Dashboard/importData.png";
 import "../../style/salesExecutive/dashboard.css";
+import { axiosInstance } from "../../api/managementApi/axiosInstance";
+import { useState } from "react";
+import { useEffect } from "react";
 // import { Button } from "bootstrap";
 
 const Dashboard = () => {
+
+   const [counts, setCounts] = useState({ tls: 0, members: 0 });
+   useEffect(() => {
+    const fetchCounts = async () => {
+      const res = await axiosInstance.get("/management");
+      setCounts(res.data);
+    };
+
+    fetchCounts();
+  }, []);
   return (
     <main>
       <div id="dashboard">
@@ -59,14 +72,14 @@ const Dashboard = () => {
               <div id="data">
                 <h3>TOTAL EMPLOYEE</h3>
                 <div id="num-vector">
-                  <p>1600</p>
+                  <p>{counts.members}</p>
                   <img src={totalProjects} alt="" />
                 </div>
               </div>
               <div id="data">
                 <h3>TOTAL TLS</h3>
                 <div id="num-vector">
-                  <p>8000</p>
+                  <p>{counts.tls}</p>
                   <img src={income} alt="" />
                 </div>
               </div>

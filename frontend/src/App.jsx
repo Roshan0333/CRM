@@ -126,15 +126,15 @@ import RegisterForm from "./components/auth/RegisterForm";
 
     const [role, setRole] = useState(null);
 
-    useEffect(() => {
-      const storedRole = localStorage.getItem("role");
-      setRole(storedRole);
-      console.log(storedRole)
-    }, []);
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role");
+    setRole(storedRole);
+    console.log(storedRole)
+  }, []);
 
-    useEffect(()=>{
-      console.log(role)
-    },[role])
+  useEffect(()=>{
+    console.log(role)
+  },[role])
 
     return (
       <>

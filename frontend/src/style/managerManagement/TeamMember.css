@@ -13,6 +13,7 @@
   display: inline-block;
   vertical-align: middle;  
 }
+<<<<<<< Updated upstream
 
 /* Success (Active) */
 .badge-success {
@@ -25,3 +26,32 @@
   background-color: #D41A1A !important;
   border: none;
 }
+=======
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  text-transform: capitalize;
+}
+
+.status-active {
+  background-color: #198754;
+  color: #ffffff;
+}
+
+.status-inactive {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+.join-date{
+  margin-left:65px;
+  font-size: 5px;
+  padding: 0;
+}
+>>>>>>> Stashed changes

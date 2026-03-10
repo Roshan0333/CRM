@@ -63,6 +63,8 @@ export const loginUser = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+    console.log("VERIFY SECRET:", process.env.JWT_SECRET);
+
 
     if (!user) {
       return res.status(400).json({ message: "User not found. Please register first." });
@@ -98,7 +100,7 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Incorrect password." });
     }
 
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ userId: user._id },process.env.JWT_SECRET, { expiresIn: "7d" });
 
     res.json({
       message: "Login successful",
