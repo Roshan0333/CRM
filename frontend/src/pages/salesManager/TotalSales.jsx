@@ -7,7 +7,7 @@ import LastUpdatePopUp from "../salesExecutive/LastupdatePopUp";
 const TotalSales = () => {
 
   const [salesList, setSalesList] = useState([]);
-  const [filterList, setFilterList] = useState([]);
+  let [filterList, setFilterList] = useState([]);
 
   const [monthList, setMonthList] = useState([]);
   const [TlList, setTlList] = useState([]);
