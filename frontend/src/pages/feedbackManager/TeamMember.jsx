@@ -12,15 +12,15 @@ function TeamMember() {
   const [editData, setEditData] = useState({});
 
   const [formData, setFormData] = useState({
-    name: "", 
-    position: "", 
-    contact_no: "", 
+    name: "",
+    position: "",
+    contact_no: "",
     bank_name: "",
-    email_id: "", 
-    account_no: "", 
-    location: "", 
+    email_id: "",
+    account_no: "",
+    location: "",
     ifsc_code: "",
-    joining_date: "", 
+    joining_date: "",
     upi_id: ""
   });
 
@@ -52,13 +52,13 @@ function TeamMember() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleEditChange = (e) => {
-  const { name, value } = e.target; 
+    const { name, value } = e.target;
 
-  setEditData({ 
-    ...editData,      
-    [name]: value    
-  });
-};
+    setEditData({
+      ...editData,
+      [name]: value
+    });
+  };
 
   const handleAddMember = async (e) => {
     e.preventDefault();
@@ -68,7 +68,7 @@ function TeamMember() {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("Member Added!");
-      setFormData({ name: "", position: "", contact_no: "", email_id: "", location: "", bank_name:"", account_no:"", joining_date:"", ifsc_code:"", upi_id:""}); // Reset
+      setFormData({ name: "", position: "", contact_no: "", email_id: "", location: "", bank_name: "", account_no: "", joining_date: "", ifsc_code: "", upi_id: "" }); // Reset
       fetchMembers();
     } catch (err) {
       alert("Failed to add member");
@@ -96,23 +96,23 @@ function TeamMember() {
   };
 
   // Send the PUT request to Backend
-const handleSaveUpdate = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await axios.put(`${API}/${editData._id}`, editData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const handleSaveUpdate = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(`${API}/${editData._id}`, editData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    if (response.status === 200) {
-      alert("Profile Updated Successfully!");
-      setViewModal(false);
-      fetchMembers(); // Refresh the list
+      if (response.status === 200) {
+        alert("Profile Updated Successfully!");
+        setViewModal(false);
+        fetchMembers();
+      }
+    } catch (err) {
+      console.error("Update error:", err);
+      alert("Failed to update profile");
     }
-  } catch (err) {
-    console.error("Update error:", err);
-    alert("Failed to update profile");
-  }
-};
+  };
 
   // const teamMembers = [
   //   {
@@ -169,159 +169,159 @@ const handleSaveUpdate = async () => {
     <>
       <div className="SalesManagerTeamMemberContainer">
         <h1 className="TeamMemberContainerHeading">Team Member</h1>
- <section className="team-card">
-        <section className="tableContainer">
-          <table style={{ width: "100%" }}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Location</th>
-                <th>Email ID</th>
-                <th>Contact No.</th>
-                <th>Joinning Date</th>
-                <th>Status</th>
-                <th>More</th>
-              </tr>
-            </thead>
-            {teamMembers.map((member) => (
-              <tbody key={member._id}>
+        <section className="team-card">
+          <section className="tableContainer">
+            <table style={{ width: "100%" }}>
+              <thead>
                 <tr>
-                  <td>{member.name}</td>
-                  <td>{member.location}</td>
-                  <td>{member.email_id}</td>
-                  <td>{member.contact_no}</td>
-                  <td>{member.joining_date}</td>
-                  <td
-                    className={
-                      member.status.toLowerCase() === "active"
-                        ? "badge badge-success"
-                        : "badge badge-danger"
-                    }
-                    style={{ marginTop: 15, cursor: "pointer" }}
-                  >
-                    {member.status}
-                  </td>
-                  <td>
-                    <button
-                      className="viewbtn"
-                      onClick={() => handleUpdateClick(member)}
-                    >
-                      Update
-                    </button>
-                  </td>
+                  <th>Name</th>
+                  <th>Location</th>
+                  <th>Email ID</th>
+                  <th>Contact No.</th>
+                  <th>Joinning Date</th>
+                  <th>Status</th>
+                  <th>More</th>
                 </tr>
-              </tbody>
-            ))}
-          </table>
+              </thead>
+              {teamMembers.map((member) => (
+                <tbody key={member._id}>
+                  <tr>
+                    <td>{member.name}</td>
+                    <td>{member.location}</td>
+                    <td>{member.email_id}</td>
+                    <td>{member.contact_no}</td>
+                    <td>{member.joining_date}</td>
+                    <td
+                      className={
+                        member.status.toLowerCase() === "active"
+                          ? "badge badge-success"
+                          : "badge badge-danger"
+                      }
+                      style={{ marginTop: 15, cursor: "pointer" }}
+                    >
+                      {member.status}
+                    </td>
+                    <td>
+                      <button
+                        className="viewbtn"
+                        onClick={() => handleUpdateClick(member)}
+                      >
+                        Update
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              ))}
+            </table>
+          </section>
         </section>
-        </section>
-   
-    <section className="team-card form-card">
-         <section className="teamMemberForm">
-          <form className="user-data-form" onSubmit={handleAddMember}>
-            <div className="form-grid">
-              <div className="form-group">
-                <input type="text" id="name" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                <select name="position" id="position" value={formData.position} onChange={handleChange}>
-                  <option value="">Position</option>
-                  <option value="sales-executive">Sales Executive</option>
-                  <option value="team-leader">Team Leader</option>
-                  <option value="manager">Manager</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="contact-no"
-                  name="contact_no"
-                  placeholder="Contact no."
-                  value={formData.contact_no} 
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="bank-name"
-                  name="bank_name"
-                  placeholder="Bank Name"
-                  value={formData.bank_name} 
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="email"
-                  id="email-id"
-                  name="email_id"
-                  placeholder="Email_id"
-                  value={formData.email_id} 
-                  onChange={handleChange}
 
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="account-no"
-                  name="account_no"
-                  placeholder="Account No."
-                  value={formData.account_no} 
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="location"
-                  name="location"
-                  placeholder="Location"
-                  value={formData.location} 
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="ifsc-code"
-                  name="ifsc_code"
-                  placeholder="IFSC code"
-                  value={formData.ifsc_code} 
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="joining-date"
-                  name="joining_date"
-                  placeholder="Joining date"
-                  value={formData.joining_date} 
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="upi-id"
-                  name="upi_id"
-                  placeholder="UPI Id"
-                  value={formData.upi_id} 
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
+        <section className="team-card form-card">
+          <section className="teamMemberForm">
+            <form className="user-data-form" onSubmit={handleAddMember}>
+              <div className="form-grid">
+                <div className="form-group">
+                  <input type="text" id="name" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <select name="position" id="position" value={formData.position} onChange={handleChange}>
+                    <option value="">Position</option>
+                    <option value="sales-executive">Sales Executive</option>
+                    <option value="team-leader">Team Leader</option>
+                    <option value="manager">Manager</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    id="contact-no"
+                    name="contact_no"
+                    placeholder="Contact no."
+                    value={formData.contact_no}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    id="bank-name"
+                    name="bank_name"
+                    placeholder="Bank Name"
+                    value={formData.bank_name}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="email"
+                    id="email-id"
+                    name="email_id"
+                    placeholder="Email_id"
+                    value={formData.email_id}
+                    onChange={handleChange}
 
-            <div className="form-actions">
-              <button type="submit" className="add-button">
-                ADD
-              </button>
-            </div>
-            
-          </form>
-        </section>
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    id="account-no"
+                    name="account_no"
+                    placeholder="Account No."
+                    value={formData.account_no}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    placeholder="Location"
+                    value={formData.location}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    id="ifsc-code"
+                    name="ifsc_code"
+                    placeholder="IFSC code"
+                    value={formData.ifsc_code}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    id="joining-date"
+                    name="joining_date"
+                    placeholder="Joining date"
+                    value={formData.joining_date}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    id="upi-id"
+                    name="upi_id"
+                    placeholder="UPI Id"
+                    value={formData.upi_id}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="form-actions">
+                <button type="submit" className="add-button">
+                  ADD
+                </button>
+              </div>
+
+            </form>
+          </section>
         </section>
 
         {viewModal && selectedMember && (
@@ -341,7 +341,7 @@ const handleSaveUpdate = async () => {
                     </div>
                     <div className="form-field">
                       <label htmlFor="ifsc-code">IFSC code</label>
-                      <input type="text" id="ifsc-code" name="ifsc_code" value={editData.ifsc_code || ""} onChange={handleEditChange}/>
+                      <input type="text" id="ifsc-code" name="ifsc_code" value={editData.ifsc_code || ""} onChange={handleEditChange} />
                     </div>
                     <div className="form-field">
                       <label htmlFor="account-no">Account no.</label>
@@ -365,9 +365,24 @@ const handleSaveUpdate = async () => {
                         :2000/-
                       </span>
                     </div>
+
                     <div className="status-item">
                       <span className="status-label">Status</span>
-                      <button className="status-active-btn">{selectedMember.status || "Active"}</button>
+                      <select
+                        name="status"
+                        className="status-select-dropdown"
+                        value={editData.status || "Active"}
+                        onChange={handleEditChange}
+                        style={{
+                          marginLeft: '10px',
+                          padding: '5px 10px',
+                          borderRadius: '4px',
+                          border: '1px solid #ddd'
+                        }}
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
                     </div>
 
                     <div className="modal-actions">

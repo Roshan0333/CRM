@@ -131,7 +131,7 @@ const Complaints = () => {
               <td>{item.companyName}</td>
               <td>{item.subject}</td>
               <td>{item.email_id}</td>
-              <td>{new Date(item.issuedDate).toLocaleDateString()}</td>
+              <td>{item.issuedDate}</td>
               <td>
                 <button className="btn btn-view" onClick={() => openView(item)}>View</button>
               </td>

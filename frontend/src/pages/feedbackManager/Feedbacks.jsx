@@ -56,6 +56,37 @@ const Feedbacks = () => {
   };
 
 
+  const renderCompletedActions = (feedbackItem, service) => {
+    const isLowRating = service.rating <= 2;
+    const isAssigned = feedbackItem.assignedEmployee;
+
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "center" }}>
+        {renderStars(service.rating || 0)}
+
+        {/* If rating is low and not yet assigned, show "Raise Complaint" */}
+        {isLowRating && !isAssigned && (
+          <button
+            className="btn btn-red"
+            style={{ width: "110px", height: "auto", padding: "4px" }}
+            onClick={() => handleAssignBadFeedback(feedbackItem)}
+          >
+            File Complaint
+          </button>
+        )}
+
+        {isAssigned ? (
+          <span style={{ fontSize: "11px", color: "#b05d22", fontWeight: "bold" }}>
+            Case: {feedbackItem.assignedEmployee.name || "Assigned"}
+          </span>
+        ) : !isLowRating ? (
+          <span style={{ fontSize: "11px", color: "#20844a" }}>Quality Approved</span>
+        ) : null}
+      </div>
+    );
+  };
+
+
   const renderStars = (rating) => (
     <div style={{ display: "flex", gap: "3px", justifyContent: "center" }}>
       {[...Array(5)].map((_, i) => (
@@ -155,7 +186,7 @@ const Feedbacks = () => {
   };
 
   const handleAssignBadFeedback = async (feedbackItem) => {
-    // 1. Client-side check: prevent clicking if we already know it's assigned
+
     if (feedbackItem.assignedEmployee) {
       alert(`Already assigned to: ${feedbackItem.assignedEmployee.name || feedbackItem.assignedEmployee.email}`);
       return;
@@ -175,6 +206,13 @@ const Feedbacks = () => {
         email_id: feedbackItem.email_id || feedbackItem.email,
         description: feedbackItem.clientComment || "No specific comments provided.",
         subject: `Feedback Complaint - ${feedbackItem.companyName}`,
+        services: feedbackItem.services.map(s => ({
+          name: s.name,
+          rating: s.rating,
+          adminMessage: s.adminMessage || "",
+          videoLink: s.videoLink || "",
+          fileUrl: s.fileUrl || ""
+        })),
         priority: "Medium"
       };
 
@@ -201,13 +239,11 @@ const Feedbacks = () => {
 
       alert(`Complaint generated and assigned to: ${assignedTo}`);
     } catch (err) {
-      // 3. Handle backend "Already Exists" error
       const errorMsg = err.response?.data?.message || err.message;
       alert("Notice: " + errorMsg);
-
-      // If backend says it's already there, we should probably refresh the list
     }
   };
+
   return (
     <div
       className="main-content-wrapper"
@@ -529,13 +565,13 @@ const Feedbacks = () => {
             className={`tab-button ${key === "pending" ? "active" : ""}`}
             onClick={() => setKey("pending")}
           >
-            Pending Feedbacks
+            Pending Feedbacks ({pendingFeedbacks.length})
           </button>
           <button
             className={`tab-button ${key === "completed" ? "active" : ""}`}
             onClick={() => setKey("completed")}
           >
-            Completed Feedbacks
+            Completed Feedbacks ({completedFeedbacks.length})
           </button>
         </div>
 

@@ -1,6 +1,7 @@
 import express from "express";
 import { updateAdminMessage, getClientFeedbackDetails , sendFeedbackMail, getAllFeedbacks, submitClientFeedback, uploadServiceFile} from "../../controllers/feedbackManager/feedbackManageController.js";
 import Feedback from "../../models/FeedbackManager/FeedbackSchema.js";
+import { getDashboardStats } from "../../controllers/feedbackManager/dashboardController.js";
 import multer from "multer";
 
 const router = express.Router();
@@ -10,6 +11,9 @@ router.get('/', getAllFeedbacks);
 router.get("/details/:token", getClientFeedbackDetails);
 
 router.patch("/message/:id", updateAdminMessage);
+
+router.get("/stats", getDashboardStats);
+
 
 router.post('/send-mail/:id', sendFeedbackMail);
 router.patch('/upload/:id', upload.single("file"), uploadServiceFile);

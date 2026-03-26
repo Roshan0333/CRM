@@ -138,23 +138,21 @@ export const submitClientFeedback = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-// Example Backend Snippet
+
+
 export const uploadServiceFile = async (req, res) => {
   try {
     const { id } = req.params;
-  const { serviceIndex } = req.body; // Multer puts this in req.body
-  const file = req.file; // Multer puts the file here
+  const { serviceIndex } = req.body;
+  const file = req.file; 
 
   if (!file) return res.status(400).json({ message: "No file uploaded" });
-  // 1. Find the feedback document
-  const feedback = await Feedback.findOne({id});
 
-  // Use MongoDB positional operator to update the specific service in the array
     const updateField = `services.${serviceIndex}.fileUrl`;
     
     const updatedFeedback = await Feedback.findByIdAndUpdate(
       id,
-      { [updateField]: file.path }, // Save the path to the specific service
+      { [updateField]: file.path }, 
       { new: true }
     );
 

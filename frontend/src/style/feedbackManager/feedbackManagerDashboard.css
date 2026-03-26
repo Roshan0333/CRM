@@ -21,20 +21,131 @@
   width: 100%;
 }
 
+
+/* Container for the Hot Complaints Section */
 .right {
-  /* background-color: rgb(156, 63, 63); */
-  width: 300px;
-  height: 385px;
+  background: #fdfdfd;
+  padding: 20px;
+  border-radius: 12px;
+ box-shadow: 2px 4px 9px #00000024
+}
+.hot-header {
   display: flex;
-  /* align-items: center; */
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.live-indicator {
+  font-size: 10px;
+  text-transform: uppercase;
+  background: #e6f4ea;
+  color: #1e8e3e;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* Individual Card Styling */
+.complaint-card-mini {
+  position: relative;
+  display: flex;
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+.complaint-card-mini:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Priority Vertical Line */
+.status-line {
+  width: 6px;
+}
+.status-line.high { background: #d93025; }
+.status-line.medium { background: #f9ab00; }
+.status-line.low { background: #1a73e8; }
+
+.card-content {
+  padding: 15px;
+  flex: 1;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Modern Badge */
+.priority-badge-new {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.priority-badge-new.high { background: #fce8e6; color: #d93025; }
+.priority-badge-new.medium { background: #fef7e0; color: #b06000; }
+
+.complaint-date {
+  font-size: 12px;
+  color: #70757a;
+}
+
+.company-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #202124;
+  margin: 0 0 5px 0;
+}
+
+.subject-text {
+  font-size: 13px;
+  color: #5f6368;
+  margin-bottom: 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Assignee Section */
+.card-bottom {
+  border-top: 1px solid #f1f3f4;
+  padding-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.assignee {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #3c4043;
+  font-weight: 500;
+}
+
+.avatar-circle {
+  width: 24px;
+  height: 24px;
+  background: #1a73e8;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 16px;
-  box-shadow:
-    6px 10px 5px #00000024,
-    -3px -3px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid #00000024;
-  border-radius: 5px;
-  margin-left: 50px;
+  font-size: 10px;
+  font-weight: bold;
 }
 
 .complaints {

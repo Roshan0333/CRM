@@ -13,6 +13,9 @@ import callLogRoutes from './routes/salesDepartment/callHistory.route.js';
 import auth from "./middlewares/AuthMiddleware.js"
 // =======
 
+import path from "path";
+
+
 // >>>>>>> Stashed changes
 import reminderCallRoutes from "./routes/salesDepartment/todayReminderCall.route.js"
 import salesTeamRoutes from "./routes/salesDepartment/salesTeam.route.js";
@@ -31,6 +34,11 @@ import TeamRoutes from './routes/feedbackRoutes/TeamRoutes.js';
 // import auth from "./middlewares/AuthMiddleware.js";
 import teamRouter from "./routes/managementRoutes/TeamRoutes.js";
 // import isAuth from "./middlewares/AuthMiddleware.js";
+
+
+import invoiceRoutes from "./routes/FinanceDepartment/invoice.routes.js";
+import upload from "./middlewares/Finance/upload.js";
+import financeRoutes from "./routes/FinanceDepartment/finance.routes.js";
 
 
 dotenv.config({ path: "./.env", debug: true });
@@ -81,6 +89,10 @@ app.use("/api/client",auth, clientRoutes);
 app.use("/api/sales",auth, salesRoutes);
 app.use("/api/calllog",auth, callLogRoutes);
 app.use("/team",auth,teamRouter);
+app.use("/api/finance", financeRoutes);
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use("/api/invoice", invoiceRoutes);
+
 
 
 app.use("/api/feedback", FeedbackRoutes);

@@ -4,10 +4,10 @@ import Feedback from "../../models/FeedbackManager/FeedbackSchema.js";
 
 export const getComplaints = async (req, res) => {
   try {
-    const { status } = req.query; 
+    const { status } = req.query;
     // If status is provided, filter; otherwise, fetch all
     const filter = status ? { status: status } : {};
-    
+
     const complaints = await Complaint.find(filter).sort({ createdAt: -1 });
     res.status(200).json(complaints);
   } catch (error) {
@@ -35,24 +35,24 @@ export const updateComplaint = async (req, res) => {
 
     let updatedDiscussion = complaint.discussion || "";
 
-     if (note && note.trim() !== "") {
+    if (note && note.trim() !== "") {
       const timestamp = new Date().toLocaleString("en-IN", {
         dateStyle: "short",
         timeStyle: "short",
       });
-      
+
       const newEntry = `[${timestamp}] ${note}`;
-      updatedDiscussion = updatedDiscussion 
-        ? `${newEntry}\n------------------\n${updatedDiscussion}` 
+      updatedDiscussion = updatedDiscussion
+        ? `${newEntry}\n------------------\n${updatedDiscussion}`
         : newEntry;
     }
 
     const updatedDoc = await Complaint.findByIdAndUpdate(
       id,
-      { 
-        status, 
-        priority, 
-        discussion: updatedDiscussion 
+      {
+        status,
+        priority,
+        discussion: updatedDiscussion
       },
       { new: true }
     );
@@ -83,7 +83,7 @@ export const createComplaintFromFeedback = async (req, res) => {
       companyName,
       email_id,
       subject: `Resolution Required: ${companyName}`,
-      discussion: `${description}\n\n[System]: Complaint generated from client feedback.`, 
+      discussion: `${description}\n\n[System]: Complaint generated from client feedback.`,
       feedbackId,
       assignedEmployee: {
         id: selectedEmployee._id,
@@ -104,8 +104,8 @@ export const createComplaintFromFeedback = async (req, res) => {
       }
     });
 
-    res.status(201).json({ 
-      message: "Assigned", 
+    res.status(201).json({
+      message: "Assigned",
       assignedTo: selectedEmployee.email,
       assignedName: selectedEmployee.name
     });
@@ -121,10 +121,9 @@ export const getMyAssignedTasks = async (req, res) => {
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Not authorized, no user data" });
     }
-    const employeeId = req.user.id; 
+    const employeeId = req.user.id;
 
-const tasks = await Complaint.find({ "assignedEmployee.id": employeeId })
-      .sort({ createdAt: -1 });
+    const tasks = await Complaint.find({ "assignedEmployee.id": employeeId }).populate('feedbackId').sort({ createdAt: -1 });
 
     res.status(200).json(tasks);
   } catch (error) {

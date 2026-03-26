@@ -1,5 +1,8 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import axios from "axios";
+const API = "http://localhost:5000/api/invoice";
+
 
 // icons
 import searchIcon from "../../assets/finance/invoice/searchIcon.png";
@@ -15,36 +18,238 @@ import ontrack from "../../assets/finance/invoice/ontrack.png";
 export default function InvoiceUI() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+const initialNewItem = { serviceName: "", unitPrice: 0, quantity: 1 };
+const [newInvoiceItems, setNewInvoiceItems] = useState([initialNewItem]);
+const [companyName, setCompanyName] = useState("");
+const [invoiceNo, setInvoiceNo] = useState("");
+const [companyAddress, setCompanyAddress] = useState("");
+const [invoiceDate, setInvoiceDate] = useState("");
+const [dueDate, setDueDate] = useState("");
+const [selectedInvoice, setSelectedInvoice] = useState(null);
+const [invoices, setInvoices] = useState([]);
+const [searchTerm, setSearchTerm] = useState("");
+const [statusFilter, setStatusFilter] = useState("ALL");
+const [selectedEmployee, setSelectedEmployee] = useState("");
+const [transactionId, setTransactionId] = useState("");
+const [email, setEmail] = useState("");
+const [clientName, setClientName] = useState("");
 
-  const items = [
-    { description: "Brand consultation", qty: 1, rate: 100, total: 100 },
-    { description: "Logo design", qty: 1, rate: 100, total: 100 },
-    { description: "Website design", qty: 1, rate: 100, total: 100 },
-    { description: "Social media templates", qty: 1, rate: 100, total: 100 },
-    { description: "Brand photography", qty: 1, rate: 100, total: 100 },
-    { description: "Brand guide", qty: 1, rate: 100, total: 100 },
-  ];
+ useEffect(() => {
+  fetchInvoices();
+}, []);
 
-  const subtotal = items.reduce((s, it) => s + it.total, 0);
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax;
+const fetchInvoices = async () => {
+  try {
+    const res = await axios.get(API);
+    setInvoices(res.data);
+  } catch (err) {
+    console.log("Fetch error", err);
+  }
+};
 
-  const initialNewItem = { serviceName: "", unitPrice: 0, quantity: 1 };
-  const [newInvoiceItems, setNewInvoiceItems] = useState([initialNewItem]);
 
-  const handleItemChange = useCallback(
-    (index, field, value) => {
-      const updatedItems = [...newInvoiceItems];
-      updatedItems[index] = {
-        ...updatedItems[index],
-        [field]: field === "serviceName" ? value : parseFloat(value) || 0,
-      };
-      setNewInvoiceItems(updatedItems);
-    },
-    [newInvoiceItems]
+
+const saveInvoiceToDB = async () => {
+  if (!selectedEmployee) {
+    alert("Employee select kara");
+    return;
+  }
+
+  if (!companyName) {
+    alert("Company name bhar");
+    return;
+  }
+
+  if (!newInvoiceItems[0].serviceName) {
+    alert("Service name bhar");
+    return;
+  }
+
+  try {
+    const totalAmount = newInvoiceSummary.total;
+    const receivedAmount = 0;
+    const pendingAmount = totalAmount - receivedAmount;
+
+    const payload = {
+       clientName,
+      companyName,
+       salesExecutiveName: selectedEmployee,
+       email,
+      invoiceNo,
+      transactionId,
+      companyAddress,
+      invoiceDate,
+      dueDate,
+      items: newInvoiceItems,
+      summary: newInvoiceSummary,
+      totalAmount,
+      receivedAmount,
+      pendingAmount,
+      status: pendingAmount === 0 ? "Completed" : "Processing",
+    };
+
+    await axios.post(API, payload);
+    await fetchInvoices();
+    setShowAddModal(false);
+    resetForm();
+  } catch (error) {
+    console.log("Error saving invoice:", error.response?.data || error);
+  }
+};
+
+
+
+const toggleStatus = async (id) => {
+  try {
+    await axios.patch(`${API}/status/${id}`);
+    await fetchInvoices();
+  } catch (error) {
+    console.log("Status update error:", error);
+  }
+};
+
+const deleteInvoice = async (id) => {
+  if (!window.confirm("Delete invoice?")) return;
+
+  try {
+    await axios.delete(`${API}/${id}`);
+    await fetchInvoices();   // refresh list
+  } catch (error) {
+    console.log("Delete error:", error);
+  }
+};
+
+const updateInvoiceInDB = async () => {
+  try {
+    const payload = {
+      clientName,  
+      companyName,
+      salesExecutiveName: selectedEmployee,
+      email,
+      transactionId,
+      companyAddress,
+      invoiceDate,
+      dueDate,
+      items: newInvoiceItems,
+      receivedAmount: selectedInvoice.receivedAmount // 🔥 important
+    };
+
+    await axios.put(`${API}/${selectedInvoice._id}`, payload);
+    await fetchInvoices();
+    setShowAddModal(false);
+    resetForm();
+  } catch (error) {
+    console.log("Update error:", error);
+  }
+};
+
+
+const receivePayment = async (id, amount) => {
+  try {
+    await axios.post(`${API}/payment/${id}`, { amount });
+    await fetchInvoices();   // refresh
+  } catch (error) {
+    console.log("Payment error:", error);
+  }
+};
+
+const filteredInvoices = invoices.filter((inv) => {
+  const companyMatch = inv.companyName
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
+
+  const employeeMatch = selectedEmployee
+    ? inv.employeeName === selectedEmployee
+    : true;
+
+  const today = new Date();
+  const due = new Date(inv.dueDate);
+  const diff = (due - today) / (1000 * 60 * 60 * 24);
+
+  let statusMatch = true;
+
+  if (statusFilter === "PENDING") {statusMatch = inv.pendingAmount > 0;}
+if (statusFilter === "COMPLETED") {statusMatch = inv.pendingAmount === 0;}
+  if (statusFilter === "DUE_SOON") statusMatch = diff >= 0 && diff <= 3;
+  if (statusFilter === "OVERDUE") statusMatch = due < today;
+  if (statusFilter === "ONTRACK") statusMatch = diff > 3;
+if (statusFilter === "DELETED") {statusMatch = inv.isDeleted === true;}
+
+  return companyMatch && employeeMatch && statusMatch;
+});
+const deletedCount = invoices.filter(inv => inv.isDeleted).length;
+const visibleInvoices =
+  statusFilter === "DELETED"
+    ? filteredInvoices.filter(inv => inv.isDeleted)
+    : filteredInvoices.filter(inv => !inv.isDeleted);
+
+const addRow = () => {
+  setNewInvoiceItems([...newInvoiceItems, initialNewItem]);
+};
+
+const removeRow = (index) => {
+  const updated = newInvoiceItems.filter((_, i) => i !== index);
+  setNewInvoiceItems(updated);
+};
+
+const handleItemChange = (index, field, value) => {
+  const updated = [...newInvoiceItems];
+  updated[index][field] = field === "serviceName" ? value : Number(value);
+  setNewInvoiceItems(updated);
+};
+const resetForm = () => {
+  setClientName("");
+  setCompanyName("");
+  setInvoiceNo("");
+  setTransactionId("");
+  setSelectedEmployee("");
+  setCompanyAddress("");
+  setInvoiceDate("");
+  setDueDate("");
+  setNewInvoiceItems([{ serviceName: "", unitPrice: 0, quantity: 1 }]);
+  setSelectedInvoice(null);
+};
+
+const today = new Date();
+
+const totalCount = invoices.length;
+
+const pendingCount = invoices.filter(inv => inv.status === "Pending" || inv.status === "Partially Paid").length;
+const completedCount = invoices.filter(inv => inv.status === "Paid").length;
+
+
+const dueSoonCount = invoices.filter((inv) => {
+  const due = new Date(inv.dueDate);
+  const diff = (due - today) / (1000 * 60 * 60 * 24);
+  return diff >= 0 && diff <= 3;
+}).length;
+
+const overdueCount = invoices.filter((inv) => {
+  const due = new Date(inv.dueDate);
+  return due < today;
+}).length;
+
+const onTrackCount = invoices.filter((inv) => {
+  const due = new Date(inv.dueDate);
+  const diff = (due - today) / (1000 * 60 * 60 * 24);
+  return diff > 3;
+}).length;
+const handleDelete = () => {
+  if (!selectedInvoice) return;
+
+  const updated = invoices.map(inv =>
+    inv.id === selectedInvoice.id
+      ? { ...inv, isDeleted: true }
+      : inv
   );
 
-  // Calculations for the new invoice modal
+  setInvoices(updated);
+  setSelectedInvoice(null);
+};
+
+
+ 
+
   const newInvoiceSummary = useMemo(() => {
     const s = newInvoiceItems.reduce(
       (acc, item) => acc + item.unitPrice * item.quantity,
@@ -66,116 +271,9 @@ export default function InvoiceUI() {
     transition: "border-color 0.2s",
   };
 
-  const invoices = [
-    {
-      empId: "Bold text column",
-      transId: "Bold text column",
-      dateTime: "Bold text column",
-      invoiceNo: "Bold text column",
-      company: "Bold text column",
-      email: "Bold text column",
-      totalAmount: "Bold text column",
-      receivedPayment: "Bold text column",
-      pendingPayment: "Bold text column",
-      status: "Completed",
-    },
-    {
-      empId: "Bold text column",
-      transId: "Bold text column",
-      dateTime: "Bold text column",
-      invoiceNo: "Bold text column",
-      company: "Bold text column",
-      email: "Bold text column",
-      totalAmount: "Bold text column",
-      receivedPayment: "Bold text column",
-      pendingPayment: "Bold text column",
-      status: "Processing",
-    },
-    {
-      empId: "Bold text column",
-      transId: "Bold text column",
-      dateTime: "Bold text column",
-      invoiceNo: "Bold text column",
-      company: "Bold text column",
-      email: "Bold text column",
-      totalAmount: "Bold text column",
-      receivedPayment: "Bold text column",
-      pendingPayment: "Bold text column",
-      status: "Completed",
-    },
-    {
-      empId: "Bold text column",
-      transId: "Bold text column",
-      dateTime: "Bold text column",
-      invoiceNo: "Bold text column",
-      company: "Bold text column",
-      email: "Bold text column",
-      totalAmount: "Bold text column",
-      receivedPayment: "Bold text column",
-      pendingPayment: "Bold text column",
-      status: "Processing",
-    },
-    {
-      empId: "Bold text column",
-      transId: "Bold text column",
-      dateTime: "Bold text column",
-      invoiceNo: "Bold text column",
-      company: "Bold text column",
-      email: "Bold text column",
-      totalAmount: "Bold text column",
-      receivedPayment: "Bold text column",
-      pendingPayment: "Bold text column",
-      status: "Processing",
-    },
-    {
-      empId: "Bold text column",
-      transId: "Bold text column",
-      dateTime: "Bold text column",
-      invoiceNo: "Bold text column",
-      company: "Bold text column",
-      email: "Bold text column",
-      totalAmount: "Bold text column",
-      receivedPayment: "Bold text column",
-      pendingPayment: "Bold text column",
-      status: "Processing",
-    },
-    {
-      empId: "Bold text column",
-      transId: "Bold text column",
-      dateTime: "Bold text column",
-      invoiceNo: "Bold text column",
-      company: "Bold text column",
-      email: "Bold text column",
-      totalAmount: "Bold text column",
-      receivedPayment: "Bold text column",
-      pendingPayment: "Bold text column",
-      status: "Processing",
-    },
-  ];
 
-  const service = [
-    {
-      srno: 1,
-      service: "Bold text column",
-      unitprice: "Bold text column",
-      quantity: "Bold text column",
-      total: "Bold text column",
-    },
-    {
-      srno: 2,
-      service: "Bold text column",
-      unitprice: "Bold text column",
-      quantity: "Bold text column",
-      total: "Bold text column",
-    },
-    {
-      srno: 3,
-      service: "Bold text column",
-      unitprice: "Bold text column",
-      quantity: "Bold text column",
-      total: "Bold text column",
-    },
-  ];
+
+  
 
   const Card = ({ color, bg, img, text, onClick }) => (
     <div
@@ -212,6 +310,7 @@ export default function InvoiceUI() {
       </h6>
     </div>
   );
+  
 
   return (
     <div
@@ -231,7 +330,7 @@ export default function InvoiceUI() {
       >
         <h2
           style={{
-            fontSize: "36 px",
+            fontSize: "36px",
             color: "#222",
             fontWeight: 600,
           }}
@@ -264,18 +363,21 @@ export default function InvoiceUI() {
               backgroundColor: "#fff",
             }}
           >
-            <input
-              style={{
-                flex: 1,
-                height: "100%",
-                border: "none",
-                paddingLeft: "12px",
-                outline: "none",
-                fontSize: "14px",
-                borderRadius: "8px 0 0 8px",
-              }}
-              placeholder="Search invoice..."
-            />
+           <input
+  style={{
+    flex: 1,
+    height: "100%",
+    border: "none",
+    paddingLeft: "12px",
+    outline: "none",
+    fontSize: "14px",
+    borderRadius: "8px 0 0 8px",
+  }}
+  placeholder="Search by company name..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+/>
+
             <button
               style={{
                 border: "none",
@@ -296,14 +398,19 @@ export default function InvoiceUI() {
             </button>
           </div>
         </div>
-        <div style={{ width: "343px", margintop:"50px" }}>
-          <select className="form-select">
-            <li>
-              <option>Employee Name</option>
-              <option>Dheeraj</option>
-              <option>Vivek Kumar</option>
-            </li>
-          </select>
+        <div style={{ width: "343px", marginTop:"50px" }}>
+        {/* <select
+  className="form-select"
+  value={selectedEmployee}
+  onChange={(e) => setSelectedEmployee(e.target.value)}
+>
+  <option value="">Employee Name</option>
+  <option value="Het Patel">Het Patel</option>
+  <option value="Dheeraj">Dheeraj</option>
+  <option value="Vivek Kumar">Vivek Kumar</option>
+</select> */}
+
+
         </div>
       </div>
       {/* Cards */}
@@ -322,15 +429,62 @@ export default function InvoiceUI() {
           text="Create Invoice"
           onClick={() => setShowAddModal(true)}
         />
-        <Card color="#FF893F" img={editinvoice} text="Edit Invoice" />
         <Card
-          color="#B256FF"
-          img={viewinvoice}
-          text="View Invoice"
-          onClick={() => setShowViewModal(true)}
-        />
-        <Card color="#FB57A1" img={totalinvoice} text="Total Invoice" />
-        <Card color="#42B3E9" img={pendingpayment} text="Pending Payment" />
+  color="#FF893F"
+  img={editinvoice}
+  text="Edit Invoice"
+  onClick={() => {
+    if (!selectedInvoice) {
+      alert("Select Invoice first");
+      return;
+    }
+
+    // Selected invoice ची values form मध्ये टाक
+    setClientName(selectedInvoice.clientName); 
+    setCompanyName(selectedInvoice.companyName);
+    setInvoiceNo(selectedInvoice.invoiceNo);
+    setSelectedEmployee(selectedInvoice.salesExecutiveName);
+setEmail(selectedInvoice.email);
+    setTransactionId(selectedInvoice.transactionId);
+    setCompanyAddress(selectedInvoice.companyAddress);
+    setInvoiceDate(selectedInvoice.invoiceDate);
+    setDueDate(selectedInvoice.dueDate);
+    setNewInvoiceItems(selectedInvoice.items);
+
+    // Add/Edit modal उघड
+    setShowAddModal(true);
+  }}
+/>
+
+        <Card
+  color="#B256FF"
+  img={viewinvoice}
+  text="View Invoice"
+  onClick={() => {
+    if (!selectedInvoice) {
+      alert("Select Invoice first");
+      return;
+    }
+    setShowViewModal(true);
+  }}
+/>
+
+       <Card
+  color="#FB57A1"
+  img={totalinvoice}
+  text={`Total Invoice (${totalCount})`}
+  onClick={() => setStatusFilter("ALL")}
+/>
+
+
+       <Card
+  color="#42B3E9"
+  img={pendingpayment}
+  text={`Pending Payment (${pendingCount})`}
+  onClick={() => setStatusFilter("PENDING")}
+/>
+
+
       </div>
 
       {/* Cards 2 */}
@@ -342,11 +496,45 @@ export default function InvoiceUI() {
           gap: "16px",
         }}
       >
-        <Card color="#35CC7B" img={duesoon} text="Due Soon" />
-        <Card color="#FF893F" img={overdue} text="Overdue" />
-        <Card color="#B256FF" img={ontrack} text="On Track" />
-        <Card color="#FB57A1" />
-        <Card color="#42B3E9" />
+    <Card
+  color="#35CC7B"
+  img={duesoon}
+  text={`Due Soon (${dueSoonCount})`}
+  onClick={() => setStatusFilter("DUE_SOON")}
+/>
+
+
+      <Card
+  color="#FF893F"
+  img={overdue}
+  text={`Overdue (${overdueCount})`}
+  onClick={() => setStatusFilter("OVERDUE")}
+/>
+
+       <Card
+  color="#B256FF"
+  img={ontrack}
+  text={`On Track (${onTrackCount})`}
+  onClick={() => setStatusFilter("ONTRACK")}
+/>
+
+
+      <Card
+  color="#FB57A1"
+  img={overdue}   // आत्ता जो icon आहे तोच ठेऊ
+  text={`Deleted Invoices (${deletedCount})`}
+  onClick={() => setStatusFilter("DELETED")}
+/>
+
+
+
+        <Card
+  color="#42B3E9"
+  img={pendingpayment}   // हवे तर वेगळा icon वापर
+  text={`Completed Payment (${completedCount})`}
+  onClick={() => setStatusFilter("COMPLETED")}
+/>
+
       </div>
 
       {/* Table Section */}
@@ -507,146 +695,178 @@ export default function InvoiceUI() {
               >
                 Status
               </th>
+               <th
+                style={{
+                  fontSize: "15px",
+                  fontWeight: 500,
+                  padding: "12px 8px",
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  color: "#000",
+                }}
+              >
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
-            {invoices.map((invoice, index) => (
-              <tr key={index} style={{ borderBottom: "1px solid #e9ecef" }}>
-                <td
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    padding: "12px 8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {invoice.empId}
-                </td>
-                <td
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    padding: "12px 8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {invoice.transId}
-                </td>
-                <td
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    padding: "12px 8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {invoice.dateTime}
-                </td>
-                <td
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    padding: "12px 8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {invoice.invoiceNo}
-                </td>
-                <td
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    padding: "12px 8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {invoice.company}
-                </td>
-                <td
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    padding: "12px 8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {invoice.email}
-                </td>
-                <td
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    padding: "12px 8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {invoice.totalAmount}
-                </td>
-                <td
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    padding: "12px 8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {invoice.receivedPayment}
-                </td>
-                <td
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    padding: "12px 8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {invoice.pendingPayment}
-                </td>
-                <td style={{ padding: "12px 8px", textAlign: "center" }}>
-                  <button
-                    onClick={() => setShowViewModal(true)}
-                    style={{
-                      fontSize: "11px",
-                      width: "68px",
-                      height: "21px",
-                      backgroundColor: "#3D68E7",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: 500,
-                    }}
-                  >
-                    View
-                  </button>
-                </td>
-                <td style={{ padding: "12px 8px", textAlign: "center" }}>
-                  <button
-                    style={{
-                      fontSize: "11px",
-                      width: "68px",
-                      height: "21px",
-                      backgroundColor:
-                        invoice.status === "Completed" ? "#11CE4D" : "#D41A1A",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "default",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {invoice.status}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+  {visibleInvoices.map((invoice, index) => (
+    <tr
+      key={invoice._id}
+      onClick={() => setSelectedInvoice(invoice)}
+      style={{ borderBottom: "1px solid #e9ecef", cursor: "pointer" }}
+    >
+      {/* Employee ID */}
+      <td style={{ padding: "12px 8px", fontSize: "12px", textAlign: "center" }}>
+        {index + 1}
+      </td>
+
+      {/* Transaction ID */}
+      <td style={{ padding: "12px 8px", fontSize: "12px", textAlign: "center" }}>
+        {invoice.transactionId || "-"}
+      </td>
+
+      <td style={{ padding: "12px 8px", fontSize: "12px", textAlign: "center" }}>
+        {invoice.createdAt ? (
+    <>
+      {new Date(invoice.createdAt).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+      })}
+      {" | "}
+      {new Date(invoice.createdAt).toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })}
+    </>
+  ) : (
+    "N/A"
+  )}
+      </td>
+
+      {/* Invoice No */}
+      <td style={{ padding: "12px 8px", fontSize: "12px", textAlign: "center" }}>
+        {invoice.invoiceNo}
+      </td>
+
+      {/* Company Name */}
+      <td style={{ padding: "12px 8px", fontSize: "12px", textAlign: "center" }}>
+        {invoice.companyName}
+      </td>
+
+      {/* Email */}
+      <td style={{ padding: "12px 8px", fontSize: "12px", textAlign: "center" }}>
+        {invoice.email || "-"}
+      </td>
+
+      {/* Total Amount */}
+      <td style={{ padding: "12px 8px", fontSize: "12px", textAlign: "center" }}>
+        ₹{invoice.totalAmount}
+      </td>
+
+      {/* Received */}
+      <td style={{ padding: "12px 8px", fontSize: "12px", textAlign: "center" }}>
+        ₹{invoice.receivedAmount}
+      </td>
+
+
+      {/* Pending */}
+      <td style={{ padding: "12px 8px", fontSize: "12px", textAlign: "center" }}>
+        ₹{invoice.pendingAmount}
+      </td>
+
+      {/* View */}
+      <td style={{ padding: "12px 8px", textAlign: "center" }}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedInvoice(invoice);
+            setShowViewModal(true);
+          }}
+          style={{
+            fontSize: "11px",
+            width: "68px",
+            height: "21px",
+            backgroundColor: "#3D68E7",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          View
+        </button>
+      </td>
+
+      {/* Status */}
+       <td style={{ padding: "12px 8px", textAlign: "center" }}>
+     <span
+  style={{
+    fontSize: "11px",
+    padding: "4px 10px",
+    borderRadius: "4px",
+    backgroundColor:
+  invoice.status === "Completed" ? "#11CE4D" : "#D41A1A",
+    color: "#fff",
+    cursor: "pointer",
+  }}
+>
+  {invoice.status}
+</span>
+
+      </td>
+     <td style={{ textAlign: "center" }}>
+<td style={{ textAlign: "center", display: "flex", gap: "8px", justifyContent: "center" }}>
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      deleteInvoice(invoice._id);
+    }}
+    style={{
+      fontSize: "11px",
+      backgroundColor: "#FF3B3B",
+      color: "#fff",
+      border: "none",
+      borderRadius: "4px",
+      padding: "4px 8px",
+    }}
+  >
+    Delete
+  </button>
+
+  <button
+    disabled={invoice.pendingAmount === 0}
+    onClick={(e) => {
+      e.stopPropagation();
+      const amt = prompt("Enter received amount:");
+      if (amt) receivePayment(invoice._id, Number(amt));
+    }}
+    style={{
+      fontSize: "11px",
+      backgroundColor: invoice.pendingAmount === 0 ? "#ccc" : "#4972E8",
+      color: "#fff",
+      border: "none",
+      borderRadius: "4px",
+      padding: "4px 8px",
+      cursor: invoice.pendingAmount === 0 ? "not-allowed" : "pointer",
+    }}
+  >
+    +Pay
+  </button>
+</td>
+
+
+</td>
+
+
+    </tr>
+    
+  ))}
+</tbody>
+
+
         </table>
       </div>
 
@@ -715,10 +935,13 @@ export default function InvoiceUI() {
                   fontSize: "14px",
                 }}
               >
-                Sales Executive Name : Het Patel
+              Sales Executive Name : {selectedInvoice?.salesExecutiveName}
+
               </div>
               <button
+               onClick={() => window.print()}
                 style={{
+                  
                   padding: "6px 16px",
                   width: "108px",
                   height: "33px",
@@ -777,21 +1000,10 @@ export default function InvoiceUI() {
                   >
                     ISSUED TO:
                   </p>
-                  <p
-                    style={{ fontSize: "14px", margin: "2px 0", color: "#333" }}
-                  >
-                    Richard Sanchez
-                  </p>
-                  <p
-                    style={{ fontSize: "14px", margin: "2px 0", color: "#333" }}
-                  >
-                    Thynk Unlimited
-                  </p>
-                  <p
-                    style={{ fontSize: "14px", margin: "2px 0", color: "#333" }}
-                  >
-                    123 Anywhere St., Any City
-                  </p>
+                  <p><b>Client Name:</b> {selectedInvoice?.clientName}</p>   
+                <p>{selectedInvoice.companyName}</p>
+    <p>{selectedInvoice.companyAddress}</p>
+
                 </div>
                 <div>
                   <p
@@ -848,7 +1060,7 @@ export default function InvoiceUI() {
                   <span
                     style={{ fontSize: "14px", color: "#666", fontWeight: 700 }}
                   >
-                    01234
+                    {selectedInvoice?.invoiceNo}
                   </span>
                 </div>
                 <div style={{ marginBottom: "8px" }}>
@@ -870,7 +1082,7 @@ export default function InvoiceUI() {
                       letterSpacing: "2px",
                     }}
                   >
-                    11.02.2030
+                   {selectedInvoice?.invoiceDate}
                   </span>
                 </div>
                 <div>
@@ -892,7 +1104,7 @@ export default function InvoiceUI() {
                       letterSpacing: "2px",
                     }}
                   >
-                    11.03.2030
+                    {selectedInvoice?.dueDate}
                   </span>
                 </div>
               </div>
@@ -969,7 +1181,9 @@ export default function InvoiceUI() {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((it, i) => (
+                  {selectedInvoice?.items.map((it, i) => (
+
+
                     <tr key={i}>
                       <td
                         style={{
@@ -981,7 +1195,19 @@ export default function InvoiceUI() {
                           border: "none",
                         }}
                       >
-                        {it.description}
+                        {it.serviceName}
+                      </td>
+                      <td
+                        style={{
+                          padding: "12px 8px",
+                          fontSize: "12px",
+                          color: "#333",
+                          fontWeight: 400,
+                          letterSpacing: ".5px",
+                          border: "none",
+                        }}
+                      >
+                       {it.department}
                       </td>
                       <td
                         style={{
@@ -993,7 +1219,7 @@ export default function InvoiceUI() {
                           border: "none",
                         }}
                       >
-                        {it.rate}
+                        {it.unitPrice}
                       </td>
                       <td
                         style={{
@@ -1005,7 +1231,8 @@ export default function InvoiceUI() {
                           border: "none",
                         }}
                       >
-                        {it.qty}
+                        {it.quantity}
+
                       </td>
                       <td
                         style={{
@@ -1017,7 +1244,8 @@ export default function InvoiceUI() {
                           border: "none",
                         }}
                       >
-                        ${it.total}
+                        ₹{it.unitPrice * it.quantity}
+
                       </td>
                     </tr>
                   ))}
@@ -1039,7 +1267,10 @@ export default function InvoiceUI() {
                 <span style={{ textTransform: "uppercase", fontWeight: 600 }}>
                   SUBTOTAL
                 </span>
-                <span>$400</span>
+                ₹{selectedInvoice?.summary.subtotal}
+
+
+
               </div>
               <div
                 style={{
@@ -1076,7 +1307,10 @@ export default function InvoiceUI() {
                   }}
                 >
                   <span style={{ textTransform: "uppercase" }}>TOTAL</span>
-                  <span>$440</span>
+                  ₹{selectedInvoice?.summary.total}
+
+
+
                 </div>
               </div>
             </div>
@@ -1132,23 +1366,25 @@ export default function InvoiceUI() {
                 alignItems: "center",
               }}
             >
-              <div
-                style={{
-                  backgroundColor: "#4972E8",
-                  color: "#fff",
-                  width: "218px",
-                  height: "33px",
-                  padding: "5px 5px",
-                  borderRadius: "5px",
-                  fontWeight: 600,
-                  fontSize: "13px",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-                }}
-              >
-                Sales Executive Name : Het Patel
-              </div>
+              <input
+  style={{
+    padding: "10px 12px",
+    border: "1px solid #000",
+    borderRadius: "6px",
+    fontSize: "16px",
+    outline: "none",
+    width: "260px",
+  }}
+  placeholder="SalesExecutive Name"
+  value={selectedEmployee}
+  onChange={(e) => setSelectedEmployee(e.target.value)}
+/>
+
               <button
-                onClick={() => setShowAddModal(false)}
+                 onClick={() => {
+                 resetForm();
+                   setShowAddModal(false);
+                  }}
                 style={{
                   fontSize: "13px",
                   padding: "6px 14px",
@@ -1166,30 +1402,81 @@ export default function InvoiceUI() {
             </div>
             <div style={{ padding: "1rem" }}>
               {/* Company/Invoice Inputs (Two-Column Layout) */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "1rem",
-                  marginBottom: "1rem",
-                  marginTop: "1rem",
-                }}
-              >
-                <input style={inputStyle} placeholder="Company Name" />
-                <input style={inputStyle} placeholder="Invoice no." />
-              </div>
+             <div
+ 
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr",
+    gap: "1rem",
+    marginBottom: "1rem",
+    marginTop: "1rem",
+  }}
+>
+   {/* <input
+    style={inputStyle}
+    placeholder="Employee Name"
+    value={selectedEmployee}
+    onChange={(e) => setSelectedEmployee(e.target.value)}
+  /> */}
+  <input
+    style={inputStyle}
+    placeholder="Company Name"
+    value={companyName}
+    onChange={(e) => setCompanyName(e.target.value)}
+  />
+  <input
+  style={inputStyle}
+  placeholder="Client Name"
+  value={clientName}
+  onChange={(e) => setClientName(e.target.value)}
+/>
 
-              {/* Company Address (Textarea) */}
+  <input
+  style={inputStyle}
+  placeholder="Email"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+/>
 
-              <textarea
-                style={{
-                  ...inputStyle,
-                  height: "80px",
-                  resize: "none",
-                  marginBottom: "1.5rem",
-                }}
-                placeholder="Company Address"
-              />
+
+  <input
+    style={inputStyle}
+    placeholder="Transaction ID"
+    value={transactionId}
+    onChange={(e) => setTransactionId(e.target.value)}
+  />
+
+
+</div>
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "1rem",
+    marginBottom: "1rem",
+  }}
+>
+  <input
+    type="date"
+    style={inputStyle}
+    value={invoiceDate}
+    onChange={(e) => setInvoiceDate(e.target.value)}
+  />
+
+  <input
+    type="date"
+    style={inputStyle}
+    value={dueDate}
+    onChange={(e) => setDueDate(e.target.value)}
+  />
+</div>
+
+<textarea
+  style={{ ...inputStyle, height: "80px", resize: "none", marginBottom: "1.5rem" }}
+  placeholder="Company Address"
+  value={companyAddress}
+  onChange={(e) => setCompanyAddress(e.target.value)}
+/>
 
               {/* Itemized Services Table */}
               <div
@@ -1202,6 +1489,24 @@ export default function InvoiceUI() {
                   marginBottom: "2.5rem",
                 }}
               >
+                 <div style={{ textAlign: "right", marginBottom: "10px" }}>
+                  <button
+  onClick={addRow}
+  style={{
+    backgroundColor: "#4972E8",
+    color: "#fff",
+    border: "none",
+    padding: "6px 12px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "13px"
+  }}
+>
+  + Add Service
+</button>
+
+            </div>
+
                 <table
                   style={{
                     width: "100%",
@@ -1220,130 +1525,57 @@ export default function InvoiceUI() {
                     }}
                   >
                     <tr>
-                      <th
-                        style={{
-                          fontSize: "15px",
-                          fontWeight: 500,
-                          padding: "12px 0px",
-                          textAlign: "center",
-                          whiteSpace: "nowrap",
-                          color: "#000",
-                        }}
-                      >
-                        Sr no.
-                      </th>
-                      <th
-                        style={{
-                          fontSize: "15px",
-                          fontWeight: 500,
-                          padding: "12px 0px",
-                          textAlign: "center",
-                          whiteSpace: "nowrap",
-                          color: "#000",
-                        }}
-                      >
-                        Service Name
-                      </th>
-                      <th
-                        style={{
-                          fontSize: "15px",
-                          fontWeight: 500,
-                          padding: "12px 0px",
-                          textAlign: "center",
-                          whiteSpace: "nowrap",
-                          color: "#000",
-                        }}
-                      >
-                        Unit Price
-                      </th>
-                      <th
-                        style={{
-                          fontSize: "15px",
-                          fontWeight: 500,
-                          padding: "12px 0px",
-                          textAlign: "center",
-                          whiteSpace: "nowrap",
-                          color: "#000",
-                        }}
-                      >
-                        Quantity
-                      </th>
-                      <th
-                        style={{
-                          fontSize: "15px",
-                          fontWeight: 500,
-                          padding: "12px 0px",
-                          textAlign: "center",
-                          color: "#000",
-                        }}
-                      >
-                        Total
-                      </th>
+                     <th style={{ width: "8%", textAlign: "center" }}>Sr no.</th>
+<th style={{ width: "32%", textAlign: "center" }}>Service Name</th>
+<th style={{ width: "32%", textAlign: "center" }}>Department</th>
+<th style={{ width: "15%", textAlign: "center" }}>Unit Price</th>
+<th style={{ width: "15%", textAlign: "center" }}>Quantity</th>
+<th style={{ width: "15%", textAlign: "center" }}>Total</th>
+<th style={{ width: "15%", textAlign: "center" }}>Action</th>
+
                     </tr>
                   </thead>
                   <tbody>
-                    {service.map((service, index) => (
-                      <tr
-                        key={index}
-                        style={{ borderBottom: "1px solid #e9ecef" }}
-                      >
-                        <td
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 500,
-                            padding: "12px 0px",
-                            whiteSpace: "nowrap",
-                            textAlign: "center",
-                          }}
-                        >
-                          {service.srno}
-                        </td>
-                        <td
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 500,
-                            padding: "12px 0px",
-                            whiteSpace: "nowrap",
-                            textAlign: "center",
-                          }}
-                        >
-                          {service.service}
-                        </td>
-                        <td
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 500,
-                            padding: "12px 0px",
-                            whiteSpace: "nowrap",
-                            textAlign: "center",
-                          }}
-                        >
-                          {service.unitprice}
-                        </td>
-                        <td
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 500,
-                            padding: "12px 0px",
-                            whiteSpace: "nowrap",
-                            textAlign: "center",
-                          }}
-                        >
-                          {service.quantity}
-                        </td>
-                        <td
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 500,
-                            padding: "12px 0px",
-                            whiteSpace: "nowrap",
-                            textAlign: "center",
-                          }}
-                        >
-                          {service.total}
-                        </td>
-                      </tr>
-                    ))}
+                    {newInvoiceItems.map((item, index) => (
+  <tr key={index}>
+    <td>{index + 1}</td>
+    <td>
+      <input
+        value={item.serviceName}
+        onChange={(e) =>
+          handleItemChange(index, "serviceName", e.target.value)
+        }
+      />
+    </td>
+    <td style={{ textAlign: "center", fontWeight: "500" }}>
+  {item.department || "Auto"}
+</td>
+
+    <td>
+      <input
+        type="number"
+        value={item.unitPrice}
+        onChange={(e) =>
+          handleItemChange(index, "unitPrice", e.target.value)
+        }
+      />
+    </td>
+    <td>
+      <input
+        type="number"
+        value={item.quantity}
+        onChange={(e) =>
+          handleItemChange(index, "quantity", e.target.value)
+        }
+      />
+    </td>
+    <td>{item.unitPrice * item.quantity}</td>
+    <td>
+      <button onClick={() => removeRow(index)}>❌</button>
+    </td>
+  </tr>
+))}
+
                   </tbody>
                 </table>
                 <div style={{ width: "100%", marginTop: "3rem" }}>
@@ -1366,7 +1598,8 @@ export default function InvoiceUI() {
                       }}
                     >
                       <span>Subtotal</span>
-                      <span>400/-</span>
+                      <span>{newInvoiceSummary.subtotal}/-</span>
+
                     </div>
                     <div
                       style={{
@@ -1392,9 +1625,36 @@ export default function InvoiceUI() {
                       }}
                     >
                       <span>Total</span>
-                      <span>440/-</span>
+                      <span>{newInvoiceSummary.total}/-</span>
+
                     </div>
                   </div>
+                 <div style={{ textAlign: "center", marginTop: "20px" }}>
+  <button
+  onClick={() => {
+    if (selectedInvoice) {
+      updateInvoiceInDB();   // EDIT case
+    } else {
+      saveInvoiceToDB();     // NEW case
+    }
+  }}
+  style={{
+    backgroundColor: "#4972E8",
+    color: "#fff",
+    padding: "10px 30px",
+    borderRadius: "6px",
+    border: "none",
+    fontSize: "14px",
+    cursor: "pointer"
+  }}
+>
+  Save Invoice
+</button>
+
+
+</div>
+
+
                 </div>
               </div>
             </div>

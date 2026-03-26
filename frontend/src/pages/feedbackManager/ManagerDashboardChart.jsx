@@ -10,46 +10,44 @@ import {
   Cell,
 } from 'recharts';
 
-// Sample month-wise complaint data (increasing to match the image)
-const data = [
-  { month: 'Jan', complaints: 10 },
-  { month: 'Feb', complaints: 20 },
-  { month: 'Mar', complaints: 40 },
-  { month: 'Apr', complaints: 60 },
-  { month: 'May', complaints: 80 },
-  { month: 'Jun', complaints: 100 },
-];
+const ManagerDashboardChart = ({ chartData = {} }) => {
+
+  const dynamicData = [
+    { label: 'Total', value: chartData?.totalComplaints || 0 },
+    { label: 'Unsolved', value: chartData?.unsolvedComplaints || 0 },
+    { label: 'Feedback', value: chartData?.totalFeedbacks || 0 },
+    { label: 'Pending', value: chartData?.remainingFeedbacks || 0 },
+    { label: 'Team', value: chartData?.totalTeam || 0 },
+  ];
 
 const colors = [
-  '#d8e3ea', // light
+  '#d8e3ea', 
   '#5fc3f3',
   '#39a4e6',
   '#2b7fc6',
   '#253f66',
-  '#1b2748', // darkest
+  '#1b2748', 
 ];
 
-const ManagerDashboardChart = () => {
 
   return (
     <div style={{ width: '100%', height: 400, padding: 8}}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={data}
-            margin={{ top: 20, right: 64, left: 16, bottom: 10 }}
-          barCategoryGap="8%"  // reduce gap so thick bars don't become too spaced
+          data={dynamicData}
+            margin={{ top: 20, right: 64, left: 16, bottom: 20 }}
+          barCategoryGap="8%" 
           barGap={4}
         >
       
           <XAxis
-            dataKey="month"
-          
-            tick={false}
+            dataKey="label"
+            tick={{ fontSize: 12, fill: '#666' }}
             tickLine={false}
           
             padding={{ left: 12, right: 12}}
              label={{
-              value: 'Month',   
+              value: 'label',   
               position: 'insideBottom',
               offset: -10,
               style: { textAnchor: 'middle', fill: '#222', fontSize: 22 , fontWeight: 500},
@@ -72,12 +70,12 @@ const ManagerDashboardChart = () => {
           />
         
           <Bar
-            dataKey="complaints"
-            radius={[30, 30, 30, 30]} // pill-shaped bars
+            dataKey="value"
+            radius={[20, 20, 20, 20]} 
             barSize={85}
             minPointSize={4}
           >
-            {data.map((entry, index) => (
+            {dynamicData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
             ))}
           </Bar>

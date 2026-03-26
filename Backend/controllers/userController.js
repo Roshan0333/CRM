@@ -162,3 +162,30 @@ export const updateUser = async (req, res) => {
     res.status(500).json({ message: "Update failed" });
   }
 };
+
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const { department, search } = req.query;
+    let query = {};
+
+    if (department && department !== "All") {
+      query.department = new RegExp(department, 'i'); // 'i' for case-insensitive
+    }
+
+    if (search) {
+      query.$or = [
+        { firstName: { $regex: search, $options: "i" } },
+        { lastName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    const users = await User.find(query).select("-password").sort({ createdAt: -1 });
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Fetch Users Error:", error);
+    res.status(500).json({ message: "Failed to fetch employees" });
+  }
+};

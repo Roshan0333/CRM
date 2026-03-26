@@ -1,66 +1,68 @@
 import React, { useState } from "react";
 import { CheckCircle, XCircle } from "lucide-react";
+import axios from "axios";
+import { useEffect } from "react";
 
-const clients = [
-  {
-    id: 1,
-    company: "Bold text column",
-    client: "Bold text column",
-    start: "Bold text column",
-    end: "Bold text column",
-    status: "Inactive",
-  },
-  {
-    id: 2,
-    company: "Bold text column",
-    client: "Bold text column",
-    start: "Bold text column",
-    end: "Bold text column",
-    status: "Inactive",
-  },
-  {
-    id: 3,
-    company: "Bold text column",
-    client: "Bold text column",
-    start: "Bold text column",
-    end: "Bold text column",
-    status: "Active",
-  },
-  {
-    id: 4,
-    company: "Bold text column",
-    client: "Bold text column",
-    start: "Bold text column",
-    end: "Bold text column",
-    status: "Active",
-  },
-  {
-    id: 5,
-    company: "Bold text column",
-    client: "Bold text column",
-    start: "Bold text column",
-    end: "Bold text column",
-    status: "Inactive",
-  },
-];
 
-const companyDetails = {
-  companyName: "Company Name",
-  services: [
-    { name: "Login/Signup", department: "None", employees: "None" },
-    { name: "Home Page", department: "None", employees: "None" },
-    { name: "Business Card Design", department: "None", employees: "None" },
-    { name: "Notes", department: "None", employees: "None" },
-  ],
-};
+
 
 const ClientManagement = () => {
   const [showTrackModal, setShowTrackModal] = useState(false);
   const [showCompanyModal, setShowCompanyModal] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState(null);
-  const [, setSelectedClient] = useState(null);
+  const [selectedClient, setSelectedClient] = useState(null);
   const [selectedAccount, setSelectedAccount] = useState("");
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [clients, setClients] = useState([]);
+  const [accountants, setAccountants] = useState([]);
+  const [transferRole, setTransferRole] = useState(""); // 'accountant' | 'manager'
+const [selectedUser, setSelectedUser] = useState("");
+useEffect(() => {
+  fetchClients();
+}, []);
+
+const fetchClients = async () => {
+  try {
+    const res = await axios.get("http://localhost:5000/api/invoice");
+
+    // फक्त non-deleted invoices
+    const activeClients = res.data.filter(inv => inv.isDeleted !== true);
+
+    setClients(activeClients);
+  } catch (error) {
+    console.log("Error fetching clients", error);
+  }
+};
+
+useEffect(() => {
+  fetchAccountants();
+}, []);
+
+const fetchAccountants = async () => {
+  try {
+    const res = await axios.get("http://localhost:5000/api/auth/accountants");
+    setAccountants(res.data);
+  } catch (error) {
+    console.log("Error fetching accountants", error);
+  }
+};
+
+useEffect(() => {
+  if (transferRole) {
+    fetchUsersByRole(transferRole);
+  }
+}, [transferRole]);
+
+const [users, setUsers] = useState([]);
+
+const fetchUsersByRole = async (role) => {
+  try {
+    const res = await axios.get(`http://localhost:5000/api/auth/users-by-role/${role}`);
+    setUsers(res.data);
+  } catch (err) {
+    console.log("Role fetch error", err);
+  }
+};
 
   React.useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -232,7 +234,7 @@ const ClientManagement = () => {
             <tbody>
               {clients.map((client, index) => (
                 <tr
-                  key={client.id}
+                  key={client._id}
                   style={{
                     backgroundColor: index % 2 === 0 ? "white" : "#f9fafb",
                     transition: "background-color 0.2s",
@@ -247,7 +249,7 @@ const ClientManagement = () => {
                       borderBottom: "1px solid #e5e7eb",
                     }}
                   >
-                    {client.company}
+                    {client.companyName}
                   </td>
                   <td
                     style={{
@@ -258,7 +260,7 @@ const ClientManagement = () => {
                       borderBottom: "1px solid #e5e7eb",
                     }}
                   >
-                    {client.client}
+                    {client.clientName}
                   </td>
                   <td
                     style={{
@@ -269,7 +271,7 @@ const ClientManagement = () => {
                       borderBottom: "1px solid #e5e7eb",
                     }}
                   >
-                    {client.start}
+                    {client.invoiceDate?.slice(0,10)}
                   </td>
                   <td
                     style={{
@@ -280,7 +282,7 @@ const ClientManagement = () => {
                       borderBottom: "1px solid #e5e7eb",
                     }}
                   >
-                    {client.end}
+                    {client.dueDate?.slice(0,10)}
                   </td>
                   <td
                     style={{
@@ -323,7 +325,14 @@ const ClientManagement = () => {
                         justifyContent: "center",
                       }}
                     >
-                      <button
+                       <button
+                 onClick={() =>
+                  
+                window.open(
+                      `http://localhost:5000/api/invoice/${client._id}/workorder`,
+                       "_blank"
+                       )
+                        }
                         style={{
                           backgroundColor: "#3D68E7",
                           color: "white",
@@ -341,24 +350,37 @@ const ClientManagement = () => {
                       >
                         View
                       </button>
-                      <button
-                        style={{
-                          backgroundColor: "#3D68E7",
-                          color: "white",
-                          width: "68px",
-                          height: "21px",
-                          borderRadius: "4px",
-                          fontSize: "12px",
-                          fontWeight: "400",
-                          border: "none",
-                          cursor: "pointer",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        Upload
-                      </button>
+                        <label style={{
+  backgroundColor: "#3D68E7",
+  color: "white",
+  width: "68px",
+  height: "21px",
+  borderRadius: "4px",
+  fontSize: "12px",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center"
+}}>
+  Upload
+  <input
+    type="file"
+    hidden
+    onChange={async (e) => {
+      const formData = new FormData();
+      formData.append("file", e.target.files[0]);
+
+      await axios.post(
+        `http://localhost:5000/api/invoice/${client._id}/upload-workorder`,
+        formData
+      );
+
+      alert("Work order uploaded");
+    }}
+  />
+</label>
+
+
                     </div>
                   </td>
                   <td
@@ -395,23 +417,14 @@ const ClientManagement = () => {
                       borderBottom: "1px solid #e5e7eb",
                     }}
                   >
-                    <span
-                      style={{
-                        backgroundColor:
-                          client.status === "Active" ? "#11CE4D" : "#D41A1A",
-                        color: "white",
-                        width: "68px",
-                        height: "21px",
-                        borderRadius: "4px",
-                        fontSize: "12px",
-                        fontWeight: "400",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {client.status}
-                    </span>
+                     <span style={{
+             backgroundColor: client.status === "Paid" ? "#11CE4D" : "#D41A1A",
+               color: "white",
+                padding: "4px 10px",
+                   borderRadius: "4px"
+                  }}>
+                {client.status}
+                            </span>
                   </td>
                 </tr>
               ))}
@@ -844,7 +857,7 @@ const ClientManagement = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {companyDetails.services.map((service, index) => (
+                  {selectedClient?.items.map((service, index) => (
                     <tr key={index}>
                       <td
                         style={{
@@ -855,7 +868,7 @@ const ClientManagement = () => {
                           fontWeight: 500,
                         }}
                       >
-                        {service.name}
+                        {service.serviceName}
                       </td>
                     </tr>
                   ))}
@@ -893,7 +906,7 @@ const ClientManagement = () => {
                     >
                       Department
                     </th>
-                    <th
+                    {/* <th
                       style={{
                         padding: "16px 20px",
                         textAlign: "center",
@@ -906,37 +919,38 @@ const ClientManagement = () => {
                       }}
                     >
                       Employee Name
-                    </th>
+                    </th> */}
                   </tr>
                 </thead>
                 <tbody>
-                  {companyDetails.services.map((service, index) => (
-                    <tr key={index}>
-                      <td
-                        style={{
-                          padding: "14px 20px",
-                          fontSize: "13px",
-                          color: "#000",
-                          backgroundColor: "white",
-                          fontWeight: 400,
-                        }}
-                      >
-                        {service.department}
-                      </td>
-                      <td
-                        style={{
-                          padding: "14px 20px",
-                          fontSize: "14px",
-                          color: "#374151",
-                          backgroundColor: "white",
-                          fontWeight: 400,
-                        }}
-                      >
-                        {service.employees}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+  {selectedClient?.items.map((service, index) => (
+    <tr key={index}>
+      <td
+        style={{
+          padding: "14px 20px",
+          fontSize: "13px",
+          color: "#000",
+          backgroundColor: "white",
+          fontWeight: 400,
+        }}
+      >
+        {service.department}
+      </td>
+      {/* <td
+        style={{
+          padding: "14px 20px",
+          fontSize: "14px",
+          color: "#374151",
+          backgroundColor: "white",
+          fontWeight: 400,
+        }}
+      >
+        {service.assignedTo || "Not Assigned"}
+      </td> */}
+    </tr>
+  ))}
+</tbody>
+
               </table>
             </div>
 
@@ -950,6 +964,7 @@ const ClientManagement = () => {
               }}
             >
               <button
+              onClick={() => setTransferRole("accountant")}
                 style={{
                   backgroundColor: "#3D68E7",
                   color: "white",
@@ -966,6 +981,7 @@ const ClientManagement = () => {
                 Transfer data to accountant
               </button>
               <button
+              onClick={() => setTransferRole("manager")}
                 style={{
                   backgroundColor: "#3D68E7",
                   color: "white",
@@ -993,8 +1009,8 @@ const ClientManagement = () => {
               }}
             >
               <select
-                value={selectedAccount}
-                onChange={(e) => setSelectedAccount(e.target.value)}
+                value={selectedUser}
+               onChange={(e) => setSelectedUser(e.target.value)}
                 style={{
                   border: "1px solid #d1d5db",
                   borderRadius: "4px",
@@ -1006,27 +1022,57 @@ const ClientManagement = () => {
                   width: "353px",
                 }}
               >
-                <option value="">Accountant Name</option>
-                <option value="accountant1">Accountant 1</option>
-                <option value="accountant2">Accountant 2</option>
-                <option value="accountant3">Accountant 3</option>
+                  <option value="">
+    {transferRole === "accountant" ? "Select Accountant" : "Select Manager"}
+  </option>
+
+  {users.map((u) => (
+    <option key={u._id} value={u._id}>
+      {u.firstName} {u.lastName}
+    </option>
+  ))}
+
+
               </select>
               <button
-                style={{
-                  backgroundColor: "#3D68E7",
-                  color: "white",
-                  padding: "0px",
-                  borderRadius: "4px",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  border: "none",
-                  cursor: "pointer",
-                  height: "32px",
-                  width: "89px",
-                }}
-              >
-                Submit
-              </button>
+  onClick={async () => {
+    if (!selectedClient || !selectedUser || !transferRole) {
+      alert("Accountant / Manager select करा");
+      return;
+    }
+
+    try {
+      await axios.put(
+        `http://localhost:5000/api/invoice/${selectedClient._id}/assign`,
+        {
+          assignedTo: transferRole,   // "accountant" किंवा "manager"
+          assignedUser: selectedUser // user id
+        }
+      );
+
+      alert("Data transferred successfully");
+      setShowCompanyModal(false);
+    } catch (err) {
+      console.log("Transfer error", err);
+      alert("Transfer failed");
+    }
+  }}
+  style={{
+    backgroundColor: "#3D68E7",
+    color: "white",
+    padding: "0px",
+    borderRadius: "4px",
+    fontSize: "14px",
+    fontWeight: "500",
+    border: "none",
+    cursor: "pointer",
+    height: "32px",
+    width: "89px",
+  }}
+>
+  Submit
+</button>
+
             </div>
           </div>
         </div>
